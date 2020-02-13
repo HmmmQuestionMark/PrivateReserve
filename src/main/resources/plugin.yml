@@ -1,0 +1,24 @@
+name: ReserveChat
+main: me.hqm.reservechat.ReserveChatPlugin
+api-version: 1.15
+version: ${project.version}
+description: Special chat sauce for HQM's private reservce.
+authors: [HmmmQuestionMark]
+depend: [Chitchat]
+commands:
+  ## Everyday Commands
+  nickname:
+    usage: /nickname [username] <nickname>
+    aliases: [nick]
+  pronouns:
+    usage: /pronouns [username] <pronouns>
+  clearnickname:
+    usage: /nickname [username]
+    aliases: [clearnick]
+  clearpronouns:
+    usage: /pronouns [username]
+permisions:
+  reservechat.admin:
+    default: op
+  reservechat.self:
+    default: true

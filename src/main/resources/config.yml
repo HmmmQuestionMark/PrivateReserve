@@ -1,0 +1,10 @@
+#Configuration File
+mongo:
+  use: false
+  hostname: 127.0.0.1
+  port: 27017
+  database: chat
+  username: chat
+  password: chat
+file:
+  save_pretty: false
