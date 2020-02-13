@@ -2,7 +2,7 @@ name: ReserveChat
 main: me.hqm.reservechat.ReserveChatPlugin
 api-version: 1.15
 version: ${project.version}
-description: Special chat sauce for HQM's private reservce.
+description: Special chat sauce for HQM's private reserve.
 authors: [HmmmQuestionMark]
 depend: [Chitchat]
 commands:
