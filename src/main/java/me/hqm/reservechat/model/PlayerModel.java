@@ -41,7 +41,7 @@ public class PlayerModel implements Model {
         lastKnownName = data.getString("last_known_name");
         lastLoginTime = data.getLong("last_login_time");
         nickName = data.getString("nickname");
-        pronouns = data.getString("pronouns", null);
+        pronouns = data.isString("pronouns") ? data.getString("pronouns") : null;
         buildNameTag();
     }
 
@@ -55,7 +55,7 @@ public class PlayerModel implements Model {
         Map<String, Object> data = new HashMap<>();
         data.put("last_known_name", lastKnownName);
         data.put("last_login_time", lastLoginTime);
-        data.put("nickname", nickName);
+        data.put("nickname", nickName != null ? nickName : lastKnownName);
         if (pronouns != null) {
             data.put("pronouns", pronouns);
         }
