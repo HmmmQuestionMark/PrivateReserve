@@ -23,6 +23,7 @@ public class LockedBlockListener implements Listener {
             Bukkit.getScheduler().scheduleSyncDelayedTask(PrivateReserve.PLUGIN, () -> {
                 if (PrivateReserve.LOCKED_R.create(location.getBlock(), event.getPlayer())) {
                     event.getPlayer().sendMessage(ChatColor.RED + "Locked block created.");
+                    event.getPlayer().sendMessage(ChatColor.YELLOW + "Right-click while sneaking to lock/unlock.");
                 }
             }, 5);
         }
@@ -104,8 +105,8 @@ public class LockedBlockListener implements Listener {
         PrivateReserve.LOCKED_R.getRegisteredData().values().stream().filter(model -> model.getLocation().getWorld().
                 equals(event.getLocation().getWorld()) && model.getLocation().distance(event.getLocation()) <= 10).
                 map(save -> save.getLocation().getBlock()).forEach(block -> {
-            if (LockedBlockRegistry.isDoubleChest(block)) {
-                LockedBlockRegistry.getDoubleChest(block).forEach(chest -> event.blockList().remove(chest));
+            if (LockedBlockRegistry.isBisected(block)) {
+                LockedBlockRegistry.getBisected(block).forEach(chest -> event.blockList().remove(chest));
             } else {
                 event.blockList().remove(block);
             }

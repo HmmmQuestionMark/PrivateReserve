@@ -7,6 +7,7 @@ import me.hqm.privatereserve.model.LockedBlockModel;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Bisected;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -66,7 +67,10 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
             return false;
         }
         if (isDoubleChest(block)) {
-            return isRegisteredDoubleChest(getDoubleChest(block));
+            return isRegisteredBisected(getDoubleChest(block));
+        }
+        if (isBisected(block)) {
+            return isRegisteredBisected(getBisected(block));
         }
         return isRegistered0(block);
     }
@@ -75,10 +79,10 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
         return fromKey(LocationUtil.stringFromLocation(block.getLocation())).isPresent();
     }
 
-    default boolean isRegisteredDoubleChest(List<Block> chests) {
+    default boolean isRegisteredBisected(List<Block> block) {
         boolean registered = false;
-        for (Block chest : chests) {
-            if (isRegistered0(chest)) {
+        for (Block block0 : block) {
+            if (isRegistered0(block0)) {
                 registered = true;
             }
         }
@@ -90,7 +94,10 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
             return LockState.UNLOCKED;
         }
         if (isDoubleChest(block)) {
-            return getDoubleChestLockState(getDoubleChest(block));
+            return getBisectedLockState(getDoubleChest(block));
+        }
+        if (isBisected(block)) {
+            return getBisectedLockState(getBisected(block));
         }
         return getLockState0(block);
     }
@@ -100,9 +107,9 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
         return opModel.isPresent() && opModel.get().isLocked() ? LockState.LOCKED : LockState.UNLOCKED;
     }
 
-    default LockState getDoubleChestLockState(List<Block> chests) {
-        for (Block chest : chests) {
-            if (getLockState0(chest) == LockState.LOCKED) {
+    default LockState getBisectedLockState(List<Block> blocks) {
+        for (Block block : blocks) {
+            if (getLockState0(block) == LockState.LOCKED) {
                 return LockState.LOCKED;
             }
         }
@@ -111,7 +118,10 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
 
     default LockState lockUnlock(Block block, Player player) {
         if (isDoubleChest(block)) {
-            return doubleChestLockUnlock(getDoubleChest(block), player);
+            return bisectedLockUnlock(getDoubleChest(block), player);
+        }
+        if (isBisected(block)) {
+            return bisectedLockUnlock(getBisected(block), player);
         }
         return lockUnlock0(block, player);
     }
@@ -121,7 +131,7 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
         if (opModel.isPresent()) {
             LockedBlockModel model = opModel.get();
             if ((!isLockable(block) || model.getOwner().equals(player.getUniqueId().toString()) ||
-                    player.hasPermission("seasons.bypasslock"))) {
+                    player.hasPermission("privatereserve.bypasslock"))) {
                 return model.setLocked(!model.isLocked()) ? LockState.LOCKED : LockState.UNLOCKED;
             } else {
                 return LockState.UNCHANGED;
@@ -130,10 +140,10 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
         return LockState.NO_LOCK;
     }
 
-    default LockState doubleChestLockUnlock(List<Block> chests, Player player) {
+    default LockState bisectedLockUnlock(List<Block> blocks, Player player) {
         boolean unlocked = false;
-        for (Block chest : chests) {
-            LockState state = lockUnlock0(chest, player);
+        for (Block block : blocks) {
+            LockState state = lockUnlock0(block, player);
             if (state == LockState.LOCKED) {
                 return LockState.LOCKED;
             } else if (state == LockState.UNCHANGED) {
@@ -160,13 +170,16 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
         }
     }
 
-    static List<Block> getSuroundingBlocks(Block block) {
+    static List<Block> getSuroundingBlocks(Block block, boolean y) {
         List<Block> ret = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    Block loc = block.getRelative(x, y, z);
-                    ret.add(loc);
+            for (int z = -1; z <= 1; z++) {
+                if (y) {
+                    for (int y0 = -1; y0 <= 1; y0++) {
+                        ret.add(block.getRelative(x, y0, z));
+                    }
+                } else {
+                    ret.add(block.getRelative(x, 0, z));
                 }
             }
         }
@@ -175,7 +188,7 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
 
     static boolean isDoubleChest(Block block) {
         if (block.getType().equals(Material.CHEST)) {
-            for (Block found : getSuroundingBlocks(block)) {
+            for (Block found : getSuroundingBlocks(block, false)) {
                 if (found.getType().equals(Material.CHEST)) {
                     return true;
                 }
@@ -184,8 +197,24 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
         return false;
     }
 
+    static boolean isBisected(Block block) {
+        if (block.getBlockData() instanceof Bisected) {
+            for (Block found : getSuroundingBlocks(block, true)) {
+                if (found.getBlockData() instanceof Bisected) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     static List<Block> getDoubleChest(Block block) {
-        return getSuroundingBlocks(block).stream().filter(found -> found.getType().equals(Material.CHEST)).
+        return getSuroundingBlocks(block, false).stream().filter(found -> found.getType().equals(Material.CHEST)).
+                collect(Collectors.toList());
+    }
+
+    static List<Block> getBisected(Block block) {
+        return getSuroundingBlocks(block, true).stream().filter(found -> found.getBlockData() instanceof Bisected).
                 collect(Collectors.toList());
     }
 

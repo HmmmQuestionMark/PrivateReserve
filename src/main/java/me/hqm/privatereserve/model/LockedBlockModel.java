@@ -22,13 +22,13 @@ public class LockedBlockModel implements Model {
     public LockedBlockModel(String location, String owner) {
         this.location = location;
         this.owner = owner;
-        locked = true;
+        locked = false;
     }
 
     public LockedBlockModel(Location location, String owner) {
         this.location = LocationUtil.stringFromLocation(location);
         this.owner = owner;
-        locked = true;
+        locked = false;
     }
 
     public LockedBlockModel(String location, DataSection data) {
