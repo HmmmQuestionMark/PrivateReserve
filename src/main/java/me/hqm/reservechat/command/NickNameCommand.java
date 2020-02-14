@@ -2,7 +2,8 @@ package me.hqm.reservechat.command;
 
 import me.hqm.reservechat.ReserveChat;
 import me.hqm.reservechat.model.PlayerModel;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,9 +17,13 @@ public class NickNameCommand extends BaseCommand {
             if(args.length == 2 && sender.hasPermission("reservechat.admin")) {
                 Optional<Player> maybeTarget = getPlayer(args[0]);
                 if (maybeTarget.isPresent()) {
-                    setNickName(maybeTarget.get(), args[1]);
-                    sender.sendMessage(ChatColor.GREEN + "Nickname set for " + maybeTarget.get().getName());
-                    return CommandResult.SUCCESS;
+                    if (setNickName(maybeTarget.get(), args[1])) {
+                        sender.sendMessage(ChatColor.GREEN + "Nickname set for " + maybeTarget.get().getName());
+                        return CommandResult.SUCCESS;
+                    }
+
+                    sender.sendMessage(ChatColor.RED + "Nickname is too long, please try again.");
+                    return CommandResult.QUIET_ERROR;
                 }
 
                 sender.sendMessage(ChatColor.RED + "That player does not exist, please try again.");
@@ -30,9 +35,13 @@ public class NickNameCommand extends BaseCommand {
         if(args.length == 1) {
             if (sender instanceof Player) {
                 Player self = (Player) sender;
-                setNickName(self, args[0]);
-                sender.sendMessage(ChatColor.GREEN + "Nickname set.");
-                return CommandResult.SUCCESS;
+                if (setNickName(self, args[0])) {
+                    sender.sendMessage(ChatColor.GREEN + "Nickname set.");
+                    return CommandResult.SUCCESS;
+                }
+
+                sender.sendMessage(ChatColor.RED + "Nickname is too long, please try again.");
+                return CommandResult.QUIET_ERROR;
             }
             return CommandResult.PLAYER_ONLY;
         }
@@ -40,9 +49,13 @@ public class NickNameCommand extends BaseCommand {
         return CommandResult.INVALID_SYNTAX;
     }
 
-    void setNickName(OfflinePlayer target, String nickName) {
-        PlayerModel model = ReserveChat.PLAYER_R.fromPlayer(target);
-        model.setNickName(nickName);
-        model.buildNameTag();
+    boolean setNickName(OfflinePlayer target, String nickName) {
+        if (nickName.length() <= 25) {
+            PlayerModel model = ReserveChat.PLAYER_R.fromPlayer(target);
+            model.setNickName(nickName);
+            model.buildNameTag();
+            return true;
+        }
+        return false;
     }
 }
