@@ -1,10 +1,17 @@
 #Configuration File
 mongo:
   use: false
-  hostname: 127.0.0.1
+  hostname: localhost
   port: 27017
   database: chat
   username: chat
   password: chat
 file:
   save_pretty: false
+region:
+  visitor: 'visitor'
+  visitor_world: 'world'
+  spawn: 'spawn'
+  spawn_world: 'world'
+targeting:
+  max_range: 100

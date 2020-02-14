@@ -5,39 +5,34 @@ import com.demigodsrpg.util.datasection.Registry;
 import me.hqm.privatereserve.model.PlayerModel;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public interface PlayerRegistry extends Registry<PlayerModel> {
     String NAME = "players";
 
     @Deprecated
-    default PlayerModel fromName(final String name) {
+    default Optional<PlayerModel> fromName(final String name) {
         Optional<PlayerModel> player =
                 getRegisteredData().values().stream().filter(model -> model.getLastKnownName().equalsIgnoreCase(name))
                         .findFirst();
-        return player.orElse(null);
+        return player;
     }
 
-    default PlayerModel fromPlayer(OfflinePlayer player) {
-        Optional<PlayerModel> found = fromKey(player.getUniqueId().toString());
-        if (!found.isPresent()) {
-            PlayerModel model = new PlayerModel(player);
-            return register(model);
-        }
-        return found.get();
+    default Optional<PlayerModel> fromPlayer(OfflinePlayer player) {
+        return fromKey(player.getUniqueId().toString());
     }
 
     @Deprecated
-    default PlayerModel fromId(UUID id) {
+    default Optional<PlayerModel> fromId(UUID id) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(id);
         return fromPlayer(player);
     }
 
     @Deprecated
-    default PlayerModel fromId(String id) {
+    default Optional<PlayerModel> fromId(String id) {
         return fromId(UUID.fromString(id));
     }
 
@@ -45,15 +40,50 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
         return getRegisteredData().values().stream().map(PlayerModel::getOfflinePlayer).collect(Collectors.toSet());
     }
 
-    default List<String> getNameStartsWith(final String name) {
-        return getRegisteredData().values().stream()
-                .filter(model -> TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - model.getLastLoginTime()) < 3
-                        && model.getLastKnownName().toLowerCase().startsWith(name.toLowerCase()))
-                .map(PlayerModel::getLastKnownName).collect(Collectors.toList());
-    }
-
     @Override
     default PlayerModel fromDataSection(String stringKey, DataSection data) {
         return new PlayerModel(stringKey, data);
+    }
+
+    default PlayerModel invite(OfflinePlayer player, Player inviteFrom) {
+        return invite(player, inviteFrom.getUniqueId().toString());
+    }
+
+    default PlayerModel invite(OfflinePlayer player, String inviteFrom) {
+        PlayerModel model = new PlayerModel(player, inviteFrom);
+        PlayerModel invite = fromKey(inviteFrom).get();
+        invite.getInvited().add(model.getKey());
+        register(model);
+        register(invite);
+        return model;
+    }
+
+    default PlayerModel inviteConsole(OfflinePlayer player) {
+        PlayerModel model = new PlayerModel(player, true);
+        register(model);
+        return model;
+    }
+
+    default PlayerModel inviteSelf(Player player) {
+        PlayerModel model = new PlayerModel(player, false);
+        register(model);
+        return model;
+    }
+
+    default boolean isVisitor(OfflinePlayer player) {
+        return !fromPlayer(player).isPresent();
+    }
+
+    default boolean isExpelled(OfflinePlayer player) {
+        return fromPlayer(player).isPresent() && fromPlayer(player).get().isExpelled();
+    }
+
+    default boolean isVisitorOrExpelled(OfflinePlayer player) {
+        return isVisitor(player) || isExpelled(player);
+    }
+
+    default boolean isTrusted(OfflinePlayer player) {
+        Optional<PlayerModel> oModel = fromPlayer(player);
+        return oModel.isPresent() && oModel.get().isTrusted();
     }
 }

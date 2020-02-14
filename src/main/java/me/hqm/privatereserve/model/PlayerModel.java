@@ -2,7 +2,7 @@ package me.hqm.privatereserve.model;
 
 import com.demigodsrpg.util.datasection.DataSection;
 import com.demigodsrpg.util.datasection.Model;
-import me.hqm.privatereserve.ReserveChat;
+import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.tag.ChatTag;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -12,15 +12,24 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 public class PlayerModel implements Model {
+
+    // -- META DATA -- //
+
     private final String mojangId;
     private String lastKnownName;
-
-    private long lastLoginTime;
 
     // -- INTERESTING DATA -- //
 
     private String nickName;
     private String pronouns;
+
+    // -- GREYLIST DATA -- //
+
+    boolean trusted;
+    boolean expelled;
+    long timeInvited;
+    String invitedFrom;
+    List<String> invited;
 
     // -- NAME TAG TEXT -- //
 
@@ -28,22 +37,38 @@ public class PlayerModel implements Model {
 
     // -- CONSTRUCTORS -- //
 
-    public PlayerModel(OfflinePlayer player) {
+    public PlayerModel(OfflinePlayer player, boolean console) {
+        this(player, console ? "CONSOLE" : player.getUniqueId().toString());
+        trusted = !console;
+    }
+
+    public PlayerModel(OfflinePlayer player, String invitedFrom) {
         mojangId = player.getUniqueId().toString();
         lastKnownName = player.getName();
-        lastLoginTime = System.currentTimeMillis();
         nickName = lastKnownName;
+        trusted = false;
+        expelled = false;
+        timeInvited = System.currentTimeMillis();
         buildNameTag();
     }
 
     public PlayerModel (String mojangId, DataSection data) {
         this.mojangId = mojangId;
         lastKnownName = data.getString("last_known_name");
-        lastLoginTime = data.getLong("last_login_time");
+
         nickName = data.getString("nickname");
         pronouns = data.isString("pronouns") ? data.getString("pronouns") : null;
+
+        trusted = data.getBoolean("trusted", false);
+        expelled = data.getBoolean("expelled", false);
+
+        timeInvited = data.getLong("timeInvited", System.currentTimeMillis());
+        invitedFrom = data.getString("invitedFrom");
+        invited = data.getStringList("invited");
         buildNameTag();
     }
+
+    // -- GETTERS -- //
 
     @Override
     public String getKey() {
@@ -54,13 +79,110 @@ public class PlayerModel implements Model {
     public Map<String, Object> serialize() {
         Map<String, Object> data = new HashMap<>();
         data.put("last_known_name", lastKnownName);
-        data.put("last_login_time", lastLoginTime);
+
         data.put("nickname", nickName != null ? nickName : lastKnownName);
         if (pronouns != null) {
             data.put("pronouns", pronouns);
         }
+
+        data.put("trusted", trusted);
+        data.put("expelled", expelled);
+
+        data.put("timeInvited", timeInvited);
+        data.put("invitedFrom", invitedFrom);
+        data.put("invited", invited);
         return data;
     }
+
+    public boolean getOnline() {
+        return getOfflinePlayer().isOnline();
+    }
+
+    public OfflinePlayer getOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(UUID.fromString(mojangId));
+    }
+
+    public Location getLocation() {
+        if (getOnline()) {
+            return getOfflinePlayer().getPlayer().getLocation();
+        }
+        throw new UnsupportedOperationException("We don't support finding locations for players who aren't online.");
+    }
+
+    public String getLastKnownName() {
+        return lastKnownName;
+    }
+
+    public String getRawNickName() {
+        return nickName;
+    }
+
+    public String getNickName() {
+        return ChatColor.translateAlternateColorCodes('&', nickName);
+    }
+
+    public String getPronouns() {
+        return pronouns;
+    }
+
+    public TextComponent getNameTag() {
+        return nameTagText;
+    }
+
+    public long getTimeInvited() {
+        return timeInvited;
+    }
+
+    public boolean isTrusted() {
+        return trusted;
+    }
+
+    public boolean isExpelled() {
+        return expelled;
+    }
+
+    public String getInvitedFrom() {
+        return invitedFrom;
+    }
+
+    public List<String> getInvited() {
+        return invited;
+    }
+
+    // -- MUTATORS -- //
+
+    public void setLastKnownName(String lastKnownName) {
+        this.lastKnownName = lastKnownName;
+        register();
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+        register();
+    }
+
+    public void setPronouns(String pronouns) {
+        this.pronouns = pronouns;
+        register();
+    }
+
+    public void setTrusted(boolean trusted) {
+        this.trusted = trusted;
+        register();
+    }
+
+    public void setExpelled(boolean expelled) {
+        this.expelled = expelled;
+        register();
+    }
+
+    public void setInvitedFrom(String invitedFrom) {
+        this.invitedFrom = invitedFrom;
+        this.timeInvited = System.currentTimeMillis();
+        register();
+    }
+
+    // -- UTIL -- //
 
     public void buildNameTag() {
         // Define blank component
@@ -102,65 +224,6 @@ public class PlayerModel implements Model {
 
     @Override
     public void register() {
-        ReserveChat.PLAYER_R.register(this);
-    }
-
-    public boolean getOnline() {
-        return getOfflinePlayer().isOnline();
-    }
-
-    public OfflinePlayer getOfflinePlayer() {
-        return Bukkit.getOfflinePlayer(UUID.fromString(mojangId));
-    }
-
-    public Location getLocation() {
-        if (getOnline()) {
-            return getOfflinePlayer().getPlayer().getLocation();
-        }
-        throw new UnsupportedOperationException("We don't support finding locations for players who aren't online.");
-    }
-
-    public String getLastKnownName() {
-        return lastKnownName;
-    }
-
-    public void setLastKnownName(String lastKnownName) {
-        this.lastKnownName = lastKnownName;
-        register();
-    }
-
-    public long getLastLoginTime() {
-        return lastLoginTime;
-    }
-
-    public void setLastLoginTime(Long lastLoginTime) {
-        this.lastLoginTime = lastLoginTime;
-        register();
-    }
-
-    public String getRawNickName() {
-        return nickName;
-    }
-
-    public String getNickName() {
-        return ChatColor.translateAlternateColorCodes('&', nickName);
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-        register();
-    }
-
-    public String getPronouns() {
-        return pronouns;
-    }
-
-    public void setPronouns(String pronouns) {
-        this.pronouns = pronouns;
-        register();
-    }
-
-    public TextComponent getNameTag() {
-        return nameTagText;
+        PrivateReserve.PLAYER_R.register(this);
     }
 }

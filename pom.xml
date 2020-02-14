@@ -13,6 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spigot.version>1.15.2-R0.1-SNAPSHOT</spigot.version>
         <chitchat.version>2.1.2-SNAPSHOT</chitchat.version>
+        <worldguard.version>7.0.3-SNAPSHOT</worldguard.version>
         <mongodb.version>3.12.1</mongodb.version>
     </properties>
 
@@ -20,6 +21,10 @@
         <repository>
             <id>spigot-releases</id>
             <url>http://hub.spigotmc.org/nexus/content/repositories/public</url>
+        </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>http://maven.sk89q.com/repo/</url>
         </repository>
     </repositories>
 
@@ -37,6 +42,15 @@
             <artifactId>spigot-api</artifactId>
             <version>${spigot.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- WorldGuard -->
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>${worldguard.version}</version>
+            <scope>compile</scope>
+            <type>jar</type>
         </dependency>
 
         <!-- Apache Lang -->

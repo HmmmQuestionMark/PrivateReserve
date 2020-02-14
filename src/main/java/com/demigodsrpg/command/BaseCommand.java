@@ -1,4 +1,4 @@
-package me.hqm.privatereserve.command;
+package com.demigodsrpg.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

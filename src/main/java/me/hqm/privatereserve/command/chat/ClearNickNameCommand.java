@@ -1,6 +1,8 @@
-package me.hqm.privatereserve.command;
+package me.hqm.privatereserve.command.chat;
 
-import me.hqm.privatereserve.ReserveChat;
+import com.demigodsrpg.command.BaseCommand;
+import com.demigodsrpg.command.CommandResult;
+import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -13,8 +15,11 @@ import java.util.Optional;
 public class ClearNickNameCommand extends BaseCommand {
     @Override
     protected CommandResult onCommand(CommandSender sender, Command command, String[] args) {
+        if (sender instanceof Player && (PrivateReserve.PLAYER_R.isVisitorOrExpelled((Player) sender))) {
+            return CommandResult.QUIET_ERROR;
+        }
         if(args.length == 1) {
-            if(sender.hasPermission("reservechat.admin")) {
+            if (sender.hasPermission("privatereserve.admin")) {
                 Optional<Player> maybeTarget = getPlayer(args[0]);
                 if (maybeTarget.isPresent()) {
                     clearNickName(maybeTarget.get());
@@ -42,7 +47,7 @@ public class ClearNickNameCommand extends BaseCommand {
     }
 
     void clearNickName(OfflinePlayer target) {
-        PlayerModel model = ReserveChat.PLAYER_R.fromPlayer(target);
+        PlayerModel model = PrivateReserve.PLAYER_R.fromPlayer(target).get();
         model.setNickName(target.getName());
         model.buildNameTag();
     }

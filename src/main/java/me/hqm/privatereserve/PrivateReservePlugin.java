@@ -3,7 +3,7 @@ package me.hqm.privatereserve;
 import com.demigodsrpg.chitchat.util.LibraryHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class ReserveChatPlugin extends JavaPlugin  {
+public class PrivateReservePlugin extends JavaPlugin {
 
     // -- LIBRARY HANDLER -- //
 
@@ -27,11 +27,11 @@ public class ReserveChatPlugin extends JavaPlugin  {
         }
 
         // Enable
-        new ReserveChat(this);
+        new PrivateReserve(this);
     }
 
     @Override
     public void onDisable() {
-        ReserveChat.RESERVE_CHAT.disable();
+        PrivateReserve.RESERVE_CHAT.disable();
     }
 }

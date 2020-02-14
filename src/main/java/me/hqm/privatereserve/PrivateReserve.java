@@ -1,13 +1,17 @@
 package me.hqm.privatereserve;
 
 import com.demigodsrpg.chitchat.Chitchat;
+import com.demigodsrpg.chitchat.tag.PlayerTag;
 import com.mongodb.*;
 import com.mongodb.client.*;
-import me.hqm.privatereserve.command.*;
+import me.hqm.privatereserve.command.chat.*;
+import me.hqm.privatereserve.command.dungeon.DebugCommand;
+import me.hqm.privatereserve.command.member.*;
+import me.hqm.privatereserve.listener.LockedBlockListener;
 import me.hqm.privatereserve.listener.PlayerListener;
-import me.hqm.privatereserve.registry.PlayerRegistry;
-import me.hqm.privatereserve.registry.file.FPlayerRegistry;
-import me.hqm.privatereserve.registry.mongo.MPlayerRegistry;
+import me.hqm.privatereserve.registry.*;
+import me.hqm.privatereserve.registry.file.*;
+import me.hqm.privatereserve.registry.mongo.*;
 import me.hqm.privatereserve.tag.ChatTag;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -17,9 +21,9 @@ import org.bukkit.plugin.PluginManager;
 import java.util.Collections;
 import java.util.logging.Logger;
 
-public class ReserveChat {
+public class PrivateReserve {
 
-    public static ReserveChat RESERVE_CHAT;
+    public static PrivateReserve RESERVE_CHAT;
     public static Plugin PLUGIN;
     public static Logger CONSOLE;
     public static String SAVE_PATH;
@@ -29,18 +33,24 @@ public class ReserveChat {
     // -- DATA -- //
 
     public static PlayerRegistry PLAYER_R;
+    public static LockedBlockRegistry LOCKED_R;
+    public static RelationalDataRegistry RELATIONAL_R;
 
     void enableMongo(MongoDatabase database) {
         PLAYER_R = new MPlayerRegistry(database);
+        LOCKED_R = new MLockedBlockRegistry(database);
+        RELATIONAL_R = new MRelationalDataRegistry(database);
     }
 
     void enableFile() {
         PLAYER_R = new FPlayerRegistry();
+        LOCKED_R = new FLockedBlockRegistry();
+        RELATIONAL_R = new FRelationalDataRegistry();
     }
 
     // -- LOGIC -- //
 
-    public ReserveChat(ReserveChatPlugin plugin) {
+    public PrivateReserve(PrivateReservePlugin plugin) {
         // Define instances
         PLUGIN = plugin;
         RESERVE_CHAT = this;
@@ -84,19 +94,33 @@ public class ReserveChat {
         // Listeners
         PluginManager manager = plugin.getServer().getPluginManager();
         manager.registerEvents(new PlayerListener(), plugin);
+        manager.registerEvents(new LockedBlockListener(), plugin);
 
         // Commands
         plugin.getCommand("nickname").setExecutor(new NickNameCommand());
         plugin.getCommand("pronouns").setExecutor(new PronounsCommand());
         plugin.getCommand("clearnickname").setExecutor(new ClearNickNameCommand());
         plugin.getCommand("clearpronouns").setExecutor(new ClearPronounsCommand());
+        plugin.getCommand("invite").setExecutor(new InviteCommand());
+        plugin.getCommand("trust").setExecutor(new TrustCommand());
+        plugin.getCommand("expel").setExecutor(new ExpelCommand());
+        plugin.getCommand("spawn").setExecutor(new SpawnCommand());
+        plugin.getCommand("visiting").setExecutor(new VisitingCommand());
+        plugin.getCommand("memberhelp").setExecutor(new MemberHelpCommand());
+        plugin.getCommand("prdebug").setExecutor(new DebugCommand());
 
         // Build chat format
-        Chitchat.getChatFormat().add(ChatTag.ADMIN_TAG).add(ChatTag.NAME_TAG);
+        Chitchat.getChatFormat().addAll(new PlayerTag[]{
+                ChatTag.NAME_TAG, ChatTag.ADMIN_TAG, ChatTag.TRUSTED_TAG, ChatTag.VISITOR_TAG
+        });
+
+        // Register tasks
+        Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(PLUGIN, RELATIONAL_R::clearExpired, 20, 20);
     }
 
     public void disable() {
         // Manually unregister events
         HandlerList.unregisterAll(PLUGIN);
+        Bukkit.getScheduler().cancelTasks(PLUGIN);
     }
 }

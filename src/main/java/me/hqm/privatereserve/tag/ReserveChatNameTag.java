@@ -1,7 +1,7 @@
 package me.hqm.privatereserve.tag;
 
 import com.demigodsrpg.chitchat.tag.PlayerTag;
-import me.hqm.privatereserve.ReserveChat;
+import me.hqm.privatereserve.PrivateReserve;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
@@ -15,7 +15,10 @@ public class ReserveChatNameTag extends PlayerTag {
 
     @Override
     public TextComponent getComponentFor(Player tagSource) {
-        return ReserveChat.PLAYER_R.fromPlayer(tagSource).getNameTag();
+        if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(tagSource)) {
+            return new TextComponent(TextComponent.fromLegacyText(tagSource.getName()));
+        }
+        return PrivateReserve.PLAYER_R.fromPlayer(tagSource).get().getNameTag();
     }
 
     @Override

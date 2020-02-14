@@ -4,7 +4,7 @@ api-version: 1.15
 version: ${project.version}
 description: Special sauce for HQM's private reserve.
 authors: [HmmmQuestionMark]
-depend: [Chitchat]
+depend: [Chitchat, WorldGuard]
 commands:
   ## Everyday Commands
   nickname:
@@ -17,8 +17,25 @@ commands:
     aliases: [clearnick]
   clearpronouns:
     usage: /pronouns [username]
+  invite:
+    usage: /invite [player]
+  trust:
+    usage: /trust [player]
+  expel:
+    usage: /expel [player]
+  spawn:
+    usage: /spawn
+  visiting:
+    usage: /visiting
+    aliases: [vspawn]
+  memberhelp:
+    usage: /memberhelp [topic]
+  prdebug:
+    usage: /prdebug
 permisions:
-  reservechat.admin:
+  privatereserve.bypasslock:
     default: op
-  reservechat.self:
+  privatereserve.admin:
+    default: op
+  privatereserve.self:
     default: true
