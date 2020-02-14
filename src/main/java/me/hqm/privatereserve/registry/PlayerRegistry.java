@@ -53,7 +53,7 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
         PlayerModel model = new PlayerModel(player, inviteFrom);
         PlayerModel invite = fromKey(inviteFrom).get();
         invite.addInvited(model.getKey());
-        register(invite);
+        register(model);
         return model;
     }
 
