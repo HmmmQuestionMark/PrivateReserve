@@ -5,6 +5,7 @@ import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
 import me.hqm.privatereserve.util.RegionUtil;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -27,8 +28,13 @@ public class PlayerListener implements Listener {
                 return;
             }
             if (player.hasPermission("privatereserve.admin") || player.isWhitelisted()) {
-                PrivateReserve.PLAYER_R.inviteSelf(player);
-                player.kickPlayer(ChatColor.GREEN + "Sorry, you weren't invited yet. Please rejoin.");
+                Bukkit.getScheduler().scheduleSyncDelayedTask(PrivateReserve.PLUGIN, new Runnable() {
+                    @Override
+                    public void run() {
+                        PrivateReserve.PLAYER_R.inviteSelf(player);
+                        player.kickPlayer(ChatColor.GREEN + "Sorry, you weren't invited yet. Please rejoin.");
+                    }
+                }, 20);
                 return;
             }
             if (!RegionUtil.visitingContains(player.getLocation())) {

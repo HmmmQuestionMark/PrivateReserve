@@ -52,14 +52,19 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
     default PlayerModel invite(OfflinePlayer player, String inviteFrom) {
         PlayerModel model = new PlayerModel(player, inviteFrom);
         PlayerModel invite = fromKey(inviteFrom).get();
-        invite.getInvited().add(model.getKey());
-        register(model);
+        invite.addInvited(model.getKey());
         register(invite);
         return model;
     }
 
     default PlayerModel inviteConsole(OfflinePlayer player) {
         PlayerModel model = new PlayerModel(player, true);
+        register(model);
+        return model;
+    }
+
+    default PlayerModel inviteConsole(OfflinePlayer player, boolean trusted) {
+        PlayerModel model = new PlayerModel(player, true, trusted);
         register(model);
         return model;
     }
@@ -85,5 +90,18 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
     default boolean isTrusted(OfflinePlayer player) {
         Optional<PlayerModel> oModel = fromPlayer(player);
         return oModel.isPresent() && oModel.get().isTrusted();
+    }
+
+    @Deprecated
+    default List<String> getInvitedManually(PlayerModel model) {
+        return getRegisteredData().values().stream().filter(
+                playerModel -> model.getKey().equals(playerModel.getInvitedFrom())).map(
+                PlayerModel::getKey).collect(Collectors.toList());
+    }
+
+    default int getInvitedCount(OfflinePlayer player) {
+        String playerId = player.getUniqueId().toString();
+        return (int) getRegisteredData().values().stream().filter(
+                playerModel -> playerId.equals(playerModel.getInvitedFrom())).count();
     }
 }

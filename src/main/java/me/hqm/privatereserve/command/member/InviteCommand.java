@@ -25,6 +25,12 @@ public class InviteCommand extends BaseCommand {
             // Get the invitee
             OfflinePlayer invitee = Bukkit.getOfflinePlayer(args[0]);
 
+            // Register from console
+            if (sender instanceof ConsoleCommandSender) {
+                PrivateReserve.PLAYER_R.inviteConsole(invitee);
+                return CommandResult.SUCCESS;
+            }
+
             // Already invited
             if (!PrivateReserve.PLAYER_R.isVisitor(invitee)) {
                 sender.sendMessage(ChatColor.RED + "That player is already invited.");
@@ -44,11 +50,6 @@ public class InviteCommand extends BaseCommand {
                         expelled.setInvitedFrom(((Player) sender).getUniqueId().toString());
                     }
                 }
-            }
-
-            // Register from console
-            if (sender instanceof ConsoleCommandSender) {
-                PrivateReserve.PLAYER_R.inviteConsole(invitee);
             }
 
             // Stop untrusted from inviting

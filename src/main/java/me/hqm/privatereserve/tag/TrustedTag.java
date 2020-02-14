@@ -1,6 +1,7 @@
 package me.hqm.privatereserve.tag;
 
 import com.demigodsrpg.chitchat.tag.PlayerTag;
+import me.hqm.privatereserve.PrivateReserve;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.entity.Player;
@@ -22,7 +23,10 @@ public class TrustedTag extends PlayerTag {
 
     @Override
     public TextComponent getComponentFor(Player player) {
-        return trusted;
+        if (PrivateReserve.PLAYER_R.isTrusted(player)) {
+            return trusted;
+        }
+        return ChatTag.EMPTY;
     }
 
     @Override

@@ -91,6 +91,11 @@ public class PrivateReserve {
             CONSOLE.info("Json file saving enabled.");
         }
 
+        // Load all from data
+        PLAYER_R.loadAllFromDb();
+        LOCKED_R.loadAllFromDb();
+        RELATIONAL_R.loadAllFromDb();
+
         // Listeners
         PluginManager manager = plugin.getServer().getPluginManager();
         manager.registerEvents(new PlayerListener(), plugin);
@@ -111,7 +116,7 @@ public class PrivateReserve {
 
         // Build chat format
         Chitchat.getChatFormat().addAll(new PlayerTag[]{
-                ChatTag.NAME_TAG, ChatTag.ADMIN_TAG, ChatTag.TRUSTED_TAG, ChatTag.VISITOR_TAG
+                ChatTag.ADMIN_TAG, ChatTag.VISITOR_TAG, ChatTag.TRUSTED_TAG, ChatTag.NAME_TAG
         });
 
         // Register tasks

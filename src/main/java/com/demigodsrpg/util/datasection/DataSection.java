@@ -1,7 +1,6 @@
 package com.demigodsrpg.util.datasection;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Object representing a section of a json file.
@@ -132,7 +131,7 @@ public interface DataSection extends Map<String, Object> {
     }
 
     default List<String> getStringList(String s) {
-        return (List) get(s);
+        return (List) get(s, new ArrayList<String>());
     }
 
     default List<Double> getDoubleList(String s) {

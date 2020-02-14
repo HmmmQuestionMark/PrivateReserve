@@ -38,17 +38,23 @@ public class PlayerModel implements Model {
     // -- CONSTRUCTORS -- //
 
     public PlayerModel(OfflinePlayer player, boolean console) {
+        this(player, console, !console);
+    }
+
+    public PlayerModel(OfflinePlayer player, boolean console, boolean trusted) {
         this(player, console ? "CONSOLE" : player.getUniqueId().toString());
-        trusted = !console;
+        this.trusted = trusted;
     }
 
     public PlayerModel(OfflinePlayer player, String invitedFrom) {
         mojangId = player.getUniqueId().toString();
         lastKnownName = player.getName();
+        this.invitedFrom = invitedFrom;
         nickName = lastKnownName;
         trusted = false;
         expelled = false;
         timeInvited = System.currentTimeMillis();
+        invited = new ArrayList<>();
         buildNameTag();
     }
 
@@ -63,7 +69,7 @@ public class PlayerModel implements Model {
         expelled = data.getBoolean("expelled", false);
 
         timeInvited = data.getLong("timeInvited", System.currentTimeMillis());
-        invitedFrom = data.getString("invitedFrom");
+        invitedFrom = data.getString("invitedFrom", "d5133464-b1ef-42b4-9ad4-8cac217d40f0"); // Default to HQM
         invited = data.getStringList("invited");
         buildNameTag();
     }
@@ -182,6 +188,17 @@ public class PlayerModel implements Model {
         register();
     }
 
+    @Deprecated
+    public void setInvited(List<String> invited) {
+        this.invited = invited;
+        register();
+    }
+
+    public void addInvited(String invitee) {
+        this.invited.add(invitee);
+        register();
+    }
+
     // -- UTIL -- //
 
     public void buildNameTag() {
@@ -208,6 +225,14 @@ public class PlayerModel implements Model {
                     color(ChatColor.DARK_GRAY).create());
             hover.addExtra(ChatTag.NEW_LINE);
             hover.addExtra(pronouns);
+        }
+
+        // Set invited amount
+        if (invited.size() > 0) {
+            TextComponent countText = new TextComponent(new ComponentBuilder("Invited: " + invited.size() + " members").
+                    color(ChatColor.DARK_GRAY).create());
+            hover.addExtra(ChatTag.NEW_LINE);
+            hover.addExtra(countText);
         }
 
         // Set hover text
