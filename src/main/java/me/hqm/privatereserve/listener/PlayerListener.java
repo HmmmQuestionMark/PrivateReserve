@@ -1,7 +1,7 @@
-package me.hqm.reservechat.listener;
+package me.hqm.privatereserve.listener;
 
-import me.hqm.reservechat.ReserveChat;
-import me.hqm.reservechat.model.PlayerModel;
+import me.hqm.privatereserve.ReserveChat;
+import me.hqm.privatereserve.model.PlayerModel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerJoinEvent;

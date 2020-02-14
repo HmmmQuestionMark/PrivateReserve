@@ -1,7 +1,7 @@
-package me.hqm.reservechat.tag;
+package me.hqm.privatereserve.tag;
 
 import com.demigodsrpg.chitchat.tag.PlayerTag;
-import me.hqm.reservechat.ReserveChat;
+import me.hqm.privatereserve.ReserveChat;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 

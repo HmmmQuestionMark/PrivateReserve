@@ -1,14 +1,14 @@
-package me.hqm.reservechat;
+package me.hqm.privatereserve;
 
 import com.demigodsrpg.chitchat.Chitchat;
 import com.mongodb.*;
 import com.mongodb.client.*;
-import me.hqm.reservechat.command.*;
-import me.hqm.reservechat.listener.PlayerListener;
-import me.hqm.reservechat.registry.PlayerRegistry;
-import me.hqm.reservechat.registry.file.FPlayerRegistry;
-import me.hqm.reservechat.registry.mongo.MPlayerRegistry;
-import me.hqm.reservechat.tag.ChatTag;
+import me.hqm.privatereserve.command.*;
+import me.hqm.privatereserve.listener.PlayerListener;
+import me.hqm.privatereserve.registry.PlayerRegistry;
+import me.hqm.privatereserve.registry.file.FPlayerRegistry;
+import me.hqm.privatereserve.registry.mongo.MPlayerRegistry;
+import me.hqm.privatereserve.tag.ChatTag;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;

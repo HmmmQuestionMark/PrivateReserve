@@ -1,9 +1,9 @@
-package me.hqm.reservechat.registry.mongo;
+package me.hqm.privatereserve.registry.mongo;
 
 import com.demigodsrpg.util.datasection.AbstractMongoRegistry;
 import com.mongodb.client.MongoDatabase;
-import me.hqm.reservechat.model.PlayerModel;
-import me.hqm.reservechat.registry.PlayerRegistry;
+import me.hqm.privatereserve.model.PlayerModel;
+import me.hqm.privatereserve.registry.PlayerRegistry;
 
 public class MPlayerRegistry extends AbstractMongoRegistry<PlayerModel> implements PlayerRegistry {
     public MPlayerRegistry(MongoDatabase database) {

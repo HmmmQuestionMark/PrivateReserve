@@ -1,4 +1,4 @@
-package me.hqm.reservechat.tag;
+package me.hqm.privatereserve.tag;
 
 
 import net.md_5.bungee.api.chat.TextComponent;

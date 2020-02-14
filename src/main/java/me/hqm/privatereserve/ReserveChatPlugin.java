@@ -1,4 +1,4 @@
-package me.hqm.reservechat;
+package me.hqm.privatereserve;
 
 import com.demigodsrpg.chitchat.util.LibraryHandler;
 import org.bukkit.plugin.java.JavaPlugin;

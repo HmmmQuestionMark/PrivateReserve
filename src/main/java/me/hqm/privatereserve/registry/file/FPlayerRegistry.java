@@ -1,7 +1,7 @@
-package me.hqm.reservechat.registry.file;
+package me.hqm.privatereserve.registry.file;
 
-import me.hqm.reservechat.model.PlayerModel;
-import me.hqm.reservechat.registry.PlayerRegistry;
+import me.hqm.privatereserve.model.PlayerModel;
+import me.hqm.privatereserve.registry.PlayerRegistry;
 
 public class FPlayerRegistry extends AbstractChatFileRegistry<PlayerModel> implements PlayerRegistry {
     public FPlayerRegistry() {

@@ -1,4 +1,4 @@
-package me.hqm.reservechat.tag;
+package me.hqm.privatereserve.tag;
 
 import com.demigodsrpg.chitchat.tag.DefaultPlayerTag;
 import net.md_5.bungee.api.chat.*;

@@ -1,7 +1,7 @@
-package me.hqm.reservechat.command;
+package me.hqm.privatereserve.command;
 
-import me.hqm.reservechat.ReserveChat;
-import me.hqm.reservechat.model.PlayerModel;
+import me.hqm.privatereserve.ReserveChat;
+import me.hqm.privatereserve.model.PlayerModel;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;

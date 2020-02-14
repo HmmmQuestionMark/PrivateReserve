@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.hqm</groupId>
-    <artifactId>reserve-chat</artifactId>
+    <artifactId>private-reserve</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>ReserveChat</name>
+    <name>PrivateReserve</name>
     <properties> <!-- It is important to keep up to date manually. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spigot.version>1.15.2-R0.1-SNAPSHOT</spigot.version>

@@ -1,8 +1,8 @@
-package me.hqm.reservechat.registry;
+package me.hqm.privatereserve.registry;
 
 import com.demigodsrpg.util.datasection.DataSection;
 import com.demigodsrpg.util.datasection.Registry;
-import me.hqm.reservechat.model.PlayerModel;
+import me.hqm.privatereserve.model.PlayerModel;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 

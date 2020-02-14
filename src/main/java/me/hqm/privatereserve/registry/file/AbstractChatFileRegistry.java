@@ -1,9 +1,9 @@
-package me.hqm.reservechat.registry.file;
+package me.hqm.privatereserve.registry.file;
 
 import com.demigodsrpg.util.datasection.AbstractFileRegistry;
 import com.demigodsrpg.util.datasection.Model;
-import me.hqm.reservechat.ReserveChat;
-import me.hqm.reservechat.Setting;
+import me.hqm.privatereserve.ReserveChat;
+import me.hqm.privatereserve.Setting;
 
 public abstract class AbstractChatFileRegistry<T extends Model> extends AbstractFileRegistry<T> {
     public AbstractChatFileRegistry(String name, int expireInMins) {

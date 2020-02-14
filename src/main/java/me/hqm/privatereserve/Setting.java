@@ -1,4 +1,4 @@
-package me.hqm.reservechat;
+package me.hqm.privatereserve;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;

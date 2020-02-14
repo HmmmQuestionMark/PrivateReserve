@@ -1,9 +1,9 @@
-package me.hqm.reservechat.model;
+package me.hqm.privatereserve.model;
 
 import com.demigodsrpg.util.datasection.DataSection;
 import com.demigodsrpg.util.datasection.Model;
-import me.hqm.reservechat.ReserveChat;
-import me.hqm.reservechat.tag.ChatTag;
+import me.hqm.privatereserve.ReserveChat;
+import me.hqm.privatereserve.tag.ChatTag;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.*;

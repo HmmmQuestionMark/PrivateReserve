@@ -1,4 +1,4 @@
-package me.hqm.reservechat;
+package me.hqm.privatereserve;
 
 public class Depends {
     public static final String ORG_MONGO = "org.mongodb";

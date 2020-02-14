@@ -1,4 +1,4 @@
-package me.hqm.reservechat.command;
+package me.hqm.privatereserve.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
