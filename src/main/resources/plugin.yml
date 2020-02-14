@@ -1,4 +1,4 @@
-name: ReserveChat
+name: PrivateReserve
 main: me.hqm.privatereserve.PrivateReservePlugin
 api-version: 1.15
 version: ${project.version}
