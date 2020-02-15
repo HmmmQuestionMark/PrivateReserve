@@ -15,11 +15,11 @@ import java.util.Optional;
 public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        Optional<PlayerModel> maybeThem = PrivateReserve.PLAYER_R.fromKey(event.getUniqueId().toString());
+    public void onPreLogin(PlayerLoginEvent event) {
+        Optional<PlayerModel> maybeThem = PrivateReserve.PLAYER_R.fromPlayer(event.getPlayer());
         if (maybeThem.isPresent()) {
             PlayerModel model = maybeThem.get();
-            model.setLastKnownName(event.getName());
+            model.setLastKnownName(event.getPlayer().getName());
             model.buildNameTag();
         }
     }
