@@ -7,6 +7,7 @@ import com.mongodb.client.*;
 import me.hqm.privatereserve.command.chat.*;
 import me.hqm.privatereserve.command.dungeon.DebugCommand;
 import me.hqm.privatereserve.command.member.*;
+import me.hqm.privatereserve.dungeon.mob.DungeonMobs;
 import me.hqm.privatereserve.listener.LockedBlockListener;
 import me.hqm.privatereserve.listener.PlayerListener;
 import me.hqm.privatereserve.registry.*;
@@ -18,6 +19,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.logging.Logger;
 
@@ -100,6 +102,12 @@ public class PrivateReserve {
         PluginManager manager = plugin.getServer().getPluginManager();
         manager.registerEvents(new PlayerListener(), plugin);
         manager.registerEvents(new LockedBlockListener(), plugin);
+
+        // Register dungeon mobs
+        Arrays.asList(DungeonMobs.values()).forEach(mob -> {
+            manager.registerEvents(mob, plugin);
+            mob.registerRunnables(plugin);
+        });
 
         // Commands
         plugin.getCommand("nickname").setExecutor(new NickNameCommand());
