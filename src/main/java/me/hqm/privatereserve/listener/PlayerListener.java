@@ -8,12 +8,22 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 
 import java.util.Optional;
 
 public class PlayerListener implements Listener {
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreLogin(AsyncPlayerPreLoginEvent event) {
+        Optional<PlayerModel> maybeThem = PrivateReserve.PLAYER_R.fromKey(event.getUniqueId().toString());
+        if (maybeThem.isPresent()) {
+            PlayerModel model = maybeThem.get();
+            model.setLastKnownName(event.getName());
+            model.buildNameTag();
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -47,12 +57,6 @@ public class PlayerListener implements Listener {
             player.sendMessage(ChatColor.YELLOW + "Currently you are just a " + ChatColor.GRAY + ChatColor.ITALIC +
                     "visitor" + ChatColor.YELLOW + ", ask for an invite on Discord!");
         } else {
-            Optional<PlayerModel> maybeThem = PrivateReserve.PLAYER_R.fromPlayer(player);
-            if (maybeThem.isPresent()) {
-                PlayerModel model = maybeThem.get();
-                model.setLastKnownName(player.getName());
-                model.buildNameTag();
-            }
             if (RegionUtil.spawnContains(player.getLocation()) || RegionUtil.visitingContains(player.getLocation())) {
                 try {
                     player.teleport(RegionUtil.spawnLocation());
