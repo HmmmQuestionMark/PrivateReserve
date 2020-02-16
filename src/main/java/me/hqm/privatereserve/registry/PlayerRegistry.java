@@ -21,21 +21,21 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
         return player;
     }
 
+    @Deprecated
     default Optional<PlayerModel> fromPlayer(OfflinePlayer player) {
         return fromKey(player.getUniqueId().toString());
     }
 
-    @Deprecated
     default Optional<PlayerModel> fromId(UUID id) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(id);
         return fromPlayer(player);
     }
 
-    @Deprecated
     default Optional<PlayerModel> fromId(String id) {
         return fromId(UUID.fromString(id));
     }
 
+    @Deprecated
     default Set<OfflinePlayer> getOfflinePlayers() {
         return getRegisteredData().values().stream().map(PlayerModel::getOfflinePlayer).collect(Collectors.toSet());
     }
@@ -75,20 +75,20 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
         return model;
     }
 
-    default boolean isVisitor(OfflinePlayer player) {
-        return !fromPlayer(player).isPresent();
+    default boolean isVisitor(UUID player) {
+        return !fromId(player).isPresent();
     }
 
-    default boolean isExpelled(OfflinePlayer player) {
-        return fromPlayer(player).isPresent() && fromPlayer(player).get().isExpelled();
+    default boolean isExpelled(UUID player) {
+        return fromId(player).isPresent() && fromId(player).get().isExpelled();
     }
 
-    default boolean isVisitorOrExpelled(OfflinePlayer player) {
+    default boolean isVisitorOrExpelled(UUID player) {
         return isVisitor(player) || isExpelled(player);
     }
 
-    default boolean isTrusted(OfflinePlayer player) {
-        Optional<PlayerModel> oModel = fromPlayer(player);
+    default boolean isTrusted(UUID player) {
+        Optional<PlayerModel> oModel = fromId(player);
         return oModel.isPresent() && oModel.get().isTrusted();
     }
 
@@ -99,8 +99,8 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
                 PlayerModel::getKey).collect(Collectors.toList());
     }
 
-    default int getInvitedCount(OfflinePlayer player) {
-        String playerId = player.getUniqueId().toString();
+    default int getInvitedCount(UUID player) {
+        String playerId = player.toString();
         return (int) getRegisteredData().values().stream().filter(
                 playerModel -> playerId.equals(playerModel.getInvitedFrom())).count();
     }

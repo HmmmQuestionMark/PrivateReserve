@@ -26,13 +26,13 @@ public class InviteCommand extends BaseCommand {
             OfflinePlayer invitee = Bukkit.getOfflinePlayer(args[0]);
 
             // Already invited
-            if (!PrivateReserve.PLAYER_R.isVisitor(invitee)) {
+            if (!PrivateReserve.PLAYER_R.isVisitor(invitee.getUniqueId())) {
                 sender.sendMessage(ChatColor.RED + "That player is already invited.");
                 return CommandResult.QUIET_ERROR;
             }
 
             // Check if they were expelled and give a warning
-            if (PrivateReserve.PLAYER_R.isExpelled(invitee)) {
+            if (PrivateReserve.PLAYER_R.isExpelled(invitee.getUniqueId())) {
                 sender.sendMessage(ChatColor.RED + "That player was expelled, please be cautious of them.");
                 Optional<PlayerModel> opModel = PrivateReserve.PLAYER_R.fromPlayer(invitee);
                 if (opModel.isPresent()) {
@@ -47,7 +47,7 @@ public class InviteCommand extends BaseCommand {
             }
 
             // Stop untrusted from inviting
-            else if (!PrivateReserve.PLAYER_R.isTrusted((Player) sender)) {
+            else if (!PrivateReserve.PLAYER_R.isTrusted(((Player) sender).getUniqueId())) {
                 sender.sendMessage(ChatColor.RED + "Sorry, you aren't (yet) a trusted player.");
                 return CommandResult.QUIET_ERROR;
             }

@@ -18,7 +18,7 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (PrivateReserve.PLAYER_R.isVisitor(player)) {
+        if (PrivateReserve.PLAYER_R.isVisitor(player.getUniqueId())) {
             Optional<PlayerModel> maybeThem = PrivateReserve.PLAYER_R.fromName(player.getName());
             if (maybeThem.isPresent()) {
                 PrivateReserve.PLAYER_R.remove(maybeThem.get().getKey());
@@ -67,7 +67,7 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(player)) {
+        if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(player.getUniqueId())) {
             if (!RegionUtil.visitingContains(event.getTo())) {
                 Chitchat.sendTitle(player, 10, 60, 10, ChatColor.GREEN + "Sorry!",
                         ChatColor.RED + "Only invited members are allowed there.");

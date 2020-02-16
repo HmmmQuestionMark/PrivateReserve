@@ -16,7 +16,7 @@ public class SpawnCommand extends BaseCommand {
             if (sender instanceof ConsoleCommandSender) {
                 return CommandResult.PLAYER_ONLY;
             }
-            if (PrivateReserve.PLAYER_R.isVisitorOrExpelled((Player) sender)) {
+            if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(((Player) sender).getUniqueId())) {
                 sender.sendMessage(ChatColor.YELLOW + "Currently you are just a " + ChatColor.GRAY + ChatColor.ITALIC +
                         "visitor" + ChatColor.YELLOW + ", ask for an invite on Discord!");
                 return CommandResult.QUIET_ERROR;

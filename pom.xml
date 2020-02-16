@@ -11,7 +11,7 @@
     <name>PrivateReserve</name>
     <properties> <!-- It is important to keep up to date manually. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spigot.version>1.15.2-R0.1-SNAPSHOT</spigot.version>
+        <paper.version>1.15.2-R0.1-SNAPSHOT</paper.version>
         <chitchat.version>2.1.2-SNAPSHOT</chitchat.version>
         <worldguard.version>7.0.3-SNAPSHOT</worldguard.version>
         <mongodb.version>3.12.1</mongodb.version>
@@ -19,8 +19,8 @@
 
     <repositories>
         <repository>
-            <id>spigot-releases</id>
-            <url>http://hub.spigotmc.org/nexus/content/repositories/public</url>
+            <id>papermc</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
             <id>sk89q-repo</id>
@@ -36,11 +36,11 @@
             <version>${chitchat.version}</version>
         </dependency>
 
-        <!-- Spigot -->
+        <!-- Paper -->
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>${spigot.version}</version>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>${paper.version}</version>
             <scope>compile</scope>
         </dependency>
 

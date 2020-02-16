@@ -15,7 +15,7 @@ public class ReserveChatNameTag extends PlayerTag {
 
     @Override
     public TextComponent getComponentFor(Player tagSource) {
-        if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(tagSource)) {
+        if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(tagSource.getUniqueId())) {
             return new TextComponent(TextComponent.fromLegacyText(tagSource.getName()));
         }
         return PrivateReserve.PLAYER_R.fromPlayer(tagSource).get().getNameTag();

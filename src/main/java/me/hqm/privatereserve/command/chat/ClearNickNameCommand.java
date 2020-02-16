@@ -15,7 +15,8 @@ import java.util.Optional;
 public class ClearNickNameCommand extends BaseCommand {
     @Override
     protected CommandResult onCommand(CommandSender sender, Command command, String[] args) {
-        if (sender instanceof Player && (PrivateReserve.PLAYER_R.isVisitorOrExpelled((Player) sender))) {
+        if (sender instanceof Player &&
+                (PrivateReserve.PLAYER_R.isVisitorOrExpelled(((Player) sender).getUniqueId()))) {
             return CommandResult.QUIET_ERROR;
         }
         if(args.length == 1) {

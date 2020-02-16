@@ -23,7 +23,7 @@ public class VisitorTag extends PlayerTag {
 
     @Override
     public TextComponent getComponentFor(Player player) {
-        if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(player)) {
+        if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(player.getUniqueId())) {
             return visitor;
         }
         return ChatTag.EMPTY;
