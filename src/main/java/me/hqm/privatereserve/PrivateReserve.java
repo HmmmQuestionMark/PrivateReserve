@@ -4,8 +4,9 @@ import com.demigodsrpg.chitchat.Chitchat;
 import com.demigodsrpg.chitchat.tag.PlayerTag;
 import com.mongodb.*;
 import com.mongodb.client.*;
+import me.hqm.privatereserve.command.DebugCommand;
+import me.hqm.privatereserve.command.LockModeCommand;
 import me.hqm.privatereserve.command.chat.*;
-import me.hqm.privatereserve.command.dungeon.DebugCommand;
 import me.hqm.privatereserve.command.member.*;
 import me.hqm.privatereserve.dungeon.mob.DungeonMobs;
 import me.hqm.privatereserve.listener.LockedBlockListener;
@@ -13,6 +14,7 @@ import me.hqm.privatereserve.listener.PlayerListener;
 import me.hqm.privatereserve.registry.*;
 import me.hqm.privatereserve.registry.file.*;
 import me.hqm.privatereserve.registry.mongo.*;
+import me.hqm.privatereserve.runnable.TimeRunnable;
 import me.hqm.privatereserve.tag.ChatTag;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -103,12 +105,6 @@ public class PrivateReserve {
         manager.registerEvents(new PlayerListener(), plugin);
         manager.registerEvents(new LockedBlockListener(), plugin);
 
-        // Register dungeon mobs
-        Arrays.asList(DungeonMobs.values()).forEach(mob -> {
-            manager.registerEvents(mob, plugin);
-            mob.registerRunnables(plugin);
-        });
-
         // Commands
         plugin.getCommand("nickname").setExecutor(new NickNameCommand());
         plugin.getCommand("pronouns").setExecutor(new PronounsCommand());
@@ -119,16 +115,24 @@ public class PrivateReserve {
         plugin.getCommand("expel").setExecutor(new ExpelCommand());
         plugin.getCommand("spawn").setExecutor(new SpawnCommand());
         plugin.getCommand("visiting").setExecutor(new VisitingCommand());
+        plugin.getCommand("lockmode").setExecutor(new LockModeCommand());
         plugin.getCommand("memberhelp").setExecutor(new MemberHelpCommand());
         plugin.getCommand("prdebug").setExecutor(new DebugCommand());
+
+        // Register dungeon mobs
+        Arrays.asList(DungeonMobs.values()).forEach(mob -> {
+            manager.registerEvents(mob, plugin);
+            mob.registerRunnables(plugin);
+        });
+
+        // Register tasks
+        Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(PLUGIN, RELATIONAL_R::clearExpired, 20, 20);
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(PLUGIN, new TimeRunnable(), 1, 1);
 
         // Build chat format
         Chitchat.getChatFormat().addAll(new PlayerTag[]{
                 ChatTag.ADMIN_TAG, ChatTag.VISITOR_TAG, ChatTag.TRUSTED_TAG, ChatTag.NAME_TAG
         });
-
-        // Register tasks
-        Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(PLUGIN, RELATIONAL_R::clearExpired, 20, 20);
     }
 
     public void disable() {

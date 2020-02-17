@@ -1,5 +1,6 @@
 package me.hqm.privatereserve;
 
+import com.google.common.collect.ImmutableList;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,6 +20,11 @@ public class Setting {
     public static final String VISITOR_REGION_WORLD = getConfig().getString("region.visitor_world", "world");
 
     public static final int MAX_TARGET_RANGE = getConfig().getInt("targeting.max_range", 100);
+
+    public static final int DAYLIGHT_MULTIPLIER = getConfig().getInt("time_multiplier.daylight", 2);
+    public static final int NIGHT_MULTIPLIER = getConfig().getInt("time_multiplier.night", 1);
+    public static final ImmutableList<String> TIME_MULTIPLIER_WORLDS =
+            ImmutableList.copyOf(getConfig().getStringList("time_multiplier.worlds"));
 
     private static ConfigurationSection getConfig() {
         return JavaPlugin.getProvidingPlugin(Setting.class).getConfig();

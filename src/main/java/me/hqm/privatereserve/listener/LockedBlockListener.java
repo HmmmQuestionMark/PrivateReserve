@@ -5,11 +5,13 @@ import me.hqm.privatereserve.model.LockedBlockModel;
 import me.hqm.privatereserve.registry.LockedBlockRegistry;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Optional;
@@ -22,7 +24,7 @@ public class LockedBlockListener implements Listener {
             Location location = event.getBlockPlaced().getLocation();
             Bukkit.getScheduler().scheduleSyncDelayedTask(PrivateReserve.PLUGIN, () -> {
                 if (PrivateReserve.LOCKED_R.create(location.getBlock(), event.getPlayer())) {
-                    event.getPlayer().sendMessage(ChatColor.RED + "Locked block created.");
+                    event.getPlayer().sendMessage(ChatColor.RED + "Block secured.");
                     event.getPlayer().sendMessage(ChatColor.YELLOW + "Right-click while sneaking to lock/unlock.");
                 }
             }, 5);
@@ -32,13 +34,11 @@ public class LockedBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onBlockBreak(BlockBreakEvent event) {
         String playerId = event.getPlayer().getUniqueId().toString();
-        Optional<LockedBlockModel> oModel = PrivateReserve.LOCKED_R.
-                fromLocation(event.getBlock().getLocation());
+        Optional<LockedBlockModel> oModel = PrivateReserve.LOCKED_R.fromLocation(event.getBlock().getLocation());
         if (oModel.isPresent()) {
-            if (!PrivateReserve.LOCKED_R.isLockable(event.getBlock()) || oModel.get().getOwner().
-                    equals(playerId)) {
+            if (!PrivateReserve.LOCKED_R.isLockable(event.getBlock()) || oModel.get().getOwner().equals(playerId)) {
                 PrivateReserve.LOCKED_R.delete(event.getBlock());
-                event.getPlayer().sendMessage(ChatColor.RED + "Locked block destroyed.");
+                event.getPlayer().sendMessage(ChatColor.RED + "Secured block was destroyed.");
             }
         }
     }
@@ -52,19 +52,20 @@ public class LockedBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        String playerId = event.getPlayer().getUniqueId().toString();
+        Player player = event.getPlayer();
+        String playerId = player.getUniqueId().toString();
         Block block = event.getClickedBlock();
-        if (event.getPlayer().isSneaking() && PrivateReserve.LOCKED_R.isRegistered(block)) {
+        if (canLock(player) && player.isSneaking() && EquipmentSlot.HAND.equals(event.getHand()) &&
+                PrivateReserve.LOCKED_R.isRegistered(block)) {
             event.setUseInteractedBlock(Event.Result.DENY);
             event.setUseItemInHand(Event.Result.DENY);
-            LockedBlockRegistry.LockState state = PrivateReserve.LOCKED_R.
-                    lockUnlock(block, event.getPlayer());
+            LockedBlockRegistry.LockState state = PrivateReserve.LOCKED_R.lockUnlock(block, event.getPlayer());
             if (state == LockedBlockRegistry.LockState.LOCKED) {
-                event.getPlayer().sendMessage(ChatColor.RED + "This block is locked.");
+                player.sendMessage(ChatColor.RED + "This block is locked.");
             } else if (state == LockedBlockRegistry.LockState.UNLOCKED) {
-                event.getPlayer().sendMessage(ChatColor.YELLOW + "This block is unlocked.");
+                player.sendMessage(ChatColor.YELLOW + "This block is unlocked.");
             } else if (state == LockedBlockRegistry.LockState.UNCHANGED) {
-                event.getPlayer().sendMessage(ChatColor.YELLOW + "You don't have the key to this block.");
+                player.sendMessage(ChatColor.YELLOW + "You don't have the key to this block.");
             }
         } else if (PrivateReserve.LOCKED_R.getLockState(event.getClickedBlock()) ==
                 LockedBlockRegistry.LockState.LOCKED) {
@@ -74,11 +75,11 @@ public class LockedBlockListener implements Listener {
 
             // Cancel break animation
             PrivateReserve.RELATIONAL_R.put(playerId, "NO-BREAK", true);
-            event.getPlayer().addPotionEffect(PotionEffectType.SLOW_DIGGING.createEffect(9999999, 5), true);
+            player.addPotionEffect(PotionEffectType.SLOW_DIGGING.createEffect(9999999, 5), true);
         } else if (block == null || PrivateReserve.RELATIONAL_R.contains(playerId, "NO-BREAK")) {
             // Allow break animation
             PrivateReserve.RELATIONAL_R.remove(playerId, "NO-BREAK");
-            event.getPlayer().removePotionEffect(PotionEffectType.SLOW_DIGGING);
+            player.removePotionEffect(PotionEffectType.SLOW_DIGGING);
         }
     }
 
@@ -107,9 +108,15 @@ public class LockedBlockListener implements Listener {
                 map(save -> save.getLocation().getBlock()).forEach(block -> {
             if (LockedBlockRegistry.isBisected(block)) {
                 LockedBlockRegistry.getBisected(block).forEach(chest -> event.blockList().remove(chest));
+            } else if (LockedBlockRegistry.isDoubleChest(block)) {
+                LockedBlockRegistry.getDoubleChest(block).forEach(chest -> event.blockList().remove(chest));
             } else {
                 event.blockList().remove(block);
             }
         });
+    }
+
+    boolean canLock(Player player) {
+        return PrivateReserve.RELATIONAL_R.contains(player.getUniqueId().toString(), "NO-LOCK");
     }
 }

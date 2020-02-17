@@ -40,6 +40,10 @@ public class NickNameCommand extends BaseCommand {
         if(args.length == 1) {
             if (sender instanceof Player) {
                 Player self = (Player) sender;
+                if (args[0].contains("[") || args[0].contains("]")) {
+                    sender.sendMessage(ChatColor.RED + "That is not an allowed nickname. Please try again.");
+                    return CommandResult.QUIET_ERROR;
+                }
                 if (setNickName(PrivateReserve.PLAYER_R.fromPlayer(self).get(), args[0])) {
                     sender.sendMessage(ChatColor.GREEN + "Nickname set.");
                     return CommandResult.SUCCESS;

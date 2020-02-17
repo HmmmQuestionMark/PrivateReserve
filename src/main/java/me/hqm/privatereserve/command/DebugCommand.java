@@ -1,4 +1,4 @@
-package me.hqm.privatereserve.command.dungeon;
+package me.hqm.privatereserve.command;
 
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;

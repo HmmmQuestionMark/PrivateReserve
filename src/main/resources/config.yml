@@ -15,3 +15,7 @@ region:
   spawn_world: 'world'
 targeting:
   max_range: 100
+time_multiplier:
+  daylight: 2
+  night: 1
+  worlds: [world]

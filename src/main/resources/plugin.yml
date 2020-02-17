@@ -1,6 +1,6 @@
 name: PrivateReserve
 main: me.hqm.privatereserve.PrivateReservePlugin
-api-version: 1.15
+api-version: '1.15'
 version: ${project.version}
 description: Special sauce for HQM's private reserve.
 authors: [HmmmQuestionMark]
@@ -28,6 +28,9 @@ commands:
   visiting:
     usage: /visiting
     aliases: [vspawn]
+  lockmode:
+    usage: /lockmode
+    aliases: [lock]
   memberhelp:
     usage: /memberhelp [topic]
   prdebug:
