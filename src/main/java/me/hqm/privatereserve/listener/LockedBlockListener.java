@@ -117,6 +117,6 @@ public class LockedBlockListener implements Listener {
     }
 
     boolean canLock(Player player) {
-        return PrivateReserve.RELATIONAL_R.contains(player.getUniqueId().toString(), "NO-LOCK");
+        return !PrivateReserve.RELATIONAL_R.contains(player.getUniqueId().toString(), "NO-LOCK");
     }
 }
