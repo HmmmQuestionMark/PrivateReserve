@@ -54,6 +54,15 @@ public class InviteCommand extends BaseCommand {
 
             // Register from player
             else {
+                if (args.length > 1) {
+                    Optional<PlayerModel> primary = PrivateReserve.PLAYER_R.fromName(args[1]);
+                    if (primary.isPresent()) {
+                        PrivateReserve.PLAYER_R.invite(invitee, (Player) sender, primary.get().getKey());
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "The provided primary account does not exist.");
+                        return CommandResult.QUIET_ERROR;
+                    }
+                }
                 PrivateReserve.PLAYER_R.invite(invitee, (Player) sender);
             }
 
@@ -65,8 +74,8 @@ public class InviteCommand extends BaseCommand {
             // Let the invitee know
             if (invitee.isOnline()) {
                 invitee.getPlayer().teleport(RegionUtil.spawnLocation());
-                Chitchat.sendTitle(invitee.getPlayer(), 10, 80, 10, ChatColor.YELLOW + "Celebrate!", ChatColor.GREEN +
-                        "You were invited! Have fun!");
+                Chitchat.sendTitle(invitee.getPlayer(), 10, 80, 10,
+                        ChatColor.YELLOW + "Celebrate!", ChatColor.GREEN + "You were invited! Have fun!");
             }
 
             // If this is reached, the invite worked

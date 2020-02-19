@@ -46,11 +46,23 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
     }
 
     default PlayerModel invite(OfflinePlayer player, Player inviteFrom) {
-        return invite(player, inviteFrom.getUniqueId().toString());
+        return invite(player, inviteFrom.getUniqueId().toString(), null);
     }
 
     default PlayerModel invite(OfflinePlayer player, String inviteFrom) {
-        PlayerModel model = new PlayerModel(player, inviteFrom);
+        PlayerModel model = new PlayerModel(player, inviteFrom, null);
+        PlayerModel invite = fromKey(inviteFrom).get();
+        invite.addInvited(model.getKey());
+        register(model);
+        return model;
+    }
+
+    default PlayerModel invite(OfflinePlayer player, Player inviteFrom, String primaryAcoount) {
+        return invite(player, inviteFrom.getUniqueId().toString(), primaryAcoount);
+    }
+
+    default PlayerModel invite(OfflinePlayer player, String inviteFrom, String primaryAcoount) {
+        PlayerModel model = new PlayerModel(player, inviteFrom, primaryAcoount);
         PlayerModel invite = fromKey(inviteFrom).get();
         invite.addInvited(model.getKey());
         register(model);
@@ -59,6 +71,12 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
 
     default PlayerModel inviteConsole(OfflinePlayer player) {
         PlayerModel model = new PlayerModel(player, true);
+        register(model);
+        return model;
+    }
+
+    default PlayerModel inviteConsole(OfflinePlayer player, String primaryAccount) {
+        PlayerModel model = new PlayerModel(player, true, false, primaryAccount);
         register(model);
         return model;
     }
@@ -83,11 +101,24 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
         return fromId(player).isPresent() && fromId(player).get().isExpelled();
     }
 
+    default boolean isExpelled(String player) {
+        return fromId(player).isPresent() && fromId(player).get().isExpelled();
+    }
+
+    default boolean isAlternate(UUID player) {
+        return fromId(player).isPresent() && fromId(player).get().isAlternate();
+    }
+
     default boolean isVisitorOrExpelled(UUID player) {
         return isVisitor(player) || isExpelled(player);
     }
 
     default boolean isTrusted(UUID player) {
+        Optional<PlayerModel> oModel = fromId(player);
+        return oModel.isPresent() && oModel.get().isTrusted();
+    }
+
+    default boolean isTrusted(String player) {
         Optional<PlayerModel> oModel = fromId(player);
         return oModel.isPresent() && oModel.get().isTrusted();
     }

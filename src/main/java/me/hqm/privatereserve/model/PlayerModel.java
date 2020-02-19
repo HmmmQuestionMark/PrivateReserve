@@ -17,6 +17,7 @@ public class PlayerModel implements Model {
 
     private final String mojangId;
     private String lastKnownName;
+    private String primaryAccount;
 
     // -- INTERESTING DATA -- //
 
@@ -25,11 +26,11 @@ public class PlayerModel implements Model {
 
     // -- GREYLIST DATA -- //
 
-    boolean trusted;
-    boolean expelled;
-    long timeInvited;
-    String invitedFrom;
-    List<String> invited;
+    private boolean trusted;
+    private boolean expelled;
+    private long timeInvited;
+    private String invitedFrom;
+    private List<String> invited;
 
     // -- NAME TAG TEXT -- //
 
@@ -42,17 +43,23 @@ public class PlayerModel implements Model {
     }
 
     public PlayerModel(OfflinePlayer player, boolean console, boolean trusted) {
-        this(player, console ? "CONSOLE" : player.getUniqueId().toString());
+        this(player, console ? "CONSOLE" : player.getUniqueId().toString(), null);
         this.trusted = trusted;
     }
 
-    public PlayerModel(OfflinePlayer player, String invitedFrom) {
+    public PlayerModel(OfflinePlayer player, boolean console, boolean trusted, String primaryAccount) {
+        this(player, console ? "CONSOLE" : player.getUniqueId().toString(), primaryAccount);
+        this.trusted = trusted;
+    }
+
+    public PlayerModel(OfflinePlayer player, String invitedFrom, String primaryAccount) {
         mojangId = player.getUniqueId().toString();
         lastKnownName = player.getName();
         this.invitedFrom = invitedFrom;
         nickName = lastKnownName;
         trusted = false;
         expelled = false;
+        this.primaryAccount = primaryAccount;
         timeInvited = System.currentTimeMillis();
         invited = new ArrayList<>();
         buildNameTag();
@@ -67,6 +74,8 @@ public class PlayerModel implements Model {
 
         trusted = data.getBoolean("trusted", false);
         expelled = data.getBoolean("expelled", false);
+
+        primaryAccount = data.getStringNullable("primaryAccount"); // If specified, this is an alt account
 
         timeInvited = data.getLong("timeInvited", System.currentTimeMillis());
         invitedFrom = data.getString("invitedFrom", "d5133464-b1ef-42b4-9ad4-8cac217d40f0"); // Default to HQM
@@ -94,6 +103,10 @@ public class PlayerModel implements Model {
         data.put("trusted", trusted);
         data.put("expelled", expelled);
 
+        if (primaryAccount != null) {
+            data.put("primaryAccount", primaryAccount);
+        }
+
         data.put("timeInvited", timeInvited);
         data.put("invitedFrom", invitedFrom);
         data.put("invited", invited);
@@ -119,6 +132,10 @@ public class PlayerModel implements Model {
         return lastKnownName;
     }
 
+    public String getPrimaryAccount() {
+        return primaryAccount;
+    }
+
     public String getRawNickName() {
         return nickName;
     }
@@ -140,11 +157,15 @@ public class PlayerModel implements Model {
     }
 
     public boolean isTrusted() {
-        return trusted;
+        return isAlternate() ? PrivateReserve.PLAYER_R.isTrusted(primaryAccount) : trusted;
     }
 
     public boolean isExpelled() {
-        return expelled;
+        return isAlternate() ? PrivateReserve.PLAYER_R.isExpelled(primaryAccount) : expelled;
+    }
+
+    public boolean isAlternate() {
+        return primaryAccount != null;
     }
 
     public String getInvitedFrom() {
@@ -182,6 +203,12 @@ public class PlayerModel implements Model {
         register();
     }
 
+    public void setPrimaryAccount(String primaryAccount) {
+        this.primaryAccount = primaryAccount;
+        buildNameTag();
+        register();
+    }
+
     public void setInvitedFrom(String invitedFrom) {
         this.invitedFrom = invitedFrom;
         this.timeInvited = System.currentTimeMillis();
@@ -202,8 +229,31 @@ public class PlayerModel implements Model {
     // -- UTIL -- //
 
     public void buildNameTag() {
+        String primaryAccountName = null;
+        if (isAlternate()) {
+            Optional<PlayerModel> primary = PrivateReserve.PLAYER_R.fromId(primaryAccount);
+            if (primary.isPresent()) {
+                primaryAccountName = primary.get().getLastKnownName();
+            } else {
+                setPrimaryAccount(null);
+                register();
+            }
+        }
+
+        nameTagText = buildNameTag0(nickName, lastKnownName, primaryAccountName, pronouns, invited);
+
+        // Set display name in Bukkit/Spigot
+        if (getOnline()) {
+            Player player = (Player) getOfflinePlayer();
+            player.setDisplayName(org.bukkit.ChatColor.translateAlternateColorCodes('&', nickName));
+            player.setPlayerListName(org.bukkit.ChatColor.translateAlternateColorCodes('&', nickName));
+        }
+    }
+
+    private TextComponent buildNameTag0(String nickName, String lastKnownName, String primaryAccountName,
+                                        String pronouns, List<String> invited) {
         // Define blank component
-        nameTagText = new TextComponent();
+        TextComponent nameTagText = new TextComponent();
 
         // Build from legacy text
         for (BaseComponent component : TextComponent.fromLegacyText(
@@ -219,18 +269,27 @@ public class PlayerModel implements Model {
                 color(ChatColor.DARK_GRAY).create());
         hover.addExtra(username);
 
+        if (primaryAccountName != null) {
+            // Give last known username for the primary account
+            TextComponent primaryUsername = new TextComponent(new ComponentBuilder("Primary Account: " +
+                    primaryAccountName).color(ChatColor.DARK_GRAY).create());
+            hover.addExtra(ChatTag.NEW_LINE);
+            hover.addExtra(primaryUsername);
+        }
+
         // Set pronouns
-        if (this.pronouns != null) {
-            TextComponent pronouns = new TextComponent(new ComponentBuilder("Pronouns: " + this.pronouns).
+        if (pronouns != null) {
+            TextComponent pronounsComp = new TextComponent(new ComponentBuilder("Pronouns: " + pronouns).
                     color(ChatColor.DARK_GRAY).create());
             hover.addExtra(ChatTag.NEW_LINE);
-            hover.addExtra(pronouns);
+            hover.addExtra(pronounsComp);
         }
 
         // Set invited amount
         if (invited.size() > 0) {
-            TextComponent countText = new TextComponent(new ComponentBuilder("Invited: " + invited.size() + " members").
-                    color(ChatColor.DARK_GRAY).create());
+            TextComponent countText =
+                    new TextComponent(new ComponentBuilder("Invited: " + invited.size() + " members").
+                            color(ChatColor.DARK_GRAY).create());
             hover.addExtra(ChatTag.NEW_LINE);
             hover.addExtra(countText);
         }
@@ -239,12 +298,7 @@ public class PlayerModel implements Model {
         BaseComponent[] hoverText = Collections.singleton(hover).toArray(new BaseComponent[1]);
         nameTagText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
 
-        // Set display name in Bukkit/Spigot
-        if(getOnline()) {
-            Player player = (Player) getOfflinePlayer();
-            player.setDisplayName(org.bukkit.ChatColor.translateAlternateColorCodes('&', nickName));
-            player.setPlayerListName(org.bukkit.ChatColor.translateAlternateColorCodes('&', nickName));
-        }
+        return nameTagText;
     }
 
     @Override

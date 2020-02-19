@@ -18,11 +18,14 @@ commands:
   clearpronouns:
     usage: /pronouns [username]
   invite:
-    usage: /invite [player]
+    usage: /invite <player> [primary]
   trust:
-    usage: /trust [player]
+    usage: /trust <player>
   expel:
-    usage: /expel [player]
+    usage: /expel <player>
+  alternate:
+    usage: /alternate <player> <primary>
+    aliases: [alt]
   spawn:
     usage: /spawn
   visiting:

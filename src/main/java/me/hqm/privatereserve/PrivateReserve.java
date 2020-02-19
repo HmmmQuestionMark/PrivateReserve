@@ -113,6 +113,7 @@ public class PrivateReserve {
         plugin.getCommand("invite").setExecutor(new InviteCommand());
         plugin.getCommand("trust").setExecutor(new TrustCommand());
         plugin.getCommand("expel").setExecutor(new ExpelCommand());
+        plugin.getCommand("alternate").setExecutor(new AlternateCommand());
         plugin.getCommand("spawn").setExecutor(new SpawnCommand());
         plugin.getCommand("visiting").setExecutor(new VisitingCommand());
         plugin.getCommand("lockmode").setExecutor(new LockModeCommand());
@@ -131,7 +132,7 @@ public class PrivateReserve {
 
         // Build chat format
         Chitchat.getChatFormat().addAll(new PlayerTag[]{
-                ChatTag.ADMIN_TAG, ChatTag.VISITOR_TAG, ChatTag.TRUSTED_TAG, ChatTag.NAME_TAG
+                ChatTag.ADMIN_TAG, ChatTag.VISITOR_TAG, ChatTag.ALTERNATE_TAG, ChatTag.TRUSTED_TAG, ChatTag.NAME_TAG
         });
     }
 

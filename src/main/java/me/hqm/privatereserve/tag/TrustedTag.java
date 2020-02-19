@@ -23,7 +23,8 @@ public class TrustedTag extends PlayerTag {
 
     @Override
     public TextComponent getComponentFor(Player player) {
-        if (PrivateReserve.PLAYER_R.isTrusted(player.getUniqueId())) {
+        if (!PrivateReserve.PLAYER_R.isAlternate(player.getUniqueId()) &&
+                PrivateReserve.PLAYER_R.isTrusted(player.getUniqueId())) {
             return trusted;
         }
         return ChatTag.EMPTY;
