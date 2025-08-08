@@ -112,6 +112,9 @@ public class PrivateReserve {
         plugin.getCommand("expel").setExecutor(new ExpelCommand());
         plugin.getCommand("alternate").setExecutor(new AlternateCommand());
         plugin.getCommand("spawn").setExecutor(new SpawnCommand());
+        if(PLUGIN.getConfig().getBoolean("home.enabled", true)) {
+            plugin.getCommand("home").setExecutor(new HomeCommand());
+        }
         plugin.getCommand("visiting").setExecutor(new VisitingCommand());
         plugin.getCommand("lockmode").setExecutor(new LockModeCommand());
         plugin.getCommand("memberhelp").setExecutor(new MemberHelpCommand());

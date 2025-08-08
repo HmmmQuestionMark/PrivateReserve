@@ -19,3 +19,5 @@ time_multiplier:
   daylight: 2
   night: 1
   worlds: [world]
+home:
+  enabled: true

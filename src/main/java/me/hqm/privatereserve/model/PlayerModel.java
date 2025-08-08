@@ -1,5 +1,6 @@
 package me.hqm.privatereserve.model;
 
+import com.demigodsrpg.util.LocationUtil;
 import com.demigodsrpg.util.datasection.DataSection;
 import com.demigodsrpg.util.datasection.Model;
 import me.hqm.privatereserve.PrivateReserve;
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class PlayerModel implements Model {
@@ -34,6 +36,10 @@ public class PlayerModel implements Model {
     private long timeInvited;
     private String invitedFrom;
     private List<String> invited;
+
+    // -- LOCATION DATA -- //
+
+    private Location homeLoc;
 
     // -- NAME TAG TEXT -- //
 
@@ -59,7 +65,8 @@ public class PlayerModel implements Model {
         mojangId = player.getUniqueId().toString();
         lastKnownName = player.getName();
         this.invitedFrom = invitedFrom;
-        nickName = lastKnownName;
+        nickName = LegacyComponentSerializer.legacyAmpersand().
+                serialize(Component.text(lastKnownName, NamedTextColor.GRAY));
         trusted = false;
         expelled = false;
         this.primaryAccount = primaryAccount;
@@ -83,6 +90,12 @@ public class PlayerModel implements Model {
         timeInvited = data.getLong("timeInvited", System.currentTimeMillis());
         invitedFrom = data.getString("invitedFrom", "d5133464-b1ef-42b4-9ad4-8cac217d40f0"); // Default to HQM
         invited = data.getStringList("invited");
+
+        String homeLocString = data.getStringNullable("homeLoc");
+        if (homeLocString != null) {
+            homeLoc = LocationUtil.locationFromString(homeLocString);
+        }
+
         buildNameTag();
     }
 
@@ -113,6 +126,10 @@ public class PlayerModel implements Model {
         data.put("timeInvited", timeInvited);
         data.put("invitedFrom", invitedFrom);
         data.put("invited", invited);
+
+        if (homeLoc != null) {
+            data.put("homeLoc", LocationUtil.stringFromLocation(homeLoc));
+        }
         return data;
     }
 
@@ -143,12 +160,16 @@ public class PlayerModel implements Model {
         return nickName;
     }
 
-    public String getNickName() {
-        return ChatColor.translateAlternateColorCodes('&', nickName);
+    public Component getNickName() {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(nickName);
     }
 
     public String getPronouns() {
         return pronouns;
+    }
+
+    public @Nullable Location getHomeLoc() {
+        return homeLoc;
     }
 
     public Component getNameTag() {
@@ -193,6 +214,11 @@ public class PlayerModel implements Model {
 
     public void setPronouns(String pronouns) {
         this.pronouns = pronouns;
+        register();
+    }
+
+    public void setHomeLoc(Location homeLoc) {
+        this.homeLoc = homeLoc;
         register();
     }
 
@@ -248,8 +274,8 @@ public class PlayerModel implements Model {
         // Set display name in Bukkit/Spigot
         if (getOnline()) {
             Player player = (Player) getOfflinePlayer();
-            player.setDisplayName(org.bukkit.ChatColor.translateAlternateColorCodes('&', nickName));
-            player.setPlayerListName(org.bukkit.ChatColor.translateAlternateColorCodes('&', nickName));
+            player.displayName(LegacyComponentSerializer.legacyAmpersand().deserialize(nickName));
+            player.playerListName(LegacyComponentSerializer.legacyAmpersand().deserialize(nickName));
         }
     }
 
@@ -284,7 +310,7 @@ public class PlayerModel implements Model {
         }
 
         // Set invited amount
-        if (invited.size() > 0) {
+        if (!invited.isEmpty()) {
             Component countText = Component.text("Invited: " + invited.size() + " members", NamedTextColor.DARK_GRAY);
             hover.append(ChatTag.NEW_LINE);
             hover.append(countText);
