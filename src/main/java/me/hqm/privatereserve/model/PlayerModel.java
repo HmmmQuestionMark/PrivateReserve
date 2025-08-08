@@ -80,7 +80,7 @@ public class PlayerModel implements Model {
         lastKnownName = data.getString("last_known_name");
 
         nickName = data.getString("nickname");
-        pronouns = data.isString("pronouns") ? data.getString("pronouns") : null;
+        pronouns = data.getStringNullable("pronouns");
 
         trusted = data.getBoolean("trusted", false);
         expelled = data.getBoolean("expelled", false);
@@ -214,6 +214,7 @@ public class PlayerModel implements Model {
 
     public void setPronouns(String pronouns) {
         this.pronouns = pronouns;
+        buildNameTag();
         register();
     }
 
@@ -252,6 +253,7 @@ public class PlayerModel implements Model {
 
     public void addInvited(String invitee) {
         this.invited.add(invitee);
+        buildNameTag();
         register();
     }
 
