@@ -2,8 +2,6 @@ package me.hqm.privatereserve;
 
 import com.demigodsrpg.chitchat.Chitchat;
 import com.demigodsrpg.chitchat.tag.PlayerTag;
-import com.mongodb.*;
-import com.mongodb.client.*;
 import me.hqm.privatereserve.command.DebugCommand;
 import me.hqm.privatereserve.command.LockModeCommand;
 import me.hqm.privatereserve.command.chat.*;
@@ -13,7 +11,6 @@ import me.hqm.privatereserve.listener.LockedBlockListener;
 import me.hqm.privatereserve.listener.PlayerListener;
 import me.hqm.privatereserve.registry.*;
 import me.hqm.privatereserve.registry.file.*;
-import me.hqm.privatereserve.registry.mongo.*;
 import me.hqm.privatereserve.runnable.TimeRunnable;
 import me.hqm.privatereserve.tag.ChatTag;
 import org.bukkit.Bukkit;
@@ -22,7 +19,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.logging.Logger;
 
 public class PrivateReserve {
@@ -32,7 +28,7 @@ public class PrivateReserve {
     public static Logger CONSOLE;
     public static String SAVE_PATH;
 
-    private static MongoDatabase DATABASE;
+    //private static MongoDatabase DATABASE;
 
     // -- DATA -- //
 
@@ -40,11 +36,11 @@ public class PrivateReserve {
     public static LockedBlockRegistry LOCKED_R;
     public static RelationalDataRegistry RELATIONAL_R;
 
-    void enableMongo(MongoDatabase database) {
+    /*void enableMongo(MongoDatabase database) {
         PLAYER_R = new MPlayerRegistry(database);
         LOCKED_R = new MLockedBlockRegistry(database);
         RELATIONAL_R = new MRelationalDataRegistry(database);
-    }
+    }*/
 
     void enableFile() {
         PLAYER_R = new FPlayerRegistry();
@@ -64,6 +60,7 @@ public class PrivateReserve {
         SAVE_PATH = plugin.getDataFolder().getPath() + "/data/";
 
         // Test for Mongo connection if enabled
+        /**
         if (Setting.MONGODB_PERSISTENCE) {
             try {
                 String hostname = Setting.MONGODB_HOSTNAME;
@@ -89,11 +86,11 @@ public class PrivateReserve {
                 Bukkit.getPluginManager().disablePlugin(PLUGIN);
                 return;
             }
-        } else {
+        } else {**/
             enableFile();
 
             CONSOLE.info("Json file saving enabled.");
-        }
+        //}
 
         // Load all from data
         PLAYER_R.loadAllFromDb();

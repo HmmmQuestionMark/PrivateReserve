@@ -1,25 +1,25 @@
 package me.hqm.privatereserve.tag;
 
 import com.demigodsrpg.chitchat.tag.DefaultPlayerTag;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class AdminTag extends DefaultPlayerTag {
     public AdminTag() {
         super("admin-tag", "reservechat.admin", admin(), 5);
     }
 
-    static TextComponent admin() {
-        TextComponent admin = new TextComponent("[");
-        admin.setColor(ChatColor.DARK_GRAY);
-        TextComponent middle = new TextComponent("A");
-        middle.setColor(ChatColor.DARK_RED);
-        admin.addExtra(middle);
-        admin.addExtra("]");
-        admin.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder("Visiting").color(ChatColor.GREEN).create()));
-        admin.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Administrator").
-                color(net.md_5.bungee.api.ChatColor.DARK_RED).create()));
-        return admin;
+    static Component admin() {
+        ComponentBuilder<TextComponent, TextComponent.Builder> admin = Component.text();
+        admin.append(Component.text("[", NamedTextColor.DARK_GRAY));
+        admin.append(Component.text("A", NamedTextColor.DARK_RED));
+        admin.append(Component.text("]", NamedTextColor.DARK_GRAY));
+        admin.hoverEvent(HoverEvent.showText(Component.text("Administrator", NamedTextColor.DARK_RED)));
+        admin.clickEvent(ClickEvent.runCommand("/memberhelp ADMIN"));
+        return admin.build();
     }
 }

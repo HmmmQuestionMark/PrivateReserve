@@ -3,6 +3,8 @@ package me.hqm.privatereserve.listener;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.LockedBlockModel;
 import me.hqm.privatereserve.registry.LockedBlockRegistry;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -24,8 +26,8 @@ public class LockedBlockListener implements Listener {
             Location location = event.getBlockPlaced().getLocation();
             Bukkit.getScheduler().scheduleSyncDelayedTask(PrivateReserve.PLUGIN, () -> {
                 if (PrivateReserve.LOCKED_R.create(location.getBlock(), event.getPlayer())) {
-                    event.getPlayer().sendMessage(ChatColor.RED + "Block secured.");
-                    event.getPlayer().sendMessage(ChatColor.YELLOW + "Right-click while sneaking to lock/unlock.");
+                    event.getPlayer().sendMessage(Component.text("Block secured.", NamedTextColor.RED));
+                    event.getPlayer().sendMessage(Component.text("Right-click while sneaking to lock/unlock.", NamedTextColor.YELLOW));
                 }
             }, 5);
         }
@@ -38,7 +40,7 @@ public class LockedBlockListener implements Listener {
         if (oModel.isPresent()) {
             if (!PrivateReserve.LOCKED_R.isLockable(event.getBlock()) || oModel.get().getOwner().equals(playerId)) {
                 PrivateReserve.LOCKED_R.delete(event.getBlock());
-                event.getPlayer().sendMessage(ChatColor.RED + "Secured block was destroyed.");
+                event.getPlayer().sendMessage(Component.text("Secured block was destroyed.", NamedTextColor.RED));
             }
         }
     }
@@ -61,11 +63,11 @@ public class LockedBlockListener implements Listener {
             event.setUseItemInHand(Event.Result.DENY);
             LockedBlockRegistry.LockState state = PrivateReserve.LOCKED_R.lockUnlock(block, event.getPlayer());
             if (state == LockedBlockRegistry.LockState.LOCKED) {
-                player.sendMessage(ChatColor.RED + "This block is locked.");
+                player.sendMessage(Component.text("This block is locked.", NamedTextColor.RED));
             } else if (state == LockedBlockRegistry.LockState.UNLOCKED) {
-                player.sendMessage(ChatColor.YELLOW + "This block is unlocked.");
+                player.sendMessage(Component.text("This block is unlocked.", NamedTextColor.YELLOW));
             } else if (state == LockedBlockRegistry.LockState.UNCHANGED) {
-                player.sendMessage(ChatColor.YELLOW + "You don't have the key to this block.");
+                player.sendMessage(Component.text("You don't have the key to this block.", NamedTextColor.YELLOW));
             }
         } else if (PrivateReserve.LOCKED_R.getLockState(event.getClickedBlock()) ==
                 LockedBlockRegistry.LockState.LOCKED) {
@@ -75,11 +77,11 @@ public class LockedBlockListener implements Listener {
 
             // Cancel break animation
             PrivateReserve.RELATIONAL_R.put(playerId, "NO-BREAK", true);
-            player.addPotionEffect(PotionEffectType.SLOW_DIGGING.createEffect(9999999, 5), true);
+            player.addPotionEffect(PotionEffectType.MINING_FATIGUE.createEffect(9999999, 5));
         } else if (block == null || PrivateReserve.RELATIONAL_R.contains(playerId, "NO-BREAK")) {
             // Allow break animation
             PrivateReserve.RELATIONAL_R.remove(playerId, "NO-BREAK");
-            player.removePotionEffect(PotionEffectType.SLOW_DIGGING);
+            player.removePotionEffect(PotionEffectType.MINING_FATIGUE);
         }
     }
 

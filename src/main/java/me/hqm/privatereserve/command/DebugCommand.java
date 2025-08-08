@@ -3,7 +3,8 @@ package me.hqm.privatereserve.command;
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.dungeon.mob.DungeonMobs;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -25,12 +26,12 @@ public class DebugCommand extends BaseCommand {
 
         if (select.toLowerCase().startsWith("sk")) {
             DungeonMobs.spawnDungeonMob(location, DungeonMobs.SKELETOR);
-            sender.sendMessage(ChatColor.YELLOW + "Skeletor has been spawned.");
+            sender.sendMessage(Component.text("Skeletor has been spawned.", NamedTextColor.YELLOW));
         } else if (select.toLowerCase().startsWith("evil")) {
             DungeonMobs.spawnDungeonMob(location, DungeonMobs.EVIL_SQUID);
-            sender.sendMessage(ChatColor.YELLOW + "Evil squid has been spawned.");
+            sender.sendMessage(Component.text("Evil squid has been spawned.", NamedTextColor.YELLOW));
         } else {
-            sender.sendMessage(ChatColor.RED + "Not a valid option.");
+            sender.sendMessage(Component.text("Not a valid option.", NamedTextColor.RED));
             return CommandResult.QUIET_ERROR;
         }
         return CommandResult.SUCCESS;

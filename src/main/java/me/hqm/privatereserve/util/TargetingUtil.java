@@ -2,6 +2,8 @@ package me.hqm.privatereserve.util;
 
 import com.google.common.collect.Lists;
 import me.hqm.privatereserve.Setting;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -83,7 +85,7 @@ public class TargetingUtil {
     public static boolean target(Player player, Location target, boolean notify) {
         Location toHit = adjustedAimLocation(player, target);
         if (isHit(target, toHit)) return true;
-        if (notify) player.sendMessage(ChatColor.RED + "Missed..."); // TODO Better message.
+        if (notify) player.sendMessage(Component.text("Missed...", NamedTextColor.RED)); // TODO Better message.
         return false;
     }
 

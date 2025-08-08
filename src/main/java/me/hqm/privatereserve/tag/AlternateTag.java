@@ -2,31 +2,22 @@ package me.hqm.privatereserve.tag;
 
 import com.demigodsrpg.chitchat.tag.PlayerTag;
 import me.hqm.privatereserve.PrivateReserve;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
 public class AlternateTag extends PlayerTag {
-    public static String DISPLAY_TAG = org.bukkit.ChatColor.DARK_GRAY + "[" + org.bukkit.ChatColor.GRAY +
-            org.bukkit.ChatColor.ITALIC + "A" + org.bukkit.ChatColor.DARK_GRAY + "]";
-    private TextComponent alternate;
-
-    public AlternateTag() {
-        alternate = new TextComponent("[");
-        alternate.setColor(ChatColor.DARK_GRAY);
-        TextComponent middle = new TextComponent("A");
-        middle.setColor(ChatColor.GRAY);
-        middle.setItalic(true);
-        alternate.addExtra(middle);
-        alternate.addExtra("]");
-        alternate.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder("Alt Account").color(ChatColor.GRAY).create()));
-    }
+    public static Component DISPLAY_TAG = Component.text("[", NamedTextColor.DARK_GRAY).
+            append(Component.text("A", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)).
+            append(Component.text("]", NamedTextColor.DARK_GRAY)).
+            hoverEvent(HoverEvent.showText(Component.text("Alt Account", NamedTextColor.GRAY)));
 
     @Override
-    public TextComponent getComponentFor(Player player) {
+    public Component getComponentFor(Player player) {
         if (PrivateReserve.PLAYER_R.isAlternate(player.getUniqueId())) {
-            return alternate;
+            return DISPLAY_TAG;
         }
         return ChatTag.EMPTY;
     }

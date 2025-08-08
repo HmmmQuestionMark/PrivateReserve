@@ -2,7 +2,9 @@ package me.hqm.privatereserve.dungeon.mob;
 
 import me.hqm.privatereserve.dungeon.drop.DropQuery;
 import me.hqm.privatereserve.dungeon.drop.Loot;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.*;
@@ -10,7 +12,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 public interface DungeonMob extends Listener {
-    String getName();
+    Component getName();
 
     EntityType getType();
 
@@ -26,9 +28,9 @@ public interface DungeonMob extends Listener {
 
     default LivingEntity spawnRaw(Location location) {
         LivingEntity entity = (LivingEntity) location.getWorld().spawnEntity(location, getType());
-        entity.setCustomName(getName());
+        entity.customName(getName());
         entity.setCustomNameVisible(true);
-        entity.setMaxHealth(getMaxHealth());
+        entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(getMaxHealth());
         entity.setHealth(getMaxHealth());
         return entity;
     }

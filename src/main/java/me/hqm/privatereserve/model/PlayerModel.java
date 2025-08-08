@@ -4,8 +4,11 @@ import com.demigodsrpg.util.datasection.DataSection;
 import com.demigodsrpg.util.datasection.Model;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.tag.ChatTag;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -34,7 +37,7 @@ public class PlayerModel implements Model {
 
     // -- NAME TAG TEXT -- //
 
-    private transient TextComponent nameTagText;
+    private transient Component nameTagText;
 
     // -- CONSTRUCTORS -- //
 
@@ -148,7 +151,7 @@ public class PlayerModel implements Model {
         return pronouns;
     }
 
-    public TextComponent getNameTag() {
+    public Component getNameTag() {
         return nameTagText;
     }
 
@@ -250,55 +253,47 @@ public class PlayerModel implements Model {
         }
     }
 
-    private TextComponent buildNameTag0(String nickName, String lastKnownName, String primaryAccountName,
+    private Component buildNameTag0(String nickName, String lastKnownName, String primaryAccountName,
                                         String pronouns, List<String> invited) {
         // Define blank component
-        TextComponent nameTagText = new TextComponent();
+        ComponentBuilder<TextComponent, TextComponent.Builder> nameTagText = Component.text();
 
         // Build from legacy text
-        for (BaseComponent component : TextComponent.fromLegacyText(
-                org.bukkit.ChatColor.translateAlternateColorCodes('&', nickName))) {
-            nameTagText.addExtra(component);
-        }
+        nameTagText.append(LegacyComponentSerializer.legacyAmpersand().deserialize(nickName));
 
         // Begin hover text
-        TextComponent hover = new TextComponent();
+        ComponentBuilder<TextComponent, TextComponent.Builder> hover = Component.text();
 
         // Give last known username
-        TextComponent username = new TextComponent(new ComponentBuilder("Username: " + lastKnownName).
-                color(ChatColor.DARK_GRAY).create());
-        hover.addExtra(username);
+        Component username = Component.text("Username: " + lastKnownName, NamedTextColor.DARK_GRAY);
+        hover.append(username);
 
         if (primaryAccountName != null) {
             // Give last known username for the primary account
-            TextComponent primaryUsername = new TextComponent(new ComponentBuilder("Primary Account: " +
-                    primaryAccountName).color(ChatColor.DARK_GRAY).create());
-            hover.addExtra(ChatTag.NEW_LINE);
-            hover.addExtra(primaryUsername);
+            Component primaryUsername = Component.text("Primary Account: " +
+                    primaryAccountName, NamedTextColor.DARK_GRAY);
+            hover.append(ChatTag.NEW_LINE);
+            hover.append(primaryUsername);
         }
 
         // Set pronouns
         if (pronouns != null) {
-            TextComponent pronounsComp = new TextComponent(new ComponentBuilder("Pronouns: " + pronouns).
-                    color(ChatColor.DARK_GRAY).create());
-            hover.addExtra(ChatTag.NEW_LINE);
-            hover.addExtra(pronounsComp);
+            Component pronounsComp = Component.text("Pronouns: " + pronouns, NamedTextColor.DARK_GRAY);
+            hover.append(ChatTag.NEW_LINE);
+            hover.append(pronounsComp);
         }
 
         // Set invited amount
         if (invited.size() > 0) {
-            TextComponent countText =
-                    new TextComponent(new ComponentBuilder("Invited: " + invited.size() + " members").
-                            color(ChatColor.DARK_GRAY).create());
-            hover.addExtra(ChatTag.NEW_LINE);
-            hover.addExtra(countText);
+            Component countText = Component.text("Invited: " + invited.size() + " members", NamedTextColor.DARK_GRAY);
+            hover.append(ChatTag.NEW_LINE);
+            hover.append(countText);
         }
 
         // Set hover text
-        BaseComponent[] hoverText = Collections.singleton(hover).toArray(new BaseComponent[1]);
-        nameTagText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
+        nameTagText.hoverEvent(hover.build());
 
-        return nameTagText;
+        return nameTagText.build();
     }
 
     @Override

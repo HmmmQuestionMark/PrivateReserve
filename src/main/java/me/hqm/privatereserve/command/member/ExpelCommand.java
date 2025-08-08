@@ -1,16 +1,18 @@
 package me.hqm.privatereserve.command.member;
 
-import com.demigodsrpg.chitchat.Chitchat;
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
 import me.hqm.privatereserve.util.RegionUtil;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.Optional;
 
 public class ExpelCommand extends BaseCommand {
@@ -25,10 +27,10 @@ public class ExpelCommand extends BaseCommand {
             // Get the player to be expelled
             Optional<PlayerModel> model = PrivateReserve.PLAYER_R.fromName(args[0]);
             if (!model.isPresent()) {
-                sender.sendMessage(ChatColor.RED + "Player is still a visitor.");
+                sender.sendMessage(Component.text("Player is still a visitor.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             } else if (model.get().isExpelled()) {
-                sender.sendMessage(ChatColor.RED + "Player is already expelled.");
+                sender.sendMessage(Component.text("Player is already expelled.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
             OfflinePlayer expelled = model.get().getOfflinePlayer();
@@ -36,7 +38,7 @@ public class ExpelCommand extends BaseCommand {
             // Stop untrusted from expelling
             if (!model.get().getInvitedFrom().equals(((Player) sender).getUniqueId().toString()) &&
                     !(sender.hasPermission("privatereserve.admin") || sender instanceof ConsoleCommandSender)) {
-                sender.sendMessage(ChatColor.RED + "Sorry, can't expel that person.");
+                sender.sendMessage(Component.text("Sorry, can't expel that person.", NamedTextColor.RED));
                 return CommandResult.NO_PERMISSIONS;
             }
 
@@ -45,11 +47,12 @@ public class ExpelCommand extends BaseCommand {
 
             if (expelled.isOnline()) {
                 expelled.getPlayer().teleport(RegionUtil.visitingLocation());
-                Chitchat.sendTitle(expelled.getPlayer(), 10, 80, 10, ChatColor.RED + "Expelled.", ChatColor.YELLOW +
-                        "You were expelled, go away.");
+                Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(4000), Duration.ofMillis(500));
+                Title title = Title.title(Component.text("Expelled.", NamedTextColor.RED), Component.text("You were expelled, go away.", NamedTextColor.YELLOW), times);
+                expelled.getPlayer().showTitle(title);
             }
             // If this is reached, the invite worked
-            sender.sendMessage(ChatColor.RED + expelled.getName() + " has been expelled.");
+            sender.sendMessage(Component.text(expelled.getName() + " has been expelled.", NamedTextColor.RED));
 
             return CommandResult.SUCCESS;
         }

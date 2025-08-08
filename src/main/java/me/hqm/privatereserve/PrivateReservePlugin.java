@@ -22,8 +22,7 @@ public class PrivateReservePlugin extends JavaPlugin {
 
         // MongoDB
         if (Setting.MONGODB_PERSISTENCE) {
-            LIBRARIES.addMavenLibrary(LibraryHandler.MAVEN_CENTRAL, Depends.ORG_MONGO, Depends.MONGODB,
-                    Depends.MONGODB_VER);
+            //LIBRARIES.addMavenLibrary(LibraryHandler.MAVEN_CENTRAL, Depends.ORG_MONGO, Depends.MONGODB, Depends.MONGODB_VER);
         }
 
         // Enable

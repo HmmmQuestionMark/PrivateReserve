@@ -4,7 +4,8 @@ import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,11 +24,11 @@ public class ClearPronounsCommand extends BaseCommand {
                 Optional<Player> maybeTarget = getPlayer(args[0]);
                 if (maybeTarget.isPresent()) {
                     clearPronouns(PrivateReserve.PLAYER_R.fromPlayer(maybeTarget.get()).get());
-                    sender.sendMessage(ChatColor.GREEN + "Pronouns cleared for " + maybeTarget.get().getName());
+                    sender.sendMessage(Component.text("Pronouns cleared for " + maybeTarget.get().getName(), NamedTextColor.GREEN));
                     return CommandResult.SUCCESS;
                 }
 
-                sender.sendMessage(ChatColor.RED + "That player does not exist, please try again.");
+                sender.sendMessage(Component.text("That player does not exist, please try again.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
             return CommandResult.INVALID_SYNTAX;
@@ -37,7 +38,7 @@ public class ClearPronounsCommand extends BaseCommand {
             if (sender instanceof Player) {
                 Player self = (Player) sender;
                 clearPronouns(PrivateReserve.PLAYER_R.fromPlayer(self).get());
-                sender.sendMessage(ChatColor.GREEN + "Pronouns cleared.");
+                sender.sendMessage(Component.text("Pronouns cleared.", NamedTextColor.GREEN));
                 return CommandResult.SUCCESS;
             }
             return CommandResult.PLAYER_ONLY;
