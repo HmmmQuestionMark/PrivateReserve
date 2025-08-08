@@ -38,7 +38,7 @@ public class HomeCommand extends BaseCommand {
             if (args.length <= 1) {
                 target = PrivateReserve.PLAYER_R.fromPlayer((Player) sender).get();
             } else {
-                Optional<PlayerModel> maybe = PrivateReserve.PLAYER_R.fromName(args[0]);
+                Optional<PlayerModel> maybe = PrivateReserve.PLAYER_R.fromName(args[1]);
                 if (!maybe.isPresent()) {
                     sender.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
                     return CommandResult.QUIET_ERROR;
