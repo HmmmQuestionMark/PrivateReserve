@@ -1,9 +1,9 @@
 name: PrivateReserve
 main: me.hqm.privatereserve.PrivateReservePlugin
-api-version: '1.15'
+api-version: '1.21.8'
 version: ${project.version}
 description: Special sauce for HQM's private reserve.
-authors: [HmmmQuestionMark]
+authors: [HQM]
 depend: [Chitchat, WorldGuard]
 commands:
   ## Everyday Commands
@@ -28,6 +28,8 @@ commands:
     aliases: [alt]
   spawn:
     usage: /spawn
+  home:
+    usage: /home [go|set|clear] [username]
   visiting:
     usage: /visiting
     aliases: [vspawn]
