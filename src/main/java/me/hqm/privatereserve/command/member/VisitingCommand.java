@@ -3,7 +3,8 @@ package me.hqm.privatereserve.command.member;
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.util.RegionUtil;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
@@ -16,7 +17,7 @@ public class VisitingCommand extends BaseCommand {
             }
 
             ((Player) sender).teleport(RegionUtil.visitingLocation());
-            sender.sendMessage(ChatColor.YELLOW + "Warped to visiting spawn.");
+            sender.sendMessage(Component.text("Warped to visiting spawn.", NamedTextColor.YELLOW));
         }
         return CommandResult.SUCCESS;
     }

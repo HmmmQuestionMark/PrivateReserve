@@ -1,15 +1,17 @@
 package me.hqm.privatereserve.command.member;
 
-import com.demigodsrpg.chitchat.Chitchat;
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import java.time.Duration;
 import java.util.Optional;
 
 public class TrustCommand extends BaseCommand {
@@ -25,15 +27,15 @@ public class TrustCommand extends BaseCommand {
             // Get the invitee
             Optional<PlayerModel> model = PrivateReserve.PLAYER_R.fromName(args[0]);
             if (!model.isPresent()) {
-                sender.sendMessage(ChatColor.RED + "Player is still a visitor, please try again later.");
+                sender.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             } else if (model.get().isExpelled()) {
-                sender.sendMessage(ChatColor.RED + "Player is expelled, please try a different name.");
+                sender.sendMessage(Component.text("Player is expelled, please try a different name.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
             OfflinePlayer invitee = model.get().getOfflinePlayer();
 
-            if (!sender.hasPermission("seasons.admin")) {
+            if (!sender.hasPermission("privatereserve.admin")) {
                 return CommandResult.NO_PERMISSIONS;
             }
 
@@ -44,12 +46,13 @@ public class TrustCommand extends BaseCommand {
 
             // If they are online, let them know
             if (invitee.isOnline()) {
-                Chitchat.sendTitle(invitee.getPlayer(), 10, 80, 10, ChatColor.YELLOW + "Celebrate!", ChatColor.GREEN +
-                        "You are now trusted!");
+                Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(4000), Duration.ofMillis(500));
+                Title title = Title.title(Component.text("Celebrate!", NamedTextColor.YELLOW), Component.text("You are now trusted!", NamedTextColor.GREEN), times);
+                invitee.getPlayer().showTitle(title);
             }
 
             // If this is reached, the invite worked
-            sender.sendMessage(ChatColor.RED + invitee.getName() + " has been trusted.");
+            sender.sendMessage(Component.text(invitee.getName() + " has been trusted.", NamedTextColor.GREEN));
 
             return CommandResult.SUCCESS;
         }

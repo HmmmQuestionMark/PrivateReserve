@@ -1,7 +1,8 @@
 package com.demigodsrpg.command;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
@@ -16,23 +17,23 @@ public abstract class BaseCommand implements CommandExecutor {
             case QUIET_ERROR:
                 break;
             case INVALID_SYNTAX:
-                sender.sendMessage(ChatColor.RED + "Invalid syntax, please try again.");
+                sender.sendMessage(Component.text("Invalid syntax, please try again.", NamedTextColor.RED));
                 return false;
             case NO_PERMISSIONS:
-                sender.sendMessage(ChatColor.RED + "You don't have the permissions to use this command.");
+                sender.sendMessage(Component.text("You don't have the permissions to use this command.", NamedTextColor.RED));
                 break;
             case CONSOLE_ONLY:
-                sender.sendMessage(ChatColor.RED + "This command is for the console only.");
+                sender.sendMessage(Component.text("This command is for the console only.", NamedTextColor.RED));
                 break;
             case PLAYER_ONLY:
-                sender.sendMessage(ChatColor.RED + "This command can only be used by a player.");
+                sender.sendMessage(Component.text("This command can only be used by a player.", NamedTextColor.RED));
                 break;
             case ERROR:
-                sender.sendMessage(ChatColor.RED + "An error occurred, please check the console.");
+                sender.sendMessage(Component.text("An error occurred, please check the console.", NamedTextColor.RED));
                 break;
             case UNKNOWN:
             default:
-                sender.sendMessage(ChatColor.RED + "The command can't run for some unknown reason.");
+                sender.sendMessage(Component.text("The command can't run for some unknown reason.", NamedTextColor.RED));
                 break;
         }
         return true;

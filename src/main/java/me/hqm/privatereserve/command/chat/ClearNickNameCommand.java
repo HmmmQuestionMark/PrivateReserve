@@ -4,7 +4,8 @@ import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,11 +25,11 @@ public class ClearNickNameCommand extends BaseCommand {
                 Optional<Player> maybeTarget = getPlayer(args[0]);
                 if (maybeTarget.isPresent()) {
                     clearNickName(maybeTarget.get());
-                    sender.sendMessage(ChatColor.GREEN + "Nickname cleared for " + maybeTarget.get().getName());
+                    sender.sendMessage(Component.text("Nickname cleared for " + maybeTarget.get().getName(), NamedTextColor.GREEN));
                     return CommandResult.SUCCESS;
                 }
 
-                sender.sendMessage(ChatColor.RED + "That player does not exist, please try again.");
+                sender.sendMessage(Component.text("That player does not exist, please try again.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
             return CommandResult.INVALID_SYNTAX;
@@ -38,7 +39,7 @@ public class ClearNickNameCommand extends BaseCommand {
             if (sender instanceof Player) {
                 Player self = (Player) sender;
                 clearNickName(self);
-                sender.sendMessage(ChatColor.GREEN + "Nickname cleared.");
+                sender.sendMessage(Component.text("Nickname cleared.", NamedTextColor.GREEN));
                 return CommandResult.SUCCESS;
             }
             return CommandResult.PLAYER_ONLY;

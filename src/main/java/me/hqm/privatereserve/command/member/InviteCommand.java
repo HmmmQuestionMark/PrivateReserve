@@ -6,10 +6,14 @@ import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
 import me.hqm.privatereserve.util.RegionUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.Optional;
 
 public class InviteCommand extends BaseCommand {
@@ -27,13 +31,13 @@ public class InviteCommand extends BaseCommand {
 
             // Already invited
             if (!PrivateReserve.PLAYER_R.isVisitor(invitee.getUniqueId())) {
-                sender.sendMessage(ChatColor.RED + "That player is already invited.");
+                sender.sendMessage(Component.text("That player is already invited.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
 
             // Check if they were expelled and give a warning
             if (PrivateReserve.PLAYER_R.isExpelled(invitee.getUniqueId())) {
-                sender.sendMessage(ChatColor.RED + "That player was expelled, please be cautious of them.");
+                sender.sendMessage(Component.text("That player was previously expelled, please be cautious of them.", NamedTextColor.RED));
                 Optional<PlayerModel> opModel = PrivateReserve.PLAYER_R.fromPlayer(invitee);
                 if (opModel.isPresent()) {
                     PlayerModel expelled = opModel.get();
@@ -48,7 +52,7 @@ public class InviteCommand extends BaseCommand {
 
             // Stop untrusted from inviting
             else if (!PrivateReserve.PLAYER_R.isTrusted(((Player) sender).getUniqueId())) {
-                sender.sendMessage(ChatColor.RED + "Sorry, you aren't (yet) a trusted player.");
+                sender.sendMessage(Component.text("Sorry, you aren't (yet) a trusted player.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
 
@@ -59,7 +63,7 @@ public class InviteCommand extends BaseCommand {
                     if (primary.isPresent()) {
                         PrivateReserve.PLAYER_R.invite(invitee, (Player) sender, primary.get().getKey());
                     } else {
-                        sender.sendMessage(ChatColor.RED + "The provided primary account does not exist.");
+                        sender.sendMessage(Component.text("The provided primary account does not exist.", NamedTextColor.RED));
                         return CommandResult.QUIET_ERROR;
                     }
                 }
@@ -74,12 +78,13 @@ public class InviteCommand extends BaseCommand {
             // Let the invitee know
             if (invitee.isOnline()) {
                 invitee.getPlayer().teleport(RegionUtil.spawnLocation());
-                Chitchat.sendTitle(invitee.getPlayer(), 10, 80, 10,
-                        ChatColor.YELLOW + "Celebrate!", ChatColor.GREEN + "You were invited! Have fun!");
+                Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(4000), Duration.ofMillis(500));
+                Title title = Title.title(Component.text("Celebrate!", NamedTextColor.YELLOW), Component.text("You were invited! Have fun!", NamedTextColor.GREEN), times);
+                invitee.getPlayer().showTitle(title);
             }
 
             // If this is reached, the invite worked
-            sender.sendMessage(ChatColor.RED + invitee.getName() + " has been invited.");
+            sender.sendMessage(Component.text(invitee.getName() + " has been invited.", NamedTextColor.GREEN));
 
             return CommandResult.SUCCESS;
         }

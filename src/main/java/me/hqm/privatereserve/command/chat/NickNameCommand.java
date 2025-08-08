@@ -4,6 +4,8 @@ import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,15 +25,15 @@ public class NickNameCommand extends BaseCommand {
                 Optional<Player> maybeTarget = getPlayer(args[0]);
                 if (maybeTarget.isPresent()) {
                     if (setNickName(PrivateReserve.PLAYER_R.fromPlayer(maybeTarget.get()).get(), args[1])) {
-                        sender.sendMessage(ChatColor.GREEN + "Nickname set for " + maybeTarget.get().getName());
+                        sender.sendMessage(Component.text("Nickname set for " + maybeTarget.get().getName(), NamedTextColor.GREEN));
                         return CommandResult.SUCCESS;
                     }
 
-                    sender.sendMessage(ChatColor.RED + "Nickname is too long, please try again.");
+                    sender.sendMessage(Component.text("Nickname is too long, please try again.", NamedTextColor.RED));
                     return CommandResult.QUIET_ERROR;
                 }
 
-                sender.sendMessage(ChatColor.RED + "That player does not exist, please try again.");
+                sender.sendMessage(Component.text("That player does not exist, please try again.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
             return CommandResult.INVALID_SYNTAX;
@@ -41,15 +43,15 @@ public class NickNameCommand extends BaseCommand {
             if (sender instanceof Player) {
                 Player self = (Player) sender;
                 if (args[0].contains("[") || args[0].contains("]")) {
-                    sender.sendMessage(ChatColor.RED + "That is not an allowed nickname. Please try again.");
+                    sender.sendMessage(Component.text("That is not an allowed nickname. Please try again.", NamedTextColor.RED));
                     return CommandResult.QUIET_ERROR;
                 }
                 if (setNickName(PrivateReserve.PLAYER_R.fromPlayer(self).get(), args[0])) {
-                    sender.sendMessage(ChatColor.GREEN + "Nickname set.");
+                    sender.sendMessage(Component.text("Nickname set.", NamedTextColor.GREEN));
                     return CommandResult.SUCCESS;
                 }
 
-                sender.sendMessage(ChatColor.RED + "Nickname is too long, please try again.");
+                sender.sendMessage(Component.text("Nickname is too long, please try again.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
             return CommandResult.PLAYER_ONLY;

@@ -2,6 +2,8 @@ package me.hqm.privatereserve.command.member;
 
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,36 +16,21 @@ public class MemberHelpCommand extends BaseCommand {
         }
         switch (args[0].toUpperCase()) {
             case "TRUSTED": {
-                sender.sendMessage(ChatColor.DARK_AQUA + "Trusted" + ChatColor.YELLOW +
-                        " players are trusted members of the community.");
-                sender.sendMessage(ChatColor.YELLOW + "Once a member is trusted, they can invite new members.");
+                sender.sendMessage(Component.text("Trusted", NamedTextColor.DARK_AQUA).
+                        append(Component.text(" players are trusted members of the community.", NamedTextColor.YELLOW)));
+                sender.sendMessage(Component.text("Once a member is trusted, they can invite new members.", NamedTextColor.YELLOW));
                 break;
             }
             case "VISITING": {
-                sender.sendMessage(ChatColor.GREEN + "Visiting" + ChatColor.YELLOW +
-                        " players are cannot leave their spawn.");
-                sender.sendMessage(ChatColor.YELLOW + "Players need to be invited to play on this server.");
-                break;
-            }
-            case "MODERATOR": {
-                sender.sendMessage(ChatColor.DARK_GREEN + "Moderators" + ChatColor.YELLOW +
-                        " are staff who police the activity on the server.");
-                sender.sendMessage(ChatColor.YELLOW + "When you need help from a staff member, please ask for a " +
-                        ChatColor.DARK_GREEN + "Moderator" + ChatColor.YELLOW + ".");
-                break;
-            }
-            case "MODERATOR+": {
-                sender.sendMessage(ChatColor.DARK_GREEN + "Moderator" + ChatColor.DARK_AQUA + "+" + ChatColor.YELLOW +
-                        " are staff who manage the entire server.");
-                sender.sendMessage(ChatColor.YELLOW + "On many other servers, this rank is equivalent to " +
-                        ChatColor.DARK_RED + "Admin" + ChatColor.YELLOW + ".");
+                sender.sendMessage(Component.text("Visiting", NamedTextColor.GREEN).
+                        append(Component.text(" players are cannot leave their spawn.", NamedTextColor.YELLOW)));
+                sender.sendMessage(Component.text("Players need to be invited to play on this server.", NamedTextColor.YELLOW));
                 break;
             }
             case "ADMIN": {
-                sender.sendMessage(ChatColor.DARK_RED + "Admins" + ChatColor.YELLOW +
-                        " are staff who administrate the entire server.");
-                sender.sendMessage(ChatColor.YELLOW + "Development and server maintenance are handled by " +
-                        ChatColor.DARK_RED + "Admins" + ChatColor.YELLOW + ".");
+                sender.sendMessage(Component.text("Admins", NamedTextColor.DARK_RED).
+                        append(Component.text(" are staff who administrate the entire server.", NamedTextColor.YELLOW)));
+                sender.sendMessage(Component.text("Development and server maintenance are handled by them too.", NamedTextColor.YELLOW));
                 break;
             }
         }

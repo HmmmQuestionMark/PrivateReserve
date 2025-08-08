@@ -2,27 +2,29 @@ package me.hqm.privatereserve.tag;
 
 import com.demigodsrpg.chitchat.tag.PlayerTag;
 import me.hqm.privatereserve.PrivateReserve;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class VisitorTag extends PlayerTag {
-    private TextComponent visitor;
+    private Component visitor;
 
     public VisitorTag() {
-        visitor = new TextComponent("[");
-        visitor.setColor(ChatColor.DARK_GRAY);
-        TextComponent middle = new TextComponent("V");
-        middle.setColor(ChatColor.GREEN);
-        visitor.addExtra(middle);
-        visitor.addExtra("]");
-        visitor.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder("Visitor").color(ChatColor.GREEN).create()));
-        visitor.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/memberhelp VISITING"));
+        ComponentBuilder<TextComponent, TextComponent.Builder> builder = Component.text();
+        builder.append(Component.text("[", NamedTextColor.DARK_GRAY));
+        builder.append(Component.text("V", NamedTextColor.GREEN));
+        builder.append(Component.text("]", NamedTextColor.DARK_GRAY));
+        builder.hoverEvent(HoverEvent.showText(Component.text("Visotor", NamedTextColor.GREEN)));
+        builder.clickEvent(ClickEvent.runCommand("/memberhelp VISITING"));
+        visitor = builder.build();
     }
 
     @Override
-    public TextComponent getComponentFor(Player player) {
+    public Component getComponentFor(Player player) {
         if (PrivateReserve.PLAYER_R.isVisitorOrExpelled(player.getUniqueId())) {
             return visitor;
         }

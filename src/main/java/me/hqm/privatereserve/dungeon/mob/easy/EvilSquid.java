@@ -2,7 +2,8 @@ package me.hqm.privatereserve.dungeon.mob.easy;
 
 import me.hqm.privatereserve.dungeon.mob.DungeonMob;
 import me.hqm.privatereserve.dungeon.mob.DungeonMobs;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -18,8 +19,8 @@ import java.util.Optional;
 
 public class EvilSquid implements DungeonMob {
     @Override
-    public String getName() {
-        return "Evil Squid";
+    public Component getName() {
+        return Component.text("Evil Squid");
     }
 
     @Override
@@ -80,7 +81,7 @@ public class EvilSquid implements DungeonMob {
                             isTracked((Squid) squid)).map(squid -> (Squid) squid).forEach(squid -> {
                         if (player.isEmpty()) {
                             player.setPassenger(squid);
-                            player.sendMessage(ChatColor.RED + "EVIL SQUID WATCH OUT!"); //TODO DEBUG
+                            player.sendMessage(Component.text("EVIL SQUID WATCH OUT!", NamedTextColor.RED)); //TODO DEBUG
                         }
                         if (squid.equals(player.getPassenger())) {
                             EntityDamageByEntityEvent squidDamage = new EntityDamageByEntityEvent(squid, player,

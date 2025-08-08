@@ -1,13 +1,11 @@
 package me.hqm.privatereserve.tag;
 
-
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import net.kyori.adventure.text.Component;
 
 public class ChatTag {
 
-    public static final TextComponent NEW_LINE = new TextComponent(ComponentSerializer.parse("{text: \"\n\"}"));
-    public static final TextComponent EMPTY = new TextComponent();
+    public static final Component NEW_LINE = Component.newline();
+    public static final Component EMPTY = Component.empty();
 
     public static final AdminTag ADMIN_TAG = new AdminTag();
     public static final TrustedTag TRUSTED_TAG = new TrustedTag();

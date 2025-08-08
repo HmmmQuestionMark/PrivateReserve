@@ -3,7 +3,8 @@ package me.hqm.privatereserve.command;
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
@@ -22,9 +23,9 @@ public class LockModeCommand extends BaseCommand {
         }
 
         if (toggleLockMode(playerId.toString())) {
-            sender.sendMessage(ChatColor.YELLOW + "Locking is now enabled.");
+            sender.sendMessage(Component.text("Locking is now enabled.", NamedTextColor.YELLOW));
         } else {
-            sender.sendMessage(ChatColor.YELLOW + "Locking is now disabled.");
+            sender.sendMessage(Component.text("Locking is now disabled.", NamedTextColor.YELLOW));
         }
 
         return CommandResult.SUCCESS;

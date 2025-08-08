@@ -4,6 +4,8 @@ import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -25,12 +27,12 @@ public class AlternateCommand extends BaseCommand {
             Bukkit.getServer().dispatchCommand(sender, "invite " + args[0] + " " + args[1]);
             return CommandResult.SUCCESS;
         } else if (model.get().isExpelled()) {
-            sender.sendMessage(ChatColor.RED + "Player is expelled, please try a different name.");
+            sender.sendMessage(Component.text("Player is expelled, please try a different name.", NamedTextColor.RED));
             return CommandResult.QUIET_ERROR;
         }
         OfflinePlayer invitee = model.get().getOfflinePlayer();
 
-        if (!sender.hasPermission("seasons.admin")) {
+        if (!sender.hasPermission("privatereserve.admin")) {
             return CommandResult.NO_PERMISSIONS;
         }
 
@@ -40,13 +42,13 @@ public class AlternateCommand extends BaseCommand {
             if (primary.isPresent()) {
                 model.get().setPrimaryAccount(primary.get().getKey());
             } else {
-                sender.sendMessage(ChatColor.RED + "The provided primary account does not exist.");
+                sender.sendMessage(Component.text("The provided primary account does not exist.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             }
         }
 
         // If this is reached, the invite worked
-        sender.sendMessage(ChatColor.RED + invitee.getName() + " has been set as an alternate account.");
+        sender.sendMessage(Component.text(invitee.getName() + " has been set as an alternate account.", NamedTextColor.RED));
 
         return CommandResult.SUCCESS;
     }
