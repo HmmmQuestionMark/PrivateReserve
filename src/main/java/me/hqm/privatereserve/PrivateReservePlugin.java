@@ -30,6 +30,6 @@ public class PrivateReservePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        PrivateReserve.RESERVE_CHAT.disable();
+        PrivateReserve.PRIVATE_RESERVE.disable();
     }
 }

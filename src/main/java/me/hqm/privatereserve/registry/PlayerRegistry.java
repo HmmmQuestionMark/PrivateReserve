@@ -15,9 +15,8 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
 
     @Deprecated
     default Optional<PlayerModel> fromName(final String name) {
-        Optional<PlayerModel> player =
-                getRegisteredData().values().stream().filter(model -> model.getLastKnownName().equalsIgnoreCase(name))
-                        .findFirst();
+        Optional<PlayerModel> player = getRegisteredData().values().stream().
+                        filter(model -> model.getLastKnownName().equalsIgnoreCase(name)).findFirst();
         return player;
     }
 

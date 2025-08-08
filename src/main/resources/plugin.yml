@@ -30,6 +30,9 @@ commands:
     usage: /spawn
   home:
     usage: /home [go|set|clear] [username]
+  landmark:
+    usage: /landmark <list|go|set|clear> <landmark>
+    aliases: [warp]
   visiting:
     usage: /visiting
     aliases: [vspawn]

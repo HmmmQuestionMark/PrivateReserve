@@ -1,4 +1,4 @@
-package me.hqm.privatereserve.command.member;
+package me.hqm.privatereserve.command.location;
 
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
