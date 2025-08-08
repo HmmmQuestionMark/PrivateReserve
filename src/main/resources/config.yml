@@ -1,11 +1,4 @@
 #Configuration File
-mongo:
-  use: false
-  hostname: localhost
-  port: 27017
-  database: chat
-  username: chat
-  password: chat
 file:
   save_pretty: false
 region:
@@ -16,8 +9,11 @@ region:
 targeting:
   max_range: 100
 time_multiplier:
-  daylight: 2
+  daylight: 3
   night: 1
   worlds: [world]
 home:
   enabled: true
+landmark:
+  enabled: true
+  limit: 5

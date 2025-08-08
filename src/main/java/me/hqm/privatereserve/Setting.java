@@ -6,12 +6,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 @SuppressWarnings("unchecked")
 public class Setting {
-    public static final boolean MONGODB_PERSISTENCE = getConfig().getBoolean("mongo.use", false);
-    public static final String MONGODB_HOSTNAME = getConfig().getString("mongo.hostname", "localhost");
-    public static final int MONGODB_PORT = getConfig().getInt("mongo.port", 27017);
-    public static final String MONGODB_DATABASE = getConfig().getString("mongo.database", "chat");
-    public static final String MONGODB_USERNAME = getConfig().getString("mongo.username", "chat");
-    public static final String MONGODB_PASSWORD = getConfig().getString("mongo.password", "chat");
     public static final boolean SAVE_PRETTY = getConfig().getBoolean("file.save_pretty", false);
 
     public static final String SPAWN_REGION = getConfig().getString("region.spawn", "spawn");
@@ -25,6 +19,11 @@ public class Setting {
     public static final int NIGHT_MULTIPLIER = getConfig().getInt("time_multiplier.night", 1);
     public static final ImmutableList<String> TIME_MULTIPLIER_WORLDS =
             ImmutableList.copyOf(getConfig().getStringList("time_multiplier.worlds"));
+
+    public static final boolean HOME_ENABLED = getConfig().getBoolean("home.enabled", true);
+    public static final boolean LANDMARK_ENABLED = getConfig().getBoolean("landmark.enabled", true);
+
+    public static final int LANDMARK_LIMIT = getConfig().getInt("landmark.limit", 5);
 
     private static ConfigurationSection getConfig() {
         return JavaPlugin.getProvidingPlugin(Setting.class).getConfig();

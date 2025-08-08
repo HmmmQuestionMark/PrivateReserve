@@ -39,7 +39,7 @@ public class PlayerModel implements Model {
 
     // -- LOCATION DATA -- //
 
-    private Location homeLoc;
+    private String homeLoc;
 
     // -- NAME TAG TEXT -- //
 
@@ -91,10 +91,7 @@ public class PlayerModel implements Model {
         invitedFrom = data.getString("invitedFrom", "d5133464-b1ef-42b4-9ad4-8cac217d40f0"); // Default to HQM
         invited = data.getStringList("invited");
 
-        String homeLocString = data.getStringNullable("homeLoc");
-        if (homeLocString != null) {
-            homeLoc = LocationUtil.locationFromString(homeLocString);
-        }
+        homeLoc = data.getStringNullable("homeLoc");
 
         buildNameTag();
     }
@@ -128,7 +125,7 @@ public class PlayerModel implements Model {
         data.put("invited", invited);
 
         if (homeLoc != null) {
-            data.put("homeLoc", LocationUtil.stringFromLocation(homeLoc));
+            data.put("homeLoc", homeLoc);
         }
         return data;
     }
@@ -169,7 +166,10 @@ public class PlayerModel implements Model {
     }
 
     public @Nullable Location getHomeLoc() {
-        return homeLoc;
+        if (homeLoc != null) {
+            return LocationUtil.locationFromString(homeLoc);
+        }
+        return null;
     }
 
     public Component getNameTag() {
@@ -219,7 +219,11 @@ public class PlayerModel implements Model {
     }
 
     public void setHomeLoc(Location homeLoc) {
-        this.homeLoc = homeLoc;
+        if(homeLoc != null) {
+            this.homeLoc = LocationUtil.stringFromLocation(homeLoc);
+        } else {
+            this.homeLoc = null;
+        }
         register();
     }
 
