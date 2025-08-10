@@ -1,0 +1,19 @@
+package me.hqm.privatereserve.delivery.old.ghast;
+
+import me.hqm.privatereserve.delivery.data.DeliveryDocument;
+import me.hqm.privatereserve.delivery.old.MobDeliveryLoadUnloadTask;
+import me.hqm.privatereserve.delivery.old.MobDeliveryTask;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+
+public class GhastDeliveryUnloadTask extends MobDeliveryLoadUnloadTask {
+    public GhastDeliveryUnloadTask(DeliveryDocument model) {
+        super(GhastDeliveryTaskType.UNLOAD, model);
+    }
+
+    @Override
+    public MobDeliveryTask nextTask() {
+        Bukkit.getServer().broadcast(Component.text(getType().name()));
+        return new GhastDeliveryRiseFromUnloadTask(getMob());
+    }
+}

@@ -1,24 +1,28 @@
 #Configuration File
 file:
-  save_pretty: false
-debug: false
-region:
-  visitor: 'visitor'
-  visitor_world: 'world'
-  spawn: 'spawn'
-  spawn_world: 'world'
-targeting:
-  max_range: 100
-time_multiplier:
+  enabled: true
+  pretty: false
+debug:
+  enabled: false
+member:
+  enabled: true
+  region:
+    enabled: true
+    visitor: 'visiting'
+    visitor_world: 'world'
+    spawn: 'spawn'
+    spawn_world: 'world'
+  home:
+    enabled: true
+time:
+  enabled: true
   daylight: 3
   night: 1
   worlds: [world]
-home:
-  enabled: true
 landmark:
   enabled: true
   limit: 3
-delivery_mob:
+delivery:
   enabled: false
   limit: 1
   invincible: true

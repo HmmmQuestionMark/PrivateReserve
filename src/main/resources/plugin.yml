@@ -1,5 +1,5 @@
 name: PrivateReserve
-main: me.hqm.privatereserve.PrivateReservePlugin
+main: me.hqm.privatereserve.PrivateReserve
 api-version: '1.21.8'
 version: ${project.version}
 description: Special sauce for HQM's private reserve.
