@@ -2,6 +2,7 @@ package com.demigodsrpg.command;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -54,7 +55,8 @@ public abstract class BaseCommand implements CommandExecutor {
         int delta = Integer.MAX_VALUE;
         for (Player player : Bukkit.getOnlinePlayers()) {
             // Try display name first
-            if (player.getDisplayName().toLowerCase(java.util.Locale.ENGLISH).startsWith(lowerName)) {
+            if (PlainTextComponentSerializer.plainText().serialize(player.displayName()).
+                    toLowerCase(java.util.Locale.ENGLISH).startsWith(lowerName)) {
                 int curDelta = Math.abs(player.getName().length() - lowerName.length());
                 if (curDelta < delta) {
                     found = player;
