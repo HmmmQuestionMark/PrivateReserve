@@ -83,7 +83,7 @@ public class LandmarkCommand extends BaseCommand {
                 case "SET": {
                     Optional<PlayerModel> maybe = PrivateReserve.PLAYER_R.fromId(((Player) sender).getUniqueId());
                     if (Setting.LANDMARK_LIMIT.getInteger() <= PrivateReserve.LANDMARK_R.landmarksOwned(maybe.get())) {
-                        sender.sendMessage(Component.text("You've hit the landmark limit (max " + Setting.LANDMARK_LIMIT + ")!", NamedTextColor.RED));
+                        sender.sendMessage(Component.text("You've hit the landmark limit (max " + Setting.LANDMARK_LIMIT.getInteger() + ")!", NamedTextColor.RED));
                         return CommandResult.QUIET_ERROR;
                     }
                     return setLandmark((Player) sender, landmarkName);
@@ -104,7 +104,7 @@ public class LandmarkCommand extends BaseCommand {
         if (playerList.isEmpty()) {
             sender.sendMessage(Component.text("Nobody's made a landmark yet...", NamedTextColor.YELLOW));
         } else {
-            sender.sendMessage(Component.text("List of players with landmarks (max " + Setting.LANDMARK_LIMIT + " each):", NamedTextColor.YELLOW).decorate(TextDecoration.UNDERLINED));
+            sender.sendMessage(Component.text("List of players with landmarks (max " + Setting.LANDMARK_LIMIT.getInteger() + " each):", NamedTextColor.YELLOW).decorate(TextDecoration.UNDERLINED));
             for (Map.Entry<String, Integer> entry : playerList.entrySet()) {
                 sender.sendMessage(Component.text(" - " + entry.getKey() + " :: ", NamedTextColor.YELLOW).
                         append(Component.text(entry.getValue(), NamedTextColor.GREEN)).

@@ -66,5 +66,6 @@ public enum Setting {
 
     public static void set(String settingPath, @Nullable Object value) {
         getConfig().set(settingPath, value);
+        JavaPlugin.getProvidingPlugin(Setting.class).saveConfig();
     }
 }
