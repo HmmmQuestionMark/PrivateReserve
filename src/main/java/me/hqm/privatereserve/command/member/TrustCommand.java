@@ -26,7 +26,7 @@ public class TrustCommand extends BaseCommand {
 
             // Get the invitee
             Optional<PlayerModel> model = PrivateReserve.PLAYER_R.fromName(args[0]);
-            if (!model.isPresent()) {
+            if (model.isEmpty()) {
                 sender.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             } else if (model.get().isExpelled()) {

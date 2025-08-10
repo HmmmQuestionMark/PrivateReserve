@@ -110,8 +110,7 @@ public class FJsonSection extends HashMap<String, Object> implements DataSection
         return this;
     }
 
-    /**@Override
-    public MJsonSection toMJsonSection() {
-        return new MJsonSection(this);
+    /**@Override public MJsonSection toMJsonSection() {
+    return new MJsonSection(this);
     }**/
 }

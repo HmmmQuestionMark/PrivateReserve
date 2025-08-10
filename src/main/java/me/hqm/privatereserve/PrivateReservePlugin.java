@@ -4,10 +4,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class PrivateReservePlugin extends JavaPlugin {
 
-    // -- LIBRARY HANDLER -- //
-
-    //private static LibraryHandler LIBRARIES;
-
     // -- BUKKIT ENABLE/DISABLE METHODS -- //
 
     @Override
@@ -15,14 +11,6 @@ public class PrivateReservePlugin extends JavaPlugin {
         // Config
         getConfig().options().copyDefaults(true);
         saveConfig();
-
-        // Get and load the libraries
-        //LIBRARIES = new LibraryHandler(this);
-
-        // MongoDB
-        //if (Setting.MONGODB_PERSISTENCE) {
-            //LIBRARIES.addMavenLibrary(LibraryHandler.MAVEN_CENTRAL, Depends.ORG_MONGO, Depends.MONGODB, Depends.MONGODB_VER);
-        //}
 
         // Enable
         new PrivateReserve(this);

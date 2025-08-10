@@ -31,7 +31,7 @@ commands:
   home:
     usage: /home [go|set|clear] [username]
   landmark:
-    usage: /landmark <list|go|set|clear> <landmark>
+    usage: /landmark <list|go|set|clear|limit> <landmark|limit>
     aliases: [warp]
   visiting:
     usage: /visiting

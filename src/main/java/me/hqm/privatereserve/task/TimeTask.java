@@ -1,11 +1,13 @@
-package me.hqm.privatereserve.runnable;
+package me.hqm.privatereserve.task;
 
 import me.hqm.privatereserve.Setting;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 
 // Based on https://github.com/magnusulf/LongerDays
 
-public class TimeRunnable implements Runnable {
+public class TimeTask implements Runnable {
 
     // The amount of moon phases minus one
     private final static int MOON_PHASES = 7;
@@ -24,7 +26,7 @@ public class TimeRunnable implements Runnable {
     @SuppressWarnings("ConstantConditions")
     private void worldChangeTime(World world) {
         // Not all worlds needs to get time changed
-        if (Setting.TIME_MULTIPLIER_WORLDS.contains(world.getName())) {
+        if (Setting.TIME_MULTIPLIER_WORLDS.getStringList().contains(world.getName())) {
             if (world.getGameRuleValue(GameRule.DO_DAYLIGHT_CYCLE)) {
 
                 // Here the counter is used.
@@ -51,9 +53,9 @@ public class TimeRunnable implements Runnable {
     public static int getMultiplier(World world) {
         long time = world.getTime();
         if (isDay(time)) {
-            return Setting.DAYLIGHT_MULTIPLIER;
+            return Setting.DAYLIGHT_MULTIPLIER.getInteger();
         }
-        return Setting.NIGHT_MULTIPLIER;
+        return Setting.NIGHT_MULTIPLIER.getInteger();
     }
 
     public static boolean isDay(long time) {

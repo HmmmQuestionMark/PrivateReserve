@@ -6,7 +6,6 @@ import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -20,7 +19,7 @@ public class PronounsCommand extends BaseCommand {
                 (PrivateReserve.PLAYER_R.isVisitorOrExpelled(((Player) sender).getUniqueId()))) {
             return CommandResult.QUIET_ERROR;
         }
-        if(args.length > 1) {
+        if (args.length > 1) {
             if (args.length == 2 && sender.hasPermission("privatereserve.admin")) {
                 Optional<Player> maybeTarget = getPlayer(args[0]);
                 if (maybeTarget.isPresent()) {
@@ -39,9 +38,8 @@ public class PronounsCommand extends BaseCommand {
             return CommandResult.INVALID_SYNTAX;
         }
 
-        if(args.length == 1) {
-            if (sender instanceof Player) {
-                Player self = (Player) sender;
+        if (args.length == 1) {
+            if (sender instanceof Player self) {
                 if (setPronouns(PrivateReserve.PLAYER_R.fromPlayer(self).get(), args[0])) {
                     sender.sendMessage(Component.text("Pronouns set.", NamedTextColor.GREEN));
                     return CommandResult.SUCCESS;

@@ -4,7 +4,6 @@ import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 

@@ -7,10 +7,15 @@ import me.hqm.privatereserve.model.LockedBlockModel;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.type.Switch;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
@@ -25,41 +30,11 @@ public interface LockedBlockRegistry extends Registry<LockedBlockModel> {
     }
 
     default boolean isLockable(Block block) {
-        switch (block.getType()) {
-            case ACACIA_DOOR:
-            case BIRCH_DOOR:
-            case DARK_OAK_DOOR:
-            case JUNGLE_DOOR:
-            case SPRUCE_DOOR:
-            case IRON_DOOR:
-            case OAK_DOOR:
-            case ACACIA_TRAPDOOR:
-            case BIRCH_TRAPDOOR:
-            case DARK_OAK_TRAPDOOR:
-            case JUNGLE_TRAPDOOR:
-            case OAK_TRAPDOOR:
-            case SPRUCE_TRAPDOOR:
-            case IRON_TRAPDOOR:
-            case DISPENSER:
-            case FURNACE:
-            case BLAST_FURNACE:
-            case FURNACE_MINECART:
-            case CHEST:
-            case TRAPPED_CHEST:
-            case HOPPER:
-            case HOPPER_MINECART:
-            case CHEST_MINECART:
-            case STONE_BUTTON:
-            case BIRCH_BUTTON:
-            case ACACIA_BUTTON:
-            case DARK_OAK_BUTTON:
-            case JUNGLE_BUTTON:
-            case OAK_BUTTON:
-            case SPRUCE_BUTTON:
-            case LEVER:
-                return true;
-        }
-        return false;
+        return switch (block.getType()) {
+            case BEEHIVE, CAMPFIRE, SOUL_CAMPFIRE -> true;
+            default -> block instanceof Container || block.getBlockData() instanceof Openable ||
+                    block.getBlockData() instanceof Switch;
+        };
     }
 
     default boolean isRegistered(Block block) {

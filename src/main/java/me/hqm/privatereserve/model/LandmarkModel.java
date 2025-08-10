@@ -5,8 +5,6 @@ import com.demigodsrpg.util.datasection.DataSection;
 import com.demigodsrpg.util.datasection.Model;
 import me.hqm.privatereserve.PrivateReserve;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -16,9 +14,9 @@ public class LandmarkModel implements Model {
 
     // -- DATA -- //
 
-    private String name;
+    private final String name;
     private String location;
-    private String owner;
+    private final String owner;
     private long timeCreated;
 
     // -- CONSTRUCTORS -- //
@@ -70,6 +68,7 @@ public class LandmarkModel implements Model {
         Map<String, Object> map = new HashMap<>();
         map.put("location", location);
         map.put("owner", owner);
+        map.put("timeCreated", timeCreated);
         return map;
     }
 

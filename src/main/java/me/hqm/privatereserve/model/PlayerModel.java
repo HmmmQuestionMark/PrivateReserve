@@ -10,7 +10,9 @@ import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
@@ -75,7 +77,7 @@ public class PlayerModel implements Model {
         buildNameTag();
     }
 
-    public PlayerModel (String mojangId, DataSection data) {
+    public PlayerModel(String mojangId, DataSection data) {
         this.mojangId = mojangId;
         lastKnownName = data.getString("last_known_name");
 
@@ -219,7 +221,7 @@ public class PlayerModel implements Model {
     }
 
     public void setHomeLoc(Location homeLoc) {
-        if(homeLoc != null) {
+        if (homeLoc != null) {
             this.homeLoc = LocationUtil.stringFromLocation(homeLoc);
         } else {
             this.homeLoc = null;
@@ -286,7 +288,7 @@ public class PlayerModel implements Model {
     }
 
     private Component buildNameTag0(String nickName, String lastKnownName, String primaryAccountName,
-                                        String pronouns, List<String> invited) {
+                                    String pronouns, List<String> invited) {
         // Define blank component
         ComponentBuilder<TextComponent, TextComponent.Builder> nameTagText = Component.text();
 

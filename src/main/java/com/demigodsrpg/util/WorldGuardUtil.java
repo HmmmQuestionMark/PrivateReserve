@@ -11,9 +11,14 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.util.function.Predicate;
@@ -157,7 +162,7 @@ public class WorldGuardUtil implements Listener {
     }
 
     public static class WorldGuardPVPListener implements Listener {
-        private Predicate<Event> checkPVP;
+        private final Predicate<Event> checkPVP;
 
         WorldGuardPVPListener(Plugin plugin, Predicate<Event> checkPVP) {
             this.checkPVP = checkPVP;

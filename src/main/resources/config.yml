@@ -1,6 +1,7 @@
 #Configuration File
 file:
   save_pretty: false
+debug: false
 region:
   visitor: 'visitor'
   visitor_world: 'world'
@@ -16,4 +17,10 @@ home:
   enabled: true
 landmark:
   enabled: true
-  limit: 5
+  limit: 3
+delivery_mob:
+  enabled: false
+  limit: 1
+  invincible: true
+  ghast:
+    enabled: true

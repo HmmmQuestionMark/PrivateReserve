@@ -27,7 +27,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
@@ -38,8 +41,8 @@ public abstract class AbstractFileRegistry<T extends Model> implements Registry<
     protected final Cache<String, T> REGISTERED_DATA;
 
     // -- FILE -- //
-    private File FOLDER;
-    private boolean PRETTY;
+    private final File FOLDER;
+    private final boolean PRETTY;
 
     public AbstractFileRegistry(String path, String folder, boolean pretty, int expireMins) {
         if (expireMins > 0) {

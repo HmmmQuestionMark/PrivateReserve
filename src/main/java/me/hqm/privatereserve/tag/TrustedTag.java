@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class TrustedTag extends PlayerTag {
-    private Component trusted;
+    private final Component trusted;
 
     public TrustedTag() {
         ComponentBuilder<TextComponent, TextComponent.Builder> builder = Component.text();

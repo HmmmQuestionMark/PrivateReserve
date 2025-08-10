@@ -49,7 +49,7 @@ public interface LandmarkRegistry extends Registry<LandmarkModel> {
         Map<String, Integer> nameAndCount = new HashMap<>();
         for (LandmarkModel landmark : getRegisteredData().values()) {
             Optional<PlayerModel> maybe = PrivateReserve.PLAYER_R.fromId(landmark.getOwner());
-            if(maybe.isPresent()) {
+            if (maybe.isPresent()) {
                 String lastKnownName = maybe.get().getLastKnownName();
                 nameAndCount.merge(lastKnownName, 1, Integer::sum);
             }

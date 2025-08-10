@@ -1,6 +1,5 @@
 package me.hqm.privatereserve.listener;
 
-import com.demigodsrpg.chitchat.Chitchat;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
 import me.hqm.privatereserve.util.RegionUtil;
@@ -8,10 +7,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -35,12 +35,9 @@ public class PlayerListener implements Listener {
                 return;
             }
             if (player.hasPermission("privatereserve.admin") || player.isWhitelisted()) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(PrivateReserve.PLUGIN, new Runnable() {
-                    @Override
-                    public void run() {
-                        PrivateReserve.PLAYER_R.inviteSelf(player);
-                        player.kick(Component.text("Sorry, had reconfigure your permissions. Please rejoin.", NamedTextColor.GREEN));
-                    }
+                Bukkit.getScheduler().scheduleSyncDelayedTask(PrivateReserve.PLUGIN, () -> {
+                    PrivateReserve.PLAYER_R.inviteSelf(player);
+                    player.kick(Component.text("Sorry, had reconfigure your permissions. Please rejoin.", NamedTextColor.GREEN));
                 }, 20);
                 return;
             }

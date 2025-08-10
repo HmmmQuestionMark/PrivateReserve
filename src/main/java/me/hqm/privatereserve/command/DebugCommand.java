@@ -2,12 +2,9 @@ package me.hqm.privatereserve.command;
 
 import com.demigodsrpg.command.BaseCommand;
 import com.demigodsrpg.command.CommandResult;
-import me.hqm.privatereserve.dungeon.mob.DungeonMobs;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Location;
-import org.bukkit.command.*;
-import org.bukkit.entity.Player;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 
 public class DebugCommand extends BaseCommand {
     @Override
@@ -21,19 +18,39 @@ public class DebugCommand extends BaseCommand {
         if (args.length < 1) {
             return CommandResult.INVALID_SYNTAX;
         }
-        String select = args[0];
-        Location location = ((Player) sender).getLocation();
 
-        if (select.toLowerCase().startsWith("sk")) {
-            DungeonMobs.spawnDungeonMob(location, DungeonMobs.SKELETOR);
-            sender.sendMessage(Component.text("Skeletor has been spawned.", NamedTextColor.YELLOW));
-        } else if (select.toLowerCase().startsWith("evil")) {
-            DungeonMobs.spawnDungeonMob(location, DungeonMobs.EVIL_SQUID);
-            sender.sendMessage(Component.text("Evil squid has been spawned.", NamedTextColor.YELLOW));
+        /*if (sender instanceof Player player && player.isInsideVehicle() &&
+                player.getVehicle() instanceof HappyGhast ghast) {
+            Optional<MobDeliveryModel> maybe = PrivateReserve.MOB_DELIVERY_R.fromEntity(ghast);
+            MobDeliveryModel mob = maybe.orElseGet(() -> new MobDeliveryModel(ghast, "DEBUG", player.getUniqueId().toString()));
+            switch(args[0].toUpperCase()) {
+                case "SETLOAD": {
+                    mob.setLoadLocation(player.getLocation());
+                    break;
+                }
+                case "SETUNLOAD": {
+                    mob.setUnloadLocation(player.getLocation());
+                    break;
+                }
+                case "SETHOME": {
+                    mob.setHomeLocation(player.getLocation());
+                    break;
+                }
+                case "START": {
+                    mob.setActive(true);
+                    double loadDistance = ghast.getLocation().distance(mob.getLoadLocation());
+                    double unloadDistance = ghast.getLocation().distance(mob.getUnloadLocation());
+                    if(loadDistance < unloadDistance) {
+                        new GhastDeliveryMoveFromUnloadTask(mob).start();
+                    } else {
+                        new GhastDeliveryMoveFromLoadTask(mob).start();
+                    }
+                }
+            }
         } else {
-            sender.sendMessage(Component.text("Not a valid option.", NamedTextColor.RED));
-            return CommandResult.QUIET_ERROR;
-        }
+            PrivateReserve.MOB_DELIVERY_R.cancelAll();
+        }*/
+
         return CommandResult.SUCCESS;
     }
 }

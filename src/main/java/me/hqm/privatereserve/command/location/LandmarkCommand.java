@@ -66,7 +66,7 @@ public class LandmarkCommand extends BaseCommand {
                 case "LIST": {
                     if (args.length > 1) {
                         Optional<PlayerModel> maybe = PrivateReserve.PLAYER_R.fromName(landmarkName);
-                        if (!maybe.isPresent()) {
+                        if (maybe.isEmpty()) {
                             sender.sendMessage(Component.text("That player is still a visitor or does not exist.", NamedTextColor.RED));
                             return CommandResult.QUIET_ERROR;
                         } else if (maybe.get().isExpelled()) {
@@ -82,7 +82,7 @@ public class LandmarkCommand extends BaseCommand {
                 }
                 case "SET": {
                     Optional<PlayerModel> maybe = PrivateReserve.PLAYER_R.fromId(((Player) sender).getUniqueId());
-                    if(Setting.LANDMARK_LIMIT <= PrivateReserve.LANDMARK_R.landmarksOwned(maybe.get())) {
+                    if (Setting.LANDMARK_LIMIT.getInteger() <= PrivateReserve.LANDMARK_R.landmarksOwned(maybe.get())) {
                         sender.sendMessage(Component.text("You've hit the landmark limit (max " + Setting.LANDMARK_LIMIT + ")!", NamedTextColor.RED));
                         return CommandResult.QUIET_ERROR;
                     }
@@ -90,6 +90,9 @@ public class LandmarkCommand extends BaseCommand {
                 }
                 case "CLEAR": {
                     return clearLandmark((Player) sender, landmarkName);
+                }
+                case "LIMIT": {
+                    return setLimit((Player) sender, landmarkName);
                 }
             }
         }
@@ -122,8 +125,8 @@ public class LandmarkCommand extends BaseCommand {
                 Location location = landmark.getLocation();
                 sender.sendMessage(Component.text(" - ", NamedTextColor.YELLOW).
                         append(Component.text(landmark.getName(), NamedTextColor.GREEN)).
-                        append(Component.text(" :: Distance: ", NamedTextColor.YELLOW)).
-                        append(Component.text(LocationUtil.calculateDistance(sender.getLocation(), location), NamedTextColor.DARK_GRAY).decorate(TextDecoration.ITALIC)));
+                        append(Component.text(" :: Location: ", NamedTextColor.YELLOW)).
+                        append(Component.text(LocationUtil.prettyLocation(location), NamedTextColor.DARK_GRAY).decorate(TextDecoration.ITALIC)));
             }
         }
         return CommandResult.SUCCESS;
@@ -131,7 +134,7 @@ public class LandmarkCommand extends BaseCommand {
 
     private CommandResult goLandmark(CommandSender sender, String landMarkName) {
         Optional<LandmarkModel> maybe = PrivateReserve.LANDMARK_R.fromName(landMarkName);
-        if (!maybe.isPresent()) {
+        if (maybe.isEmpty()) {
             sender.sendMessage(Component.text("That landmark does not exist.", NamedTextColor.RED));
             return CommandResult.QUIET_ERROR;
         }
@@ -166,17 +169,31 @@ public class LandmarkCommand extends BaseCommand {
 
     private CommandResult clearLandmark(Player sender, String landmarkName) {
         Optional<LandmarkModel> maybe = PrivateReserve.LANDMARK_R.fromName(landmarkName);
-        if (!maybe.isPresent()) {
+        if (maybe.isEmpty()) {
             sender.sendMessage(Component.text("That landmark does not exist.", NamedTextColor.RED));
             return CommandResult.QUIET_ERROR;
         }
 
         LandmarkModel landmark = maybe.get();
-        if(landmark.isOwnerOrAdmin(sender)) {
+        if (landmark.isOwnerOrAdmin(sender)) {
             PrivateReserve.LANDMARK_R.remove(landmark.getKey());
             sender.sendMessage(Component.text("Cleared landmark.", NamedTextColor.YELLOW));
         }
 
         return CommandResult.SUCCESS;
+    }
+
+    private CommandResult setLimit(Player sender, String maybeNumber) {
+        if (!sender.hasPermission("privatereserve.admin")) {
+            return CommandResult.NO_PERMISSIONS;
+        }
+        try {
+            int limit = Integer.valueOf(maybeNumber);
+            Setting.set(Setting.LANDMARK_LIMIT.getPath(), limit);
+            sender.sendMessage(Component.text("Landmark limit set to " + limit + ".", NamedTextColor.YELLOW));
+            return CommandResult.SUCCESS;
+        } catch (NumberFormatException ignored) {
+            return CommandResult.INVALID_SYNTAX;
+        }
     }
 }

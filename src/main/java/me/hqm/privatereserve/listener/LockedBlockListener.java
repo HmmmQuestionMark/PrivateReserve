@@ -5,11 +5,18 @@ import me.hqm.privatereserve.model.LockedBlockModel;
 import me.hqm.privatereserve.registry.LockedBlockRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
-import org.bukkit.event.block.*;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -106,16 +113,16 @@ public class LockedBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityExplode(final EntityExplodeEvent event) {
         PrivateReserve.LOCKED_R.getRegisteredData().values().stream().filter(model -> model.getLocation().getWorld().
-                equals(event.getLocation().getWorld()) && model.getLocation().distance(event.getLocation()) <= 10).
+                        equals(event.getLocation().getWorld()) && model.getLocation().distance(event.getLocation()) <= 10).
                 map(save -> save.getLocation().getBlock()).forEach(block -> {
-            if (LockedBlockRegistry.isBisected(block)) {
-                LockedBlockRegistry.getBisected(block).forEach(chest -> event.blockList().remove(chest));
-            } else if (LockedBlockRegistry.isDoubleChest(block)) {
-                LockedBlockRegistry.getDoubleChest(block).forEach(chest -> event.blockList().remove(chest));
-            } else {
-                event.blockList().remove(block);
-            }
-        });
+                    if (LockedBlockRegistry.isBisected(block)) {
+                        LockedBlockRegistry.getBisected(block).forEach(chest -> event.blockList().remove(chest));
+                    } else if (LockedBlockRegistry.isDoubleChest(block)) {
+                        LockedBlockRegistry.getDoubleChest(block).forEach(chest -> event.blockList().remove(chest));
+                    } else {
+                        event.blockList().remove(block);
+                    }
+                });
     }
 
     boolean canLock(Player player) {

@@ -87,7 +87,9 @@ public interface RelationalDataRegistry extends Registry<RelationalDataModel> {
     default RelationalDataModel find(String row, String column) {
         if (findByRow(row) == null) return null;
 
-        for (RelationalDataModel data : findByRow(row)) { if (data.getColumn().equals(column)) return data; }
+        for (RelationalDataModel data : findByRow(row)) {
+            if (data.getColumn().equals(column)) return data;
+        }
 
         return null;
     }
@@ -108,7 +110,7 @@ public interface RelationalDataRegistry extends Registry<RelationalDataModel> {
         getRegisteredData().values().stream()
                 .filter(model -> RelationalDataModel.DataType.TIMED.equals(model.getDataType()) &&
                         model.getExpiration() <= System.currentTimeMillis()).map(RelationalDataModel::getKey).
-                collect(Collectors.toList()).forEach(this::remove);
+                toList().forEach(this::remove);
     }
 
     @Override

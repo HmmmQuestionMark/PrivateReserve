@@ -9,7 +9,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
@@ -26,7 +28,7 @@ public class ExpelCommand extends BaseCommand {
 
             // Get the player to be expelled
             Optional<PlayerModel> model = PrivateReserve.PLAYER_R.fromName(args[0]);
-            if (!model.isPresent()) {
+            if (model.isEmpty()) {
                 sender.sendMessage(Component.text("Player is still a visitor.", NamedTextColor.RED));
                 return CommandResult.QUIET_ERROR;
             } else if (model.get().isExpelled()) {

@@ -36,7 +36,7 @@ public class HomeCommand extends BaseCommand {
                 target = PrivateReserve.PLAYER_R.fromPlayer((Player) sender).get();
             } else {
                 Optional<PlayerModel> maybe = PrivateReserve.PLAYER_R.fromName(args[1]);
-                if (!maybe.isPresent()) {
+                if (maybe.isEmpty()) {
                     sender.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
                     return CommandResult.QUIET_ERROR;
                 } else if (maybe.get().isExpelled()) {
@@ -65,7 +65,7 @@ public class HomeCommand extends BaseCommand {
     }
 
     private CommandResult goHome(CommandSender sender, PlayerModel homeOwner) {
-        if(sender.getName().equals(homeOwner.getLastKnownName())) {
+        if (sender.getName().equals(homeOwner.getLastKnownName())) {
             Location homeLoc = homeOwner.getHomeLoc();
             if (homeLoc != null) {
                 ((Player) sender).teleport(homeLoc);
@@ -93,7 +93,7 @@ public class HomeCommand extends BaseCommand {
     }
 
     private CommandResult setHome(CommandSender sender, PlayerModel homeOwner, Location homeLoc) {
-        if(sender.getName().equals(homeOwner.getLastKnownName())) {
+        if (sender.getName().equals(homeOwner.getLastKnownName())) {
             if (homeLoc != null) {
                 homeOwner.setHomeLoc(homeLoc);
                 sender.sendMessage(Component.text("Set home.", NamedTextColor.YELLOW));
@@ -105,7 +105,7 @@ public class HomeCommand extends BaseCommand {
             return CommandResult.NO_PERMISSIONS;
         } else {
             if (homeLoc != null) {
-               homeOwner.setHomeLoc(homeLoc);
+                homeOwner.setHomeLoc(homeLoc);
                 sender.sendMessage(Component.text("Set ", NamedTextColor.YELLOW).
                         append(homeOwner.getNameTag()).
                         append(Component.text("'s home.", NamedTextColor.YELLOW)));
@@ -119,7 +119,7 @@ public class HomeCommand extends BaseCommand {
 
     private CommandResult clearHome(CommandSender sender, PlayerModel homeOwner) {
         Location homeLoc = homeOwner.getHomeLoc();
-        if(sender.getName().equals(homeOwner.getLastKnownName())) {
+        if (sender.getName().equals(homeOwner.getLastKnownName())) {
             if (homeLoc != null) {
                 homeOwner.setHomeLoc(null);
                 sender.sendMessage(Component.text("Cleared home.", NamedTextColor.YELLOW));

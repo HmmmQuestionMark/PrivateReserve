@@ -6,7 +6,8 @@ import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.model.PlayerModel;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -23,7 +24,7 @@ public class AlternateCommand extends BaseCommand {
 
         // Get the invitee
         Optional<PlayerModel> model = PrivateReserve.PLAYER_R.fromName(args[0]);
-        if (!model.isPresent()) {
+        if (model.isEmpty()) {
             Bukkit.getServer().dispatchCommand(sender, "invite " + args[0] + " " + args[1]);
             return CommandResult.SUCCESS;
         } else if (model.get().isExpelled()) {

@@ -13,8 +13,8 @@ public class LockedBlockModel implements Model {
 
     // -- DATA -- //
 
-    private String location;
-    private String owner;
+    private final String location;
+    private final String owner;
     private boolean locked;
 
     // -- CONSTRUCTORS -- //

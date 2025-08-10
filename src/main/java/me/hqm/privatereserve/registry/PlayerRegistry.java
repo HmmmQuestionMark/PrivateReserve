@@ -7,7 +7,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public interface PlayerRegistry extends Registry<PlayerModel> {
@@ -15,9 +18,8 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
 
     @Deprecated
     default Optional<PlayerModel> fromName(final String name) {
-        Optional<PlayerModel> player = getRegisteredData().values().stream().
-                        filter(model -> model.getLastKnownName().equalsIgnoreCase(name)).findFirst();
-        return player;
+        return getRegisteredData().values().stream().
+                filter(model -> model.getLastKnownName().equalsIgnoreCase(name)).findFirst();
     }
 
     @Deprecated
@@ -93,7 +95,7 @@ public interface PlayerRegistry extends Registry<PlayerModel> {
     }
 
     default boolean isVisitor(UUID player) {
-        return !fromId(player).isPresent();
+        return fromId(player).isEmpty();
     }
 
     default boolean isExpelled(UUID player) {

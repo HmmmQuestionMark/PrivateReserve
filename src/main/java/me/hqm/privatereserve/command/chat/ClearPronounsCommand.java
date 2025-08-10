@@ -19,7 +19,7 @@ public class ClearPronounsCommand extends BaseCommand {
                 (PrivateReserve.PLAYER_R.isVisitorOrExpelled(((Player) sender).getUniqueId()))) {
             return CommandResult.QUIET_ERROR;
         }
-        if(args.length == 1) {
+        if (args.length == 1) {
             if (sender.hasPermission("privatereserve.admin")) {
                 Optional<Player> maybeTarget = getPlayer(args[0]);
                 if (maybeTarget.isPresent()) {
@@ -34,9 +34,8 @@ public class ClearPronounsCommand extends BaseCommand {
             return CommandResult.INVALID_SYNTAX;
         }
 
-        if(args.length == 0) {
-            if (sender instanceof Player) {
-                Player self = (Player) sender;
+        if (args.length == 0) {
+            if (sender instanceof Player self) {
                 clearPronouns(PrivateReserve.PLAYER_R.fromPlayer(self).get());
                 sender.sendMessage(Component.text("Pronouns cleared.", NamedTextColor.GREEN));
                 return CommandResult.SUCCESS;

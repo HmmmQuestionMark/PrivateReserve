@@ -11,7 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 public class VisitorTag extends PlayerTag {
-    private Component visitor;
+    private final Component visitor;
 
     public VisitorTag() {
         ComponentBuilder<TextComponent, TextComponent.Builder> builder = Component.text();
