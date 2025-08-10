@@ -124,7 +124,12 @@ public class PrivateReserve {
 
         // Build chat format
         Chitchat.getChatFormat().addAll(new PlayerTag[]{
-                ChatTag.ADMIN_TAG, ChatTag.VISITOR_TAG, ChatTag.ALTERNATE_TAG, ChatTag.TRUSTED_TAG, ChatTag.NAME_TAG
+                ChatTag.WORLD_TYPE_TAG,
+                ChatTag.ALTERNATE_TAG,
+                ChatTag.ADMIN_TAG,
+                ChatTag.VISITOR_TAG,
+                ChatTag.TRUSTED_TAG,
+                ChatTag.NAME_TAG
         });
     }
 
