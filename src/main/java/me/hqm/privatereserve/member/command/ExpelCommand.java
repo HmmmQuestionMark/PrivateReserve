@@ -7,7 +7,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.hqm.privatereserve.member.Members;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import me.hqm.privatereserve.member.region.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,12 +45,12 @@ public class ExpelCommand {
         Player player = (Player) ctx.getSource().getSender();
         String name = StringArgumentType.getString(ctx, "player");
 
-        Optional<MemberDocument> model = Members.data().fromName(name);
+        Optional<Member> model = Members.data().fromName(name);
         if (model.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
-        MemberDocument doc = model.get();
+        Member doc = model.get();
         if (doc.isExpelled()) {
             player.sendMessage(Component.text("Player is already expelled.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;

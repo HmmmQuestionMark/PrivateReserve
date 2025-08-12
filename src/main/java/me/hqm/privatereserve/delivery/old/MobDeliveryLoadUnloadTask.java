@@ -2,7 +2,7 @@ package me.hqm.privatereserve.delivery.old;
 
 import me.hqm.privatereserve.Locations;
 import me.hqm.privatereserve.PrivateReserve;
-import me.hqm.privatereserve.delivery.data.DeliveryDocument;
+import me.hqm.privatereserve.delivery.data.DeliveryMob;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -25,7 +25,7 @@ public abstract class MobDeliveryLoadUnloadTask extends MobDeliveryTask {
     final Long wait;
     final State state;
     final List<InventoryHolder> holders;
-    public MobDeliveryLoadUnloadTask(DeliveryTaskType type, DeliveryDocument model) {
+    public MobDeliveryLoadUnloadTask(DeliveryTaskType type, DeliveryMob model) {
         super(type, model);
         state = State.valueOf(type.name());
         wait = state == State.LOAD ? model.getLoadTicks() : model.getUnloadTicks();

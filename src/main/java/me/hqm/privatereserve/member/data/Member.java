@@ -18,7 +18,7 @@ import org.bukkit.persistence.PersistentDataType;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class MemberDocument implements DocumentCompatible {
+public class Member implements DocumentCompatible {
 
     // -- META DATA -- //
 
@@ -49,21 +49,21 @@ public class MemberDocument implements DocumentCompatible {
 
     // -- CONSTRUCTORS -- //
 
-    public MemberDocument(OfflinePlayer player, boolean console) {
+    public Member(OfflinePlayer player, boolean console) {
         this(player, console, !console);
     }
 
-    public MemberDocument(OfflinePlayer player, boolean console, boolean trusted) {
+    public Member(OfflinePlayer player, boolean console, boolean trusted) {
         this(player, console ? "CONSOLE" : player.getUniqueId().toString(), null);
         this.trusted = trusted;
     }
 
-    public MemberDocument(OfflinePlayer player, boolean console, boolean trusted, String primaryAccount) {
+    public Member(OfflinePlayer player, boolean console, boolean trusted, String primaryAccount) {
         this(player, console ? "CONSOLE" : player.getUniqueId().toString(), primaryAccount);
         this.trusted = trusted;
     }
 
-    public MemberDocument(OfflinePlayer player, String invitedFrom, String primaryAccount) {
+    public Member(OfflinePlayer player, String invitedFrom, String primaryAccount) {
         mojangId = player.getUniqueId().toString();
         lastKnownName = player.getName();
         this.invitedFrom = invitedFrom;
@@ -77,7 +77,7 @@ public class MemberDocument implements DocumentCompatible {
         buildNameTag();
     }
 
-    public MemberDocument(String mojangId, Document data) {
+    public Member(String mojangId, Document data) {
         this.mojangId = mojangId;
         lastKnownName = data.get("last_known_name", PersistentDataType.STRING);
 
@@ -268,7 +268,7 @@ public class MemberDocument implements DocumentCompatible {
     public void buildNameTag() {
         String primaryAccountName = null;
         if (isAlternate()) {
-            Optional<MemberDocument> primary = Members.data().fromId(primaryAccount);
+            Optional<Member> primary = Members.data().fromId(primaryAccount);
             if (primary.isPresent()) {
                 primaryAccountName = primary.get().getLastKnownName();
             } else {

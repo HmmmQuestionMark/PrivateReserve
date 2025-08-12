@@ -10,7 +10,7 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LockedBlockDocument implements DocumentCompatible {
+public class LockedBlock implements DocumentCompatible {
 
     // -- DATA -- //
 
@@ -20,19 +20,19 @@ public class LockedBlockDocument implements DocumentCompatible {
 
     // -- CONSTRUCTORS -- //
 
-    public LockedBlockDocument(String location, String owner) {
+    public LockedBlock(String location, String owner) {
         this.location = location;
         this.owner = owner;
         locked = false;
     }
 
-    public LockedBlockDocument(Location location, String owner) {
+    public LockedBlock(Location location, String owner) {
         this.location = Locations.stringFromLocation(location);
         this.owner = owner;
         locked = false;
     }
 
-    public LockedBlockDocument(String location, Document data) {
+    public LockedBlock(String location, Document data) {
         this.location = location;
         owner = data.get("owner", PersistentDataType.STRING);
         locked = data.get("locked", PersistentDataType.BOOLEAN);

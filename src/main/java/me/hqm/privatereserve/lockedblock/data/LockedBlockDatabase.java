@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public interface LockedBlockDatabase extends DocumentDatabase<LockedBlockDocument> {
+public interface LockedBlockDatabase extends DocumentDatabase<LockedBlock> {
     String NAME = "locked_blocks";
 
     static List<Block> getSuroundingBlocks(Block block, boolean y) {
@@ -68,7 +68,7 @@ public interface LockedBlockDatabase extends DocumentDatabase<LockedBlockDocumen
                 collect(Collectors.toList());
     }
 
-    default Optional<LockedBlockDocument> fromLocation(Location location) {
+    default Optional<LockedBlock> fromLocation(Location location) {
         return fromId(Locations.stringFromLocation(location));
     }
 
@@ -121,7 +121,7 @@ public interface LockedBlockDatabase extends DocumentDatabase<LockedBlockDocumen
     }
 
     default LockState getLockState0(Block block) {
-        Optional<LockedBlockDocument> opModel = fromId(Locations.stringFromLocation(block.getLocation()));
+        Optional<LockedBlock> opModel = fromId(Locations.stringFromLocation(block.getLocation()));
         return opModel.isPresent() && opModel.get().isLocked() ? LockState.LOCKED : LockState.UNLOCKED;
     }
 
@@ -145,9 +145,9 @@ public interface LockedBlockDatabase extends DocumentDatabase<LockedBlockDocumen
     }
 
     default LockState lockUnlock0(Block block, Player player) {
-        Optional<LockedBlockDocument> opModel = fromId(Locations.stringFromLocation(block.getLocation()));
+        Optional<LockedBlock> opModel = fromId(Locations.stringFromLocation(block.getLocation()));
         if (opModel.isPresent()) {
-            LockedBlockDocument model = opModel.get();
+            LockedBlock model = opModel.get();
             if ((!isLockable(block) || model.getOwner().equals(player.getUniqueId().toString()) ||
                     player.hasPermission("privatereserve.bypasslock"))) {
                 return model.setLocked(!model.isLocked()) ? LockState.LOCKED : LockState.UNLOCKED;
@@ -175,20 +175,20 @@ public interface LockedBlockDatabase extends DocumentDatabase<LockedBlockDocumen
 
     default boolean create(Block block, Player player) {
         if (isLockable(block) && !isRegistered(block)) {
-            write(new LockedBlockDocument(block.getLocation(), player.getUniqueId().toString()));
+            write(new LockedBlock(block.getLocation(), player.getUniqueId().toString()));
             return true;
         }
         return false;
     }
 
     default void delete(Block block) {
-        Optional<LockedBlockDocument> opModel = fromId(Locations.stringFromLocation(block.getLocation()));
-        opModel.ifPresent(lockedBlockDocument -> remove(lockedBlockDocument.getId()));
+        Optional<LockedBlock> opModel = fromId(Locations.stringFromLocation(block.getLocation()));
+        opModel.ifPresent(lockedBlock -> remove(lockedBlock.getId()));
     }
 
     @Override
-    default LockedBlockDocument createDocument(String stringKey, Document data) {
-        return new LockedBlockDocument(stringKey, data);
+    default LockedBlock createDocument(String stringKey, Document data) {
+        return new LockedBlock(stringKey, data);
     }
 
     enum LockState {

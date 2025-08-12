@@ -3,7 +3,7 @@ package me.hqm.privatereserve.delivery.old;
 import com.destroystokyo.paper.entity.Pathfinder;
 import io.papermc.paper.entity.TeleportFlag;
 import me.hqm.privatereserve.PrivateReserve;
-import me.hqm.privatereserve.delivery.data.DeliveryDocument;
+import me.hqm.privatereserve.delivery.data.DeliveryMob;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.ScheduledForRemoval(inVersion = "1.1")
 public class MobDeliveryReturnHomeTask extends MobDeliveryMovementTask {
 
-    public MobDeliveryReturnHomeTask(DeliveryDocument model) {
+    public MobDeliveryReturnHomeTask(DeliveryMob model) {
         super(GeneralDeliveryTaskType.RETURN_HOME, model, model.getCurrentLocation(), model.getHomeLocation());
     }
 

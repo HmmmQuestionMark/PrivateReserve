@@ -13,9 +13,9 @@ import io.papermc.paper.entity.TeleportFlag;
 import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.Locations;
 import me.hqm.privatereserve.Settings;
-import me.hqm.privatereserve.landmark.data.LandmarkDocument;
+import me.hqm.privatereserve.landmark.data.Landmark;
 import me.hqm.privatereserve.member.Members;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -120,7 +120,7 @@ public class LandmarkCommand {
 
     private static int runLandmarkList(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
-        Optional<MemberDocument> maybe = Members.data().fromName(StringArgumentType.getString(ctx, "player"));
+        Optional<Member> maybe = Members.data().fromName(StringArgumentType.getString(ctx, "player"));
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("That player is still a visitor or does not exist.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -128,14 +128,14 @@ public class LandmarkCommand {
             player.sendMessage(Component.text("That player is expelled, please try a different name.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
-        MemberDocument owner = maybe.get();
-        List<LandmarkDocument> landmarks = Landmarks.data().fromOwner(owner);
+        Member owner = maybe.get();
+        List<Landmark> landmarks = Landmarks.data().fromOwner(owner);
         if (landmarks.isEmpty()) {
             player.sendMessage(owner.getNickName().append(Component.text(" hasn't made a landmark yet...", NamedTextColor.YELLOW)));
         } else {
             player.sendMessage(owner.getNickName().decorate(TextDecoration.BOLD).
                     append(Component.text("'s' landmarks:", NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)));
-            for (LandmarkDocument landmark : landmarks) {
+            for (Landmark landmark : landmarks) {
                 Location location = landmark.getLocation();
                 player.sendMessage(Component.text(" - ", NamedTextColor.YELLOW).
                         append(Component.text(landmark.getName(), NamedTextColor.GREEN)).
@@ -149,12 +149,12 @@ public class LandmarkCommand {
 
     private static int runLandmarkGo(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
-        Optional<LandmarkDocument> maybe = Landmarks.data().fromName(StringArgumentType.getString(ctx, "name"));
+        Optional<Landmark> maybe = Landmarks.data().fromName(StringArgumentType.getString(ctx, "name"));
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("That landmark does not exist.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
-        LandmarkDocument landmark = maybe.get();
+        Landmark landmark = maybe.get();
         Location location = landmark.getLocation();
         if (location != null) {
             player.teleportAsync(
@@ -175,7 +175,7 @@ public class LandmarkCommand {
 
     private static int runLandmarkSet(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
-        Optional<MemberDocument> maybe = Members.data().fromId((player.getUniqueId()));
+        Optional<Member> maybe = Members.data().fromId((player.getUniqueId()));
         if (Settings.LANDMARK_LIMIT.getInteger() <= Landmarks.data().landmarksOwned(maybe.get())) {
             player.sendMessage(Component.text("You've hit the landmark limit (max " + Settings.LANDMARK_LIMIT.getInteger() + ")!", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -187,13 +187,13 @@ public class LandmarkCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        Optional<LandmarkDocument> maybeMark = Landmarks.data().fromName(name);
+        Optional<Landmark> maybeMark = Landmarks.data().fromName(name);
         if (maybeMark.isPresent()) {
             player.sendMessage(Component.text("That landmark already exists.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
 
-        LandmarkDocument landmark = new LandmarkDocument(name, player.getLocation(), player.getUniqueId().toString());
+        Landmark landmark = new Landmark(name, player.getLocation(), player.getUniqueId().toString());
         player.sendMessage(Component.text("Landmark ", NamedTextColor.YELLOW).
                 append(Component.text(landmark.getName(), NamedTextColor.GREEN)).
                 append(Component.text(" created!", NamedTextColor.YELLOW)));
@@ -204,13 +204,13 @@ public class LandmarkCommand {
     private static int runLandmarkClear(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
         String name = StringArgumentType.getString(ctx, "name");
-        Optional<LandmarkDocument> maybe = Landmarks.data().fromName(name);
+        Optional<Landmark> maybe = Landmarks.data().fromName(name);
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("That landmark does not exist.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
 
-        LandmarkDocument landmark = maybe.get();
+        Landmark landmark = maybe.get();
         if (landmark.isOwnerOrAdmin(player)) {
             Landmarks.data().remove(landmark.getId());
             player.sendMessage(Component.text("Cleared landmark.", NamedTextColor.YELLOW));

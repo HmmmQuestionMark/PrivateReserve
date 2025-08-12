@@ -7,7 +7,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.hqm.privatereserve.member.Members;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import me.hqm.privatereserve.member.region.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -58,7 +58,7 @@ public class InviteCommand {
         // If previously expelled, un-expel and record inviter; bypass trust check (legacy behavior)
         if (Members.data().isExpelled(invitee.getUniqueId())) {
             send(sender, Component.text("That player was previously expelled, please be cautious of them.", NamedTextColor.RED));
-            Optional<MemberDocument> opModel = Members.data().fromPlayer(invitee);
+            Optional<Member> opModel = Members.data().fromPlayer(invitee);
             opModel.ifPresent(expelled -> {
                 expelled.setExpelled(false);
                 if (sender instanceof ConsoleCommandSender) {
@@ -80,7 +80,7 @@ public class InviteCommand {
             Members.data().inviteConsole(invitee);
         } else if (sender instanceof Player p) {
             if (withPrimary) {
-                Optional<MemberDocument> primary = Members.data().fromName(primaryName);
+                Optional<Member> primary = Members.data().fromName(primaryName);
                 if (primary.isEmpty()) {
                     send(sender, Component.text("The provided primary account does not exist.", NamedTextColor.RED));
                     return Command.SINGLE_SUCCESS;

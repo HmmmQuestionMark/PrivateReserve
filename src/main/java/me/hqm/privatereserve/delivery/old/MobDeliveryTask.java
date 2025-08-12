@@ -1,7 +1,7 @@
 package me.hqm.privatereserve.delivery.old;
 
 import me.hqm.privatereserve.delivery.Deliveries;
-import me.hqm.privatereserve.delivery.data.DeliveryDocument;
+import me.hqm.privatereserve.delivery.data.DeliveryMob;
 import me.hqm.privatereserve.delivery.old.data._DeliveryDocument;
 import me.hqm.privatereserve.delivery.old.ghast.*;
 import org.bukkit.Bukkit;
@@ -22,7 +22,7 @@ public abstract class MobDeliveryTask extends BukkitRunnable {
     final String mobId;
     final OfflinePlayer owner;
 
-    protected MobDeliveryTask(DeliveryTaskType type, DeliveryDocument model) {
+    protected MobDeliveryTask(DeliveryTaskType type, DeliveryMob model) {
         this.type = type;
         this.mobId = model.getId();
         this.owner = Bukkit.getOfflinePlayer(UUID.fromString(model.getOwnerId()));
@@ -30,9 +30,9 @@ public abstract class MobDeliveryTask extends BukkitRunnable {
     }
 
     public static MobDeliveryTask createFromData(DeliveryTaskType type, String mobId) {
-        Optional<DeliveryDocument> maybe = Deliveries.data().fromId(mobId);
+        Optional<DeliveryMob> maybe = Deliveries.data().fromId(mobId);
         if (maybe.isPresent()) {
-            DeliveryDocument mob = maybe.get();
+            DeliveryMob mob = maybe.get();
             if (type instanceof GhastDeliveryTaskType ghastTask) {
                 return switch (ghastTask) {
                     case LOAD -> new GhastDeliveryLoadTask(mob);
@@ -74,7 +74,7 @@ public abstract class MobDeliveryTask extends BukkitRunnable {
         return getMob().getEntityType();
     }
 
-    protected DeliveryDocument getMob() {
+    protected DeliveryMob getMob() {
         return Deliveries.data().fromId(mobId).get();
     }
 

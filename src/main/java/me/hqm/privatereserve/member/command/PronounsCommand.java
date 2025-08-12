@@ -8,7 +8,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.member.Members;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -69,12 +69,12 @@ public class PronounsCommand {
         return s != null && s.length() <= 16;
     }
 
-    private static void applyPronouns(MemberDocument model, String pronouns) {
+    private static void applyPronouns(Member model, String pronouns) {
         model.setPronouns(pronouns);
         model.buildNameTag();
     }
 
-    private static void clearPronouns(MemberDocument model) {
+    private static void clearPronouns(Member model) {
         model.setPronouns("");
         model.buildNameTag();
     }
@@ -83,7 +83,7 @@ public class PronounsCommand {
     private static int runSetSelf(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
         String value = StringArgumentType.getString(ctx, "pronouns");
-        Optional<MemberDocument> maybe = Members.data().fromId(player.getUniqueId());
+        Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -110,7 +110,7 @@ public class PronounsCommand {
             executor.sendMessage(Component.text("Pronouns are too long, please try again.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
-        Optional<MemberDocument> maybe = Members.data().fromPlayer(target);
+        Optional<Member> maybe = Members.data().fromPlayer(target);
         if (maybe.isEmpty()) {
             executor.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -123,7 +123,7 @@ public class PronounsCommand {
     // ===== clear =====
     private static int runClearSelf(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
-        Optional<MemberDocument> maybe = Members.data().fromId(player.getUniqueId());
+        Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -141,7 +141,7 @@ public class PronounsCommand {
             executor.sendMessage(Component.text("That player does not exist, please try again.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
-        Optional<MemberDocument> maybe = Members.data().fromPlayer(target);
+        Optional<Member> maybe = Members.data().fromPlayer(target);
         if (maybe.isEmpty()) {
             executor.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;

@@ -7,7 +7,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.hqm.privatereserve.member.Members;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -37,7 +37,7 @@ public class AlternateCommand {
         String playerName = StringArgumentType.getString(ctx, "player");
         String primaryName = StringArgumentType.getString(ctx, "primary");
 
-        Optional<MemberDocument> model = Members.data().fromName(playerName);
+        Optional<Member> model = Members.data().fromName(playerName);
         if (model.isEmpty()) {
             // If the alt doesn't exist yet, run the invite with primary link
             Bukkit.getServer().dispatchCommand(sender, "invite " + playerName + " " + primaryName);
@@ -47,7 +47,7 @@ public class AlternateCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        Optional<MemberDocument> primary = Members.data().fromName(primaryName);
+        Optional<Member> primary = Members.data().fromName(primaryName);
         if (primary.isPresent()) {
             model.get().setPrimaryAccount(primary.get().getId());
         } else {

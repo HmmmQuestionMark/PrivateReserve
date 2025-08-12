@@ -12,87 +12,87 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public interface MemberDatabase extends DocumentDatabase<MemberDocument> {
+public interface MemberDatabase extends DocumentDatabase<Member> {
     String NAME = "players";
 
     @Deprecated
-    default Optional<MemberDocument> fromName(final String name) {
+    default Optional<Member> fromName(final String name) {
         return getRawData().values().stream().
                 filter(model -> model.getLastKnownName().equalsIgnoreCase(name)).findFirst();
     }
 
     @Deprecated
-    default Optional<MemberDocument> fromPlayer(OfflinePlayer player) {
+    default Optional<Member> fromPlayer(OfflinePlayer player) {
         return this.fromId(player.getUniqueId().toString());
     }
 
-    default Optional<MemberDocument> fromId(UUID id) {
+    default Optional<Member> fromId(UUID id) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(id);
         return fromPlayer(player);
     }
 
-    default Optional<MemberDocument> fromId(String id) {
+    default Optional<Member> fromId(String id) {
         return fromId(UUID.fromString(id));
     }
 
     @Deprecated
     default Set<OfflinePlayer> getOfflinePlayers() {
-        return getRawData().values().stream().map(MemberDocument::getOfflinePlayer).collect(Collectors.toSet());
+        return getRawData().values().stream().map(Member::getOfflinePlayer).collect(Collectors.toSet());
     }
 
     default Set<String> getPlayerNames() {
-        return getRawData().values().stream().map(MemberDocument::getLastKnownName).collect(Collectors.toSet());
+        return getRawData().values().stream().map(Member::getLastKnownName).collect(Collectors.toSet());
     }
 
     @Override
-    default MemberDocument createDocument(String stringKey, Document data) {
-        return new MemberDocument(stringKey, data);
+    default Member createDocument(String stringKey, Document data) {
+        return new Member(stringKey, data);
     }
 
-    default MemberDocument invite(OfflinePlayer player, Player inviteFrom) {
+    default Member invite(OfflinePlayer player, Player inviteFrom) {
         return invite(player, inviteFrom.getUniqueId().toString(), null);
     }
 
-    default MemberDocument invite(OfflinePlayer player, String inviteFrom) {
-        MemberDocument model = new MemberDocument(player, inviteFrom, null);
-        MemberDocument invite = this.fromId(inviteFrom).get();
+    default Member invite(OfflinePlayer player, String inviteFrom) {
+        Member model = new Member(player, inviteFrom, null);
+        Member invite = this.fromId(inviteFrom).get();
         invite.addInvited(model.getId());
         write(model);
         return model;
     }
 
-    default MemberDocument invite(OfflinePlayer player, Player inviteFrom, String primaryAcoount) {
+    default Member invite(OfflinePlayer player, Player inviteFrom, String primaryAcoount) {
         return invite(player, inviteFrom.getUniqueId().toString(), primaryAcoount);
     }
 
-    default MemberDocument invite(OfflinePlayer player, String inviteFrom, String primaryAcoount) {
-        MemberDocument model = new MemberDocument(player, inviteFrom, primaryAcoount);
-        MemberDocument invite = this.fromId(inviteFrom).get();
+    default Member invite(OfflinePlayer player, String inviteFrom, String primaryAcoount) {
+        Member model = new Member(player, inviteFrom, primaryAcoount);
+        Member invite = this.fromId(inviteFrom).get();
         invite.addInvited(model.getId());
         write(model);
         return model;
     }
 
-    default MemberDocument inviteConsole(OfflinePlayer player) {
-        MemberDocument model = new MemberDocument(player, true);
+    default Member inviteConsole(OfflinePlayer player) {
+        Member model = new Member(player, true);
         write(model);
         return model;
     }
 
-    default MemberDocument inviteConsole(OfflinePlayer player, String primaryAccount) {
-        MemberDocument model = new MemberDocument(player, true, false, primaryAccount);
+    default Member inviteConsole(OfflinePlayer player, String primaryAccount) {
+        Member model = new Member(player, true, false, primaryAccount);
         write(model);
         return model;
     }
 
-    default MemberDocument inviteConsole(OfflinePlayer player, boolean trusted) {
-        MemberDocument model = new MemberDocument(player, true, trusted);
+    default Member inviteConsole(OfflinePlayer player, boolean trusted) {
+        Member model = new Member(player, true, trusted);
         write(model);
         return model;
     }
 
-    default MemberDocument inviteSelf(Player player) {
-        MemberDocument model = new MemberDocument(player, false);
+    default Member inviteSelf(Player player) {
+        Member model = new Member(player, false);
         write(model);
         return model;
     }
@@ -118,20 +118,20 @@ public interface MemberDatabase extends DocumentDatabase<MemberDocument> {
     }
 
     default boolean isTrusted(UUID player) {
-        Optional<MemberDocument> oModel = fromId(player);
+        Optional<Member> oModel = fromId(player);
         return oModel.isPresent() && oModel.get().isTrusted();
     }
 
     default boolean isTrusted(String player) {
-        Optional<MemberDocument> oModel = fromId(player);
+        Optional<Member> oModel = fromId(player);
         return oModel.isPresent() && oModel.get().isTrusted();
     }
 
     @Deprecated
-    default List<String> getInvitedManually(MemberDocument model) {
+    default List<String> getInvitedManually(Member model) {
         return getRawData().values().stream().filter(
                 playerModel -> model.getId().equals(playerModel.getInvitedFrom())).map(
-                MemberDocument::getId).collect(Collectors.toList());
+                Member::getId).collect(Collectors.toList());
     }
 
     default int getInvitedCount(UUID player) {

@@ -7,7 +7,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.hqm.privatereserve.member.Members;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -33,12 +33,12 @@ public class TrustCommand {
         Object sender = ctx.getSource().getSender();
         String name = StringArgumentType.getString(ctx, "player");
 
-        Optional<MemberDocument> model = Members.data().fromName(name);
+        Optional<Member> model = Members.data().fromName(name);
         if (model.isEmpty()) {
             send(sender, Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
-        MemberDocument doc = model.get();
+        Member doc = model.get();
         if (doc.isExpelled()) {
             send(sender, Component.text("Player is expelled, please try a different name.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;

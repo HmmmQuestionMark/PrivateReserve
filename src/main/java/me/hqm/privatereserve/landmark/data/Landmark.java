@@ -11,7 +11,7 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LandmarkDocument implements DocumentCompatible {
+public class Landmark implements DocumentCompatible {
 
     // -- DATA -- //
 
@@ -22,7 +22,7 @@ public class LandmarkDocument implements DocumentCompatible {
 
     // -- CONSTRUCTORS -- //
 
-    public LandmarkDocument(String name, Location location, String owner) {
+    public Landmark(String name, Location location, String owner) {
         this.name = name;
         this.location = Locations.stringFromLocation(location);
         this.owner = owner;
@@ -30,7 +30,7 @@ public class LandmarkDocument implements DocumentCompatible {
         write();
     }
 
-    public LandmarkDocument(String name, Document data) {
+    public Landmark(String name, Document data) {
         this.name = name;
         this.location = data.get("location", PersistentDataType.STRING);
         this.owner = data.get("owner", PersistentDataType.STRING);

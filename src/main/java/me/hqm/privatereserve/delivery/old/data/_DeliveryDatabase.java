@@ -4,7 +4,7 @@ import me.hqm.document.Document;
 import me.hqm.document.DocumentDatabase;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.delivery.Deliveries;
-import me.hqm.privatereserve.delivery.data.DeliveryDocument;
+import me.hqm.privatereserve.delivery.data.DeliveryMob;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -30,9 +30,9 @@ public interface _DeliveryDatabase extends DocumentDatabase<_DeliveryDocument> {
         Optional<_DeliveryDocument> maybe = fromId(entity.getUniqueId().toString());
         if (maybe.isPresent()) {
             _DeliveryDocument delivery = maybe.get();
-            Optional<DeliveryDocument> maybe2 = Deliveries.data().fromEntity(entity);
+            Optional<DeliveryMob> maybe2 = Deliveries.data().fromEntity(entity);
             if (maybe2.isPresent()) {
-                DeliveryDocument mob = maybe2.get();
+                DeliveryMob mob = maybe2.get();
                 delivery.clear();
                 mob.setActive(false);
             }

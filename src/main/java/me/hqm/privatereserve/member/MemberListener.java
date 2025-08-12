@@ -1,7 +1,7 @@
 package me.hqm.privatereserve.member;
 
 import me.hqm.privatereserve.PrivateReserve;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import me.hqm.privatereserve.member.region.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,7 +24,7 @@ public class MemberListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (Members.data().isVisitor(player.getUniqueId())) {
-            Optional<MemberDocument> maybeThem = Members.data().fromName(player.getName());
+            Optional<Member> maybeThem = Members.data().fromName(player.getName());
             if (maybeThem.isPresent()) {
                 Members.data().remove(maybeThem.get().getId());
                 Members.data().invite(player, maybeThem.get().getInvitedFrom());
@@ -52,9 +52,9 @@ public class MemberListener implements Listener {
                     append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)).
                     append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
         } else {
-            Optional<MemberDocument> maybeThem = Members.data().fromPlayer(event.getPlayer());
+            Optional<Member> maybeThem = Members.data().fromPlayer(event.getPlayer());
             if (maybeThem.isPresent()) {
-                MemberDocument model = maybeThem.get();
+                Member model = maybeThem.get();
                 model.setLastKnownName(event.getPlayer().getName());
                 model.buildNameTag();
             }

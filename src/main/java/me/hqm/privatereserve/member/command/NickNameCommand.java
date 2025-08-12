@@ -8,7 +8,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.member.Members;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -69,12 +69,12 @@ public class NickNameCommand {
         return s != null && !s.contains("[") && !s.contains("]") && s.length() <= 25;
     }
 
-    private static void setNickName(MemberDocument model, String nickName) {
+    private static void setNickName(Member model, String nickName) {
         model.setNickName(nickName);
         model.buildNameTag();
     }
 
-    private static void clearNickName(MemberDocument model, String defaultName) {
+    private static void clearNickName(Member model, String defaultName) {
         model.setNickName(defaultName);
         model.buildNameTag();
     }
@@ -82,7 +82,7 @@ public class NickNameCommand {
     private static int runSetSelf(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
         String nick = StringArgumentType.getString(ctx, "name");
-        Optional<MemberDocument> maybe = Members.data().fromId(player.getUniqueId());
+        Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -109,7 +109,7 @@ public class NickNameCommand {
             executor.sendMessage(Component.text("Nickname is invalid or too long, please try again.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
-        Optional<MemberDocument> maybe = Members.data().fromPlayer(target);
+        Optional<Member> maybe = Members.data().fromPlayer(target);
         if (maybe.isEmpty()) {
             executor.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -121,7 +121,7 @@ public class NickNameCommand {
 
     private static int runClearSelf(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
-        Optional<MemberDocument> maybe = Members.data().fromId(player.getUniqueId());
+        Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -139,7 +139,7 @@ public class NickNameCommand {
             executor.sendMessage(Component.text("That player does not exist, please try again.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
         }
-        Optional<MemberDocument> maybe = Members.data().fromPlayer(target);
+        Optional<Member> maybe = Members.data().fromPlayer(target);
         if (maybe.isEmpty()) {
             executor.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;

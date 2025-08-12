@@ -1,6 +1,6 @@
 package me.hqm.privatereserve.delivery.old.ghast;
 
-import me.hqm.privatereserve.delivery.data.DeliveryDocument;
+import me.hqm.privatereserve.delivery.data.DeliveryMob;
 import me.hqm.privatereserve.delivery.old.MobDeliveryLoadUnloadTask;
 import me.hqm.privatereserve.delivery.old.MobDeliveryTask;
 import net.kyori.adventure.text.Component;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Obsolete
 @ApiStatus.ScheduledForRemoval(inVersion = "1.1")
 public class GhastDeliveryLoadTask extends MobDeliveryLoadUnloadTask {
-    public GhastDeliveryLoadTask(DeliveryDocument model) {
+    public GhastDeliveryLoadTask(DeliveryMob model) {
         super(GhastDeliveryTaskType.LOAD, model);
     }
 

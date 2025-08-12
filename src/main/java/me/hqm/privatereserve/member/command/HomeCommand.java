@@ -11,7 +11,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.entity.TeleportFlag;
 import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.member.Members;
-import me.hqm.privatereserve.member.data.MemberDocument;
+import me.hqm.privatereserve.member.data.Member;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -94,7 +94,7 @@ public class HomeCommand {
 
     private static int runGoSelf(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
-        Optional<MemberDocument> maybe = Members.data().fromId(player.getUniqueId());
+        Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -105,7 +105,7 @@ public class HomeCommand {
     private static int runGoTarget(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
         String targetName = StringArgumentType.getString(ctx, "player");
-        Optional<MemberDocument> maybe = Members.data().fromName(targetName);
+        Optional<Member> maybe = Members.data().fromName(targetName);
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -116,7 +116,7 @@ public class HomeCommand {
         return goHome(player, maybe.get());
     }
 
-    private static int goHome(Player executor, MemberDocument homeOwner) {
+    private static int goHome(Player executor, Member homeOwner) {
         Location homeLoc = homeOwner.getHomeLoc();
         if (executor.getName().equals(homeOwner.getLastKnownName())) {
             if (homeLoc != null) {
@@ -149,7 +149,7 @@ public class HomeCommand {
 
     private static int runSetSelf(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
-        Optional<MemberDocument> maybe = Members.data().fromId(player.getUniqueId());
+        Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -160,7 +160,7 @@ public class HomeCommand {
     private static int runSetTarget(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
         String targetName = StringArgumentType.getString(ctx, "player");
-        Optional<MemberDocument> maybe = Members.data().fromName(targetName);
+        Optional<Member> maybe = Members.data().fromName(targetName);
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -171,7 +171,7 @@ public class HomeCommand {
         return setHome(player, maybe.get(), player.getLocation());
     }
 
-    private static int setHome(Player executor, MemberDocument homeOwner, Location homeLoc) {
+    private static int setHome(Player executor, Member homeOwner, Location homeLoc) {
         if (executor.getName().equals(homeOwner.getLastKnownName())) {
             if (homeLoc != null) {
                 homeOwner.setHomeLoc(homeLoc);
@@ -195,7 +195,7 @@ public class HomeCommand {
     // ===== CLEAR =====
     private static int runClearSelf(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
-        Optional<MemberDocument> maybe = Members.data().fromId(player.getUniqueId());
+        Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -206,7 +206,7 @@ public class HomeCommand {
     private static int runClearTarget(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
         String targetName = StringArgumentType.getString(ctx, "player");
-        Optional<MemberDocument> maybe = Members.data().fromName(targetName);
+        Optional<Member> maybe = Members.data().fromName(targetName);
         if (maybe.isEmpty()) {
             player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
             return Command.SINGLE_SUCCESS;
@@ -217,7 +217,7 @@ public class HomeCommand {
         return clearHome(player, maybe.get());
     }
 
-    private static int clearHome(Player executor, MemberDocument homeOwner) {
+    private static int clearHome(Player executor, Member homeOwner) {
         Location homeLoc = homeOwner.getHomeLoc();
         if (executor.getName().equals(homeOwner.getLastKnownName())) {
             if (homeLoc != null) {

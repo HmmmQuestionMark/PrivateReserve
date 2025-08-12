@@ -17,7 +17,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
-public class DeliveryDocument implements DocumentCompatible {
+public class DeliveryMob implements DocumentCompatible {
     // -- DATA -- //
 
     // NonNullable
@@ -38,7 +38,7 @@ public class DeliveryDocument implements DocumentCompatible {
 
     // -- CONSTRUCTORS -- //
 
-    public DeliveryDocument(Entity entity, String name, String ownerId) {
+    public DeliveryMob(Entity entity, String name, String ownerId) {
         this.id = entity.getUniqueId().toString();
         this.subIds = new ArrayList<>();
         refreshSubIds(entity, false);
@@ -56,7 +56,7 @@ public class DeliveryDocument implements DocumentCompatible {
         write();
     }
 
-    public DeliveryDocument(String id, Document data) {
+    public DeliveryMob(String id, Document data) {
         this.id = id;
         subIds = data.get("subIds", PersistentDataType.LIST.strings());
         name = LegacyComponentSerializer.legacyAmpersand()

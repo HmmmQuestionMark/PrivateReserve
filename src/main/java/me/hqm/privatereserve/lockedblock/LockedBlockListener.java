@@ -2,7 +2,7 @@ package me.hqm.privatereserve.lockedblock;
 
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.lockedblock.data.LockedBlockDatabase;
-import me.hqm.privatereserve.lockedblock.data.LockedBlockDocument;
+import me.hqm.privatereserve.lockedblock.data.LockedBlock;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -45,7 +45,7 @@ public class LockedBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onBlockBreak(BlockBreakEvent event) {
         String playerId = event.getPlayer().getUniqueId().toString();
-        Optional<LockedBlockDocument> oModel = LockedBlocks.data().fromLocation(event.getBlock().getLocation());
+        Optional<LockedBlock> oModel = LockedBlocks.data().fromLocation(event.getBlock().getLocation());
         if (oModel.isPresent()) {
             if (!LockedBlocks.data().isLockable(event.getBlock()) || oModel.get().getOwner().equals(playerId)) {
                 LockedBlocks.data().delete(event.getBlock());

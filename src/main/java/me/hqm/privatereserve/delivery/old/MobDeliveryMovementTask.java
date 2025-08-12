@@ -4,7 +4,7 @@ import com.destroystokyo.paper.entity.Pathfinder;
 import me.hqm.privatereserve.Locations;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.delivery.Deliveries;
-import me.hqm.privatereserve.delivery.data.DeliveryDocument;
+import me.hqm.privatereserve.delivery.data.DeliveryMob;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -24,7 +24,7 @@ public abstract class MobDeliveryMovementTask extends MobDeliveryTask {
     final Location start;
     final Location finish;
 
-    public MobDeliveryMovementTask(DeliveryTaskType type, DeliveryDocument model, Location start, Location finish) {
+    public MobDeliveryMovementTask(DeliveryTaskType type, DeliveryMob model, Location start, Location finish) {
         super(type, model);
         this.start = start;
         this.finish = finish;
