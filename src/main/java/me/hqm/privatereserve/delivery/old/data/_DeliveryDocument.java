@@ -15,6 +15,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Deprecated
 @ApiStatus.Obsolete
@@ -26,7 +27,7 @@ public class _DeliveryDocument implements DocumentCompatible {
     private final String deliveryMobId;
     private final EntityType deliveryMobEntityType;
     private final DeliveryTaskType currentTaskType;
-    private final List<Long> loadedChunks;
+    private final List<Double> loadedChunks;
 
     // -- CONSTRUCTORS -- //
 
@@ -44,7 +45,7 @@ public class _DeliveryDocument implements DocumentCompatible {
         currentTaskType = DeliveryTaskType.
                 valueOf(deliveryMobEntityType, Objects.
                         requireNonNull(data.get("currentTaskType", PersistentDataType.STRING)));
-        loadedChunks = data.get("loadedChunks", PersistentDataType.LIST.longs());
+        loadedChunks = data.get("loadedChunks", PersistentDataType.LIST.doubles());
         Objects.requireNonNull(MobDeliveryTask.createFromData(currentTaskType, deliveryMobId)).start();
     }
 
@@ -59,7 +60,7 @@ public class _DeliveryDocument implements DocumentCompatible {
     }
 
     public List<Long> getLoadedChunks() {
-        return loadedChunks;
+        return loadedChunks.stream().map(Double::longValue).collect(Collectors.toList());
     }
 
     @Override
@@ -74,7 +75,7 @@ public class _DeliveryDocument implements DocumentCompatible {
     // -- MUTATORS -- //
 
     public void addChunk(Chunk chunk) {
-        this.loadedChunks.add(chunk.getChunkKey());
+        this.loadedChunks.add(Double.longBitsToDouble(chunk.getChunkKey()));
         write();
     }
 
@@ -92,8 +93,9 @@ public class _DeliveryDocument implements DocumentCompatible {
                 for (int x = minX; x < maxX; x++) {
                     for (int z = minZ; z < maxZ; z++) {
                         Chunk chunk = world.getChunkAt(x, z);
-                        if (!loadedChunks.contains(chunk.getChunkKey())) {
-                            loadedChunks.add(chunk.getChunkKey());
+                        Double chunkKey = Double.longBitsToDouble(chunk.getChunkKey());
+                        if (!loadedChunks.contains(chunkKey)) {
+                            loadedChunks.add(chunkKey);
                             chunk.addPluginChunkTicket(PrivateReserve.plugin());
                         }
                     }
@@ -107,7 +109,7 @@ public class _DeliveryDocument implements DocumentCompatible {
 
     public void loadChunks() {
         World currentWorld = Deliveries.data().fromId(deliveryMobId).get().getCurrentLocation().getWorld();
-        for (Long chunkKey : loadedChunks) {
+        for (Long chunkKey : getLoadedChunks()) {
             Chunk chunk = currentWorld.getChunkAt(chunkKey);
             chunk.addPluginChunkTicket(PrivateReserve.plugin());
         }

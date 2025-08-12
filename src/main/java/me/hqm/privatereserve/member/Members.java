@@ -23,13 +23,19 @@ public class Members {
 
     // -- INIT -- //
 
-    public static void init(JavaPlugin plugin) {
+    public static void init(JavaPlugin plugin, SupportedFormat format) {
         // Files
-        if (Settings.FILE_FORMAT.getString().equalsIgnoreCase(SupportedFormat.MESSAGEPACK.name())) {
-            MEMBER_DATA = new MsgPackFileMemberDB();
-        } else {
-            // Default to Json
-            MEMBER_DATA = new JsonFileMemberDB();
+        switch (format) {
+            case SupportedFormat.MESSAGEPACK: {
+                MEMBER_DATA = new MsgPackFileMemberDB();
+                PrivateReserve.logger().info("MessagePack enabled for member data.");
+                break;
+            }
+            case JSON:
+            default: {
+                MEMBER_DATA = new JsonFileMemberDB();
+                PrivateReserve.logger().info("Json enabled for member data.");
+            }
         }
         MEMBER_DATA.loadAll();
 

@@ -37,20 +37,17 @@ public class LandmarkCommand {
     }
 
     public static LiteralCommandNode<CommandSourceStack> createCommand() {
-        LiteralCommandNode<CommandSourceStack> goNode = Commands.literal("go")
-                .then(Commands.argument("name", StringArgumentType.word())
-                        .suggests(LandmarkCommand::getLandmarkNameSuggestions)
-                        .executes(LandmarkCommand::runLandmarkGo))
-                .build();
-
         return Commands.literal("landmark")
                 .requires(LandmarkCommand::canRun)
                 .executes(LandmarkCommand::runLandmarkRoot)
                 .then(Commands.argument("name", StringArgumentType.word())
-                        .redirect(goNode))
-                .then(goNode)
+                        .executes(LandmarkCommand::runLandmarkGo))
+                .then(Commands.literal("go")
+                        .then(Commands.argument("name", StringArgumentType.word())
+                                .suggests(LandmarkCommand::getLandmarkNameSuggestions)
+                                .executes(LandmarkCommand::runLandmarkGo)))
                 .then(Commands.literal("list")
-                        .executes(LandmarkCommand::runLandmarkList)
+                        .executes(LandmarkCommand::runLandmarkRoot)
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(LandmarkCommand::getLandmarkListSuggestions)
                                 .executes(LandmarkCommand::runLandmarkList)))

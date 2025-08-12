@@ -6,6 +6,6 @@ import me.hqm.privatereserve.Settings;
 
 public class JsonFileLockedBlockDB extends JsonFileDatabase<LockedBlock> implements LockedBlockDatabase {
     public JsonFileLockedBlockDB() {
-        super(Settings.FILE_FOLDER.getString(), NAME, Settings.FILE_PRETTY.getBoolean(), 0);
+        super(Settings.FILE_FOLDER.getString(), NAME, 0);
     }
 }

@@ -1,8 +1,8 @@
 package me.hqm.privatereserve.lockedblock;
 
 import me.hqm.privatereserve.PrivateReserve;
-import me.hqm.privatereserve.lockedblock.data.LockedBlockDatabase;
 import me.hqm.privatereserve.lockedblock.data.LockedBlock;
+import me.hqm.privatereserve.lockedblock.data.LockedBlockDatabase;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -135,8 +135,7 @@ public class LockedBlockListener implements Listener {
     }
 
     boolean canLock(Player player) {
-        return !player.getPersistentDataContainer().has(
-                new NamespacedKey(PrivateReserve.plugin().namespace(), "no_lock"
-                ));
+        NamespacedKey nsk = new NamespacedKey(PrivateReserve.plugin().namespace(), "no_lock");
+        return !player.getPersistentDataContainer().getOrDefault(nsk, PersistentDataType.BOOLEAN, false);
     }
 }

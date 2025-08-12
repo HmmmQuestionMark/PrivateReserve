@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public interface LockedBlockDatabase extends DocumentDatabase<LockedBlock> {
     String NAME = "locked_blocks";
 
-    static List<Block> getSuroundingBlocks(Block block, boolean y) {
+    static List<Block> getSurroundingBlocks(Block block, boolean y) {
         List<Block> ret = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -38,7 +38,7 @@ public interface LockedBlockDatabase extends DocumentDatabase<LockedBlock> {
 
     static boolean isDoubleChest(Block block) {
         if (block.getType().equals(Material.CHEST)) {
-            for (Block found : getSuroundingBlocks(block, false)) {
+            for (Block found : getSurroundingBlocks(block, false)) {
                 if (found.getType().equals(Material.CHEST)) {
                     return true;
                 }
@@ -49,7 +49,7 @@ public interface LockedBlockDatabase extends DocumentDatabase<LockedBlock> {
 
     static boolean isBisected(Block block) {
         if (block.getBlockData() instanceof Bisected) {
-            for (Block found : getSuroundingBlocks(block, true)) {
+            for (Block found : getSurroundingBlocks(block, true)) {
                 if (found.getBlockData() instanceof Bisected) {
                     return true;
                 }
@@ -59,12 +59,12 @@ public interface LockedBlockDatabase extends DocumentDatabase<LockedBlock> {
     }
 
     static List<Block> getDoubleChest(Block block) {
-        return getSuroundingBlocks(block, false).stream().filter(found -> found.getType().equals(Material.CHEST)).
+        return getSurroundingBlocks(block, false).stream().filter(found -> found.getType().equals(Material.CHEST)).
                 collect(Collectors.toList());
     }
 
     static List<Block> getBisected(Block block) {
-        return getSuroundingBlocks(block, true).stream().filter(found -> found.getBlockData() instanceof Bisected).
+        return getSurroundingBlocks(block, true).stream().filter(found -> found.getBlockData() instanceof Bisected).
                 collect(Collectors.toList());
     }
 
@@ -75,8 +75,9 @@ public interface LockedBlockDatabase extends DocumentDatabase<LockedBlock> {
     default boolean isLockable(Block block) {
         return switch (block.getType()) {
             case BEEHIVE, CAMPFIRE, SOUL_CAMPFIRE -> true;
-            default -> block instanceof Container || block.getBlockData() instanceof Openable ||
-                    block.getBlockData() instanceof Switch;
+            default -> block.getState() instanceof Container ||
+                    block.getState().getBlockData() instanceof Openable ||
+                    block.getState().getBlockData() instanceof Switch;
         };
     }
 

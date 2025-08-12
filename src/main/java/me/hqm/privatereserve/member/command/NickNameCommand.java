@@ -23,18 +23,16 @@ public class NickNameCommand {
     }
 
     public static LiteralCommandNode<CommandSourceStack> createCommand() {
-        LiteralCommandNode<CommandSourceStack> setNode = Commands.literal("set")
-                .then(Commands.argument("name", StringArgumentType.word())
-                        .executes(NickNameCommand::runSetSelf)
-                        .then(Commands.argument("player", StringArgumentType.word())
-                                .requires(ctx -> canRun(ctx, "privatereserve.admin"))
-                                .executes(NickNameCommand::runSetTarget)))
-                .build();
-
         return Commands.literal("nickname")
                 .requires(NickNameCommand::canRun)
-                .then(Commands.argument("name", StringArgumentType.word()).redirect(setNode))
-                .then(setNode)
+                .then(Commands.argument("name", StringArgumentType.string())
+                        .executes(NickNameCommand::runSetSelf))
+                .then(Commands.literal("set")
+                        .then(Commands.argument("name", StringArgumentType.string())
+                                .executes(NickNameCommand::runSetSelf)
+                                .then(Commands.argument("player", StringArgumentType.word())
+                                        .requires(ctx -> canRun(ctx, "privatereserve.admin"))
+                                        .executes(NickNameCommand::runSetTarget))))
                 .then(Commands.literal("clear")
                         .executes(NickNameCommand::runClearSelf)
                         .then(Commands.argument("player", StringArgumentType.word())

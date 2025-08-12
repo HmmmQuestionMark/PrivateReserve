@@ -8,11 +8,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class PDCDocument implements Document {
 
     static final PersistentDataType[] SUPPORTED_TYPES = {
@@ -94,7 +92,7 @@ public class PDCDocument implements Document {
                 }
                 if (container.has(nsk, PersistentDataType.LIST.dataContainers())) {
                     List<Map<String, Object>> mapList = new ArrayList<>();
-                    for (PersistentDataContainer listedContainer : container.get(nsk, PersistentDataType.LIST.dataContainers())) {
+                    for (PersistentDataContainer listedContainer : Objects.requireNonNull(container.get(nsk, PersistentDataType.LIST.dataContainers()))) {
                         mapList.add(new PDCDocument(listedContainer).asMap());
                     }
                     data.put(nsk.getKey(), mapList);

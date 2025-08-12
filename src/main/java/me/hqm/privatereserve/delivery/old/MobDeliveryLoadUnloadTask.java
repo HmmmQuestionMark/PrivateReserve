@@ -25,6 +25,7 @@ public abstract class MobDeliveryLoadUnloadTask extends MobDeliveryTask {
     final Long wait;
     final State state;
     final List<InventoryHolder> holders;
+
     public MobDeliveryLoadUnloadTask(DeliveryTaskType type, DeliveryMob model) {
         super(type, model);
         state = State.valueOf(type.name());

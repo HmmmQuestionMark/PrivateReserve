@@ -13,6 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <paper.version>1.21.8-R0.1-SNAPSHOT</paper.version>
         <msgpack.version>0.9.9</msgpack.version>
+        <snappy.version>1.1.10.7</snappy.version>
         <chitchat.version>2.2.0-SNAPSHOT</chitchat.version>
         <worldguard.version>7.0.14</worldguard.version>
     </properties>
@@ -42,6 +43,12 @@
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack-core</artifactId>
             <version>${msgpack.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>${snappy.version}</version>
             <scope>provided</scope>
         </dependency>
 

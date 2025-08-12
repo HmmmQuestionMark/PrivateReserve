@@ -1,11 +1,11 @@
 package me.hqm.document;
 
-public interface DocumentFormat<D extends DocumentCompatible> {
-    String name();
+import java.util.Map;
 
-    byte[] toRaw(D document);
+public interface DocumentFormat {
+    SupportedFormat format();
 
-    void write(D document);
+    byte[] toRaw(Map<String, Object> data);
 
-    D fromRaw(byte[] raw);
+    DocumentMap fromRaw(byte[] raw);
 }

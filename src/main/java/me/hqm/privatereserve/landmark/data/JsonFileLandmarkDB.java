@@ -5,6 +5,6 @@ import me.hqm.privatereserve.Settings;
 
 public class JsonFileLandmarkDB extends JsonFileDatabase<Landmark> implements LandmarkDatabase {
     public JsonFileLandmarkDB() {
-        super(Settings.FILE_FOLDER.getString(), NAME, Settings.FILE_PRETTY.getBoolean(), 0);
+        super(Settings.FILE_FOLDER.getString(), NAME, 0);
     }
 }

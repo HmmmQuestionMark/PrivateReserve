@@ -2,7 +2,6 @@ package me.hqm.privatereserve.landmark;
 
 import me.hqm.document.SupportedFormat;
 import me.hqm.privatereserve.PrivateReserve;
-import me.hqm.privatereserve.Settings;
 import me.hqm.privatereserve.landmark.data.JsonFileLandmarkDB;
 import me.hqm.privatereserve.landmark.data.LandmarkDatabase;
 import me.hqm.privatereserve.landmark.data.MsgPackFileLandmarkDB;
@@ -21,13 +20,19 @@ public class Landmarks {
 
     // -- INIT -- //
 
-    public static void init() {
+    public static void init(SupportedFormat format) {
         // Files
-        if (Settings.FILE_FORMAT.getString().equalsIgnoreCase(SupportedFormat.MESSAGEPACK.name())) {
-            LANDMARK_DATA = new MsgPackFileLandmarkDB();
-        } else {
-            // Default to Json
-            LANDMARK_DATA = new JsonFileLandmarkDB();
+        switch (format) {
+            case SupportedFormat.MESSAGEPACK: {
+                LANDMARK_DATA = new MsgPackFileLandmarkDB();
+                PrivateReserve.logger().info("MessagePack enabled for landmark data.");
+                break;
+            }
+            case JSON:
+            default: {
+                LANDMARK_DATA = new JsonFileLandmarkDB();
+                PrivateReserve.logger().info("Json enabled for landmark data.");
+            }
         }
         LANDMARK_DATA.loadAll();
 

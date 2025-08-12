@@ -9,10 +9,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class TimeTask extends BukkitRunnable {
 
+    public static final long DAY_LENGTH_TICKS = 24000;
     // The amount of moon phases minus one
     private final static int MOON_PHASES = 7;
-    public static final long DAY_LENGTH_TICKS = 24000;
-
     private int counter = 0;
 
     public static int getMultiplier(World world) {

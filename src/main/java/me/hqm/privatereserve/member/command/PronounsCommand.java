@@ -23,18 +23,16 @@ public class PronounsCommand {
     }
 
     public static LiteralCommandNode<CommandSourceStack> createCommand() {
-        LiteralCommandNode<CommandSourceStack> setNode = Commands.literal("set")
-                .then(Commands.argument("pronouns", StringArgumentType.word())
-                        .executes(PronounsCommand::runSetSelf)
-                        .then(Commands.argument("player", StringArgumentType.word())
-                                .requires(ctx -> canRun(ctx, "privatereserve.admin"))
-                                .executes(PronounsCommand::runSetTarget)))
-                .build();
-
         return Commands.literal("pronouns")
                 .requires(PronounsCommand::canRun)
-                .then(Commands.argument("pronouns", StringArgumentType.word()).redirect(setNode))
-                .then(setNode)
+                .then(Commands.argument("pronouns", StringArgumentType.word())
+                        .executes(PronounsCommand::runSetSelf))
+                .then(Commands.literal("set")
+                        .then(Commands.argument("pronouns", StringArgumentType.word())
+                                .executes(PronounsCommand::runSetSelf)
+                                .then(Commands.argument("player", StringArgumentType.word())
+                                        .requires(ctx -> canRun(ctx, "privatereserve.admin"))
+                                        .executes(PronounsCommand::runSetTarget))))
                 .then(Commands.literal("clear")
                         .executes(PronounsCommand::runClearSelf)
                         .then(Commands.argument("player", StringArgumentType.word())

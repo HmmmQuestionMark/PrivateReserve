@@ -4,7 +4,6 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import me.hqm.document.SupportedFormat;
 import me.hqm.privatereserve.PrivateReserve;
-import me.hqm.privatereserve.Settings;
 import me.hqm.privatereserve.landmark.LandmarkCommand;
 import me.hqm.privatereserve.lockedblock.data.JsonFileLockedBlockDB;
 import me.hqm.privatereserve.lockedblock.data.LockedBlockDatabase;
@@ -38,13 +37,19 @@ public class LockedBlocks {
 
     // -- INIT -- //
 
-    public static void init(JavaPlugin plugin) {
+    public static void init(JavaPlugin plugin, SupportedFormat format) {
         // Files
-        if (Settings.FILE_FORMAT.getString().equalsIgnoreCase(SupportedFormat.MESSAGEPACK.name())) {
-            LOCKED_DATA = new MsgPackFileLockedBlockDB();
-        } else {
-            // Default to Json
-            LOCKED_DATA = new JsonFileLockedBlockDB();
+        switch (format) {
+            case SupportedFormat.MESSAGEPACK: {
+                LOCKED_DATA = new MsgPackFileLockedBlockDB();
+                PrivateReserve.logger().info("MessagePack enabled for locked block data.");
+                break;
+            }
+            case JSON:
+            default: {
+                LOCKED_DATA = new JsonFileLockedBlockDB();
+                PrivateReserve.logger().info("Json enabled for locked block data.");
+            }
         }
         LOCKED_DATA.loadAll();
 

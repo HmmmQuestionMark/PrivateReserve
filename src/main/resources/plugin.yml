@@ -6,7 +6,8 @@ description: Special sauce for HQM\'s private reserve.
 authors: [HQM]
 softdepend: [Chitchat, WorldGuard]
 libraries:
-  - org.msgpack:msgpack-core:0.9.9
+  - org.msgpack:msgpack-core:${msgpack.version}
+  - org.xerial.snappy:snappy-java:${snappy.version}
 permisions:
   privatereserve.bypasslock:
     default: op

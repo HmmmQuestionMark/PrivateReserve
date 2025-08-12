@@ -20,9 +20,9 @@ import java.util.Map;
 @ApiStatus.Obsolete
 @ApiStatus.ScheduledForRemoval(inVersion = "1.1")
 public abstract class MobDeliveryMovementTask extends MobDeliveryTask {
-    Pathfinder finder;
     final Location start;
     final Location finish;
+    Pathfinder finder;
 
     public MobDeliveryMovementTask(DeliveryTaskType type, DeliveryMob model, Location start, Location finish) {
         super(type, model);

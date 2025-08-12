@@ -6,6 +6,6 @@ import me.hqm.privatereserve.Settings;
 
 public class JsonFileMemberDB extends JsonFileDatabase<Member> implements MemberDatabase {
     public JsonFileMemberDB() {
-        super(Settings.FILE_FOLDER.getString(), NAME, Settings.FILE_PRETTY.getBoolean(), 0);
+        super(Settings.FILE_FOLDER.getString(), NAME, 0);
     }
 }

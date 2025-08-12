@@ -9,6 +9,6 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.ScheduledForRemoval(inVersion = "1.1")
 public class JsonFile_DeliveryDB extends JsonFileDatabase<_DeliveryDocument> implements _DeliveryDatabase {
     public JsonFile_DeliveryDB() {
-        super(Settings.FILE_FOLDER.getString(), NAME, Settings.FILE_PRETTY.getBoolean(), 0);
+        super(Settings.FILE_FOLDER.getString(), NAME, 0);
     }
 }

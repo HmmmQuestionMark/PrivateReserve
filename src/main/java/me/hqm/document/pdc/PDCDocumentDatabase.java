@@ -4,7 +4,6 @@ import me.hqm.document.DocumentDatabase;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +26,6 @@ public abstract class PDCDocumentDatabase<H extends PersistentDataHolder>
         }
         return Optional.empty();
     }
-
 
     @Override
     public void add(PDCDocument value) {
@@ -68,28 +66,9 @@ public abstract class PDCDocumentDatabase<H extends PersistentDataHolder>
         return data;
     }
 
-    public String name() {
-        return "PDC";
-    }
-
-    @Override
-    public byte[] toRaw(PDCDocument document) {
-        try {
-            return document.container.serializeToBytes();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public void write(PDCDocument document) {
         // Do nothing.
-    }
-
-    @Override
-    public PDCDocument fromRaw(byte[] raw) {
-        // Do nothing.
-        return null;
     }
 
     public abstract String getId(H holder);

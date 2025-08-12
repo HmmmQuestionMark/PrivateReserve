@@ -1,8 +1,13 @@
 #Configuration File
 persistence:
+  type: 'file'
   file:
     format: 'json'
     pretty: false
+    convert:
+      on_start: true
+      overwrite: true
+      backup: true
   pdc:
     enabled: false
 debug:

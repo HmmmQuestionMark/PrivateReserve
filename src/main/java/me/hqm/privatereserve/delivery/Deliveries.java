@@ -2,7 +2,6 @@ package me.hqm.privatereserve.delivery;
 
 import me.hqm.document.SupportedFormat;
 import me.hqm.privatereserve.PrivateReserve;
-import me.hqm.privatereserve.Settings;
 import me.hqm.privatereserve.delivery.data.DeliveryDatabase;
 import me.hqm.privatereserve.delivery.data.JsonFileDeliveryDB;
 import me.hqm.privatereserve.delivery.data.MsgPackFileDeliveryDB;
@@ -37,13 +36,19 @@ public class Deliveries {
 
     // -- INIT -- //
 
-    public static void init(JavaPlugin plugin) {
+    public static void init(JavaPlugin plugin, SupportedFormat format) {
         // Files
-        if (Settings.FILE_FORMAT.getString().equalsIgnoreCase(SupportedFormat.MESSAGEPACK.name())) {
-            DELIVERY_DATA = new MsgPackFileDeliveryDB();
-        } else {
-            // Default to Json
-            DELIVERY_DATA = new JsonFileDeliveryDB();
+        switch (format) {
+            case SupportedFormat.MESSAGEPACK: {
+                DELIVERY_DATA = new MsgPackFileDeliveryDB();
+                PrivateReserve.logger().info("MessagePack enabled for delivery data.");
+                break;
+            }
+            case JSON:
+            default: {
+                DELIVERY_DATA = new JsonFileDeliveryDB();
+                PrivateReserve.logger().info("Json enabled for delivery data.");
+            }
         }
         DELIVERY_DATA.loadAll();
 

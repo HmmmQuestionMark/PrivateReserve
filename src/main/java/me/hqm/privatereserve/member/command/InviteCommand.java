@@ -18,6 +18,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
 
 public class InviteCommand {
@@ -42,6 +43,7 @@ public class InviteCommand {
         return doInvite(ctx, /*withPrimary*/ true);
     }
 
+    @SuppressWarnings("SameReturnValue")
     private static int doInvite(CommandContext<CommandSourceStack> ctx, boolean withPrimary) {
         var sender = ctx.getSource().getSender();
         String targetName = StringArgumentType.getString(ctx, "player");
@@ -93,7 +95,7 @@ public class InviteCommand {
 
         // Let the invitee know
         if (invitee.isOnline()) {
-            invitee.getPlayer().teleport(Regions.spawnLocation());
+            Objects.requireNonNull(invitee.getPlayer()).teleport(Regions.spawnLocation());
             Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(4000), Duration.ofMillis(500));
             Title title = Title.title(Component.text("Celebrate!", NamedTextColor.YELLOW),
                     Component.text("You were invited! Have fun!", NamedTextColor.GREEN), times);

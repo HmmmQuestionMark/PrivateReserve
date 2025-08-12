@@ -24,26 +24,25 @@ package me.hqm.document.json;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import me.hqm.document.Document;
 import me.hqm.document.DocumentCompatible;
 import me.hqm.document.DocumentDatabase;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
-public abstract class JsonFileDatabase<D extends DocumentCompatible> implements DocumentDatabase<D> {
+@SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})
+public abstract class JsonFileDatabase<D extends DocumentCompatible> implements DocumentDatabase<D>, JsonFormat {
     protected final Cache<String, D> REGISTERED_DATA;
 
     // -- FILE -- //
     private final File FOLDER;
-    private final boolean PRETTY;
 
-    public JsonFileDatabase(String path, String folder, boolean pretty, int expireMins) {
+    public JsonFileDatabase(String path, String folder, int expireMins) {
         if (expireMins > 0) {
             REGISTERED_DATA =
                     CacheBuilder.newBuilder().concurrencyLevel(4).expireAfterAccess(expireMins, TimeUnit.MINUTES)
@@ -53,7 +52,6 @@ public abstract class JsonFileDatabase<D extends DocumentCompatible> implements 
         }
         FOLDER = new File(path + "/" + folder + "/");
         FOLDER.mkdirs();
-        PRETTY = pretty;
     }
 
     public Optional<D> fromId(String id) {
@@ -81,13 +79,13 @@ public abstract class JsonFileDatabase<D extends DocumentCompatible> implements 
 
     @Override
     public void write(D document) {
-        File file = new File(FOLDER.getPath() + "/" + document.getId() + ".json");
+        File file = new File(FOLDER.getPath() + "/" + document.getId() + "." + format().getExt());
         if (!(file.exists())) {
             createFile(file);
         }
         try {
             PrintWriter writer = new PrintWriter(file);
-            writer.print(toString(document));
+            writer.print(toString(document.asMap()));
             writer.close();
         } catch (Exception oops) {
             oops.printStackTrace();
@@ -96,12 +94,12 @@ public abstract class JsonFileDatabase<D extends DocumentCompatible> implements 
 
     public void load(String key) {
         try {
-            File file = new File(FOLDER.getPath() + "/" + key + ".json");
+            File file = new File(FOLDER.getPath() + "/" + key + "." + format().getExt());
             if (file.exists()) {
                 FileInputStream inputStream = new FileInputStream(file);
                 InputStreamReader reader = new InputStreamReader(inputStream);
-                D document = read(reader);
-                REGISTERED_DATA.put(key, createDocument(key, (Document) document));
+                Map<String, Object> document = read(reader);
+                REGISTERED_DATA.put(key, createDocument(key, new JsonFileDocumentMap(document)));
                 reader.close();
             }
         } catch (Exception oops) {
@@ -112,8 +110,8 @@ public abstract class JsonFileDatabase<D extends DocumentCompatible> implements 
     @SuppressWarnings("ConstantConditions")
     public void loadAll() {
         for (File file : FOLDER.listFiles()) {
-            if (file.isFile() && file.getName().endsWith(".json")) {
-                String key = file.getName().replace(".json", "");
+            if (file.isFile() && file.getName().endsWith("." + format().getExt())) {
+                String key = file.getName().replace("." + format().getExt(), "");
                 load(key);
             }
         }
@@ -141,41 +139,9 @@ public abstract class JsonFileDatabase<D extends DocumentCompatible> implements 
     }
 
     public void removeFile(String key) {
-        File file = new File(FOLDER.getPath() + "/" + key + ".json");
+        File file = new File(FOLDER.getPath() + "/" + key + "." + format().getExt());
         if (file.exists()) {
             file.delete();
         }
-    }
-
-    @Override
-    public String name() {
-        return "JSON";
-    }
-
-    public String toString(D data) {
-        Gson gson = PRETTY ? new GsonBuilder().setPrettyPrinting().create() : new GsonBuilder().create();
-        return gson.toJson(data.asMap());
-    }
-
-    @Override
-    public byte[] toRaw(D data) {
-        return toString(data).getBytes();
-    }
-
-    public D read(Reader reader) {
-        Gson gson = new GsonBuilder().create();
-        return (D) new JsonFileDocumentMap(gson.fromJson(reader, Map.class));
-    }
-
-    public D fromString(String json) {
-        StringReader reader = new StringReader(json);
-        return read(reader);
-    }
-
-    @Override
-    public D fromRaw(byte[] raw) {
-        String rawString = new String(raw);
-        StringReader reader = new StringReader(rawString);
-        return read(reader);
     }
 }

@@ -5,6 +5,7 @@ import me.hqm.document.DocumentDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +16,13 @@ import java.util.stream.Collectors;
 public interface MemberDatabase extends DocumentDatabase<Member> {
     String NAME = "players";
 
-    @Deprecated
+    @ApiStatus.Internal
     default Optional<Member> fromName(final String name) {
         return getRawData().values().stream().
                 filter(model -> model.getLastKnownName().equalsIgnoreCase(name)).findFirst();
     }
 
-    @Deprecated
+    @ApiStatus.Internal
     default Optional<Member> fromPlayer(OfflinePlayer player) {
         return this.fromId(player.getUniqueId().toString());
     }
@@ -35,7 +36,7 @@ public interface MemberDatabase extends DocumentDatabase<Member> {
         return fromId(UUID.fromString(id));
     }
 
-    @Deprecated
+    @ApiStatus.Internal
     default Set<OfflinePlayer> getOfflinePlayers() {
         return getRawData().values().stream().map(Member::getOfflinePlayer).collect(Collectors.toSet());
     }
@@ -73,28 +74,24 @@ public interface MemberDatabase extends DocumentDatabase<Member> {
         return model;
     }
 
-    default Member inviteConsole(OfflinePlayer player) {
+    default void inviteConsole(OfflinePlayer player) {
         Member model = new Member(player, true);
         write(model);
-        return model;
     }
 
-    default Member inviteConsole(OfflinePlayer player, String primaryAccount) {
+    default void inviteConsole(OfflinePlayer player, String primaryAccount) {
         Member model = new Member(player, true, false, primaryAccount);
         write(model);
-        return model;
     }
 
-    default Member inviteConsole(OfflinePlayer player, boolean trusted) {
+    default void inviteConsole(OfflinePlayer player, boolean trusted) {
         Member model = new Member(player, true, trusted);
         write(model);
-        return model;
     }
 
-    default Member inviteSelf(Player player) {
+    default void inviteSelf(Player player) {
         Member model = new Member(player, false);
         write(model);
-        return model;
     }
 
     default boolean isVisitor(UUID player) {
@@ -127,7 +124,7 @@ public interface MemberDatabase extends DocumentDatabase<Member> {
         return oModel.isPresent() && oModel.get().isTrusted();
     }
 
-    @Deprecated
+    @ApiStatus.Internal
     default List<String> getInvitedManually(Member model) {
         return getRawData().values().stream().filter(
                 playerModel -> model.getId().equals(playerModel.getInvitedFrom())).map(

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.Map;
 import java.util.Optional;
 
-public interface DocumentDatabase<D extends DocumentCompatible> extends DocumentFormat<D> {
+public interface DocumentDatabase<D extends DocumentCompatible> {
     Optional<D> fromId(String id);
 
     void add(D compatible);
@@ -20,6 +20,8 @@ public interface DocumentDatabase<D extends DocumentCompatible> extends Document
     void loadAll();
 
     void purge();
+
+    void write(D document);
 
     D createDocument(String key, Document compatible);
 

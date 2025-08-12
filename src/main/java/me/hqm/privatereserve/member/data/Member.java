@@ -68,7 +68,7 @@ public class Member implements DocumentCompatible {
         lastKnownName = player.getName();
         this.invitedFrom = invitedFrom;
         nickName = LegacyComponentSerializer.legacyAmpersand().
-                serialize(Component.text(lastKnownName, NamedTextColor.GRAY));
+                serialize(Component.text(lastKnownName != null ? lastKnownName : "UNKNOWN", NamedTextColor.GRAY));
         trusted = false;
         expelled = false;
         this.primaryAccount = primaryAccount;

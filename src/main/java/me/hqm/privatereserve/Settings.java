@@ -16,7 +16,9 @@ public enum Settings {
     // File
     FILE_FORMAT("persistence.file.format", "json"),
     FILE_FOLDER("persistence.file.folder", JavaPlugin.getProvidingPlugin(Settings.class).getDataFolder().getPath() + "/data/"),
-    FILE_PRETTY("persistence.file.pretty", false),
+    FILE_CONVERT("persistence.file.convert.on_start", true),
+    FILE_CONVERT_OVERWRITE("persistence.file.convert.overwrite", true),
+    FILE_CONVERT_BACKUP("persistence.file.convert.backup", true),
 
     // PDC
     PDC_ENABLED("persistence.pdc.enabled", false),

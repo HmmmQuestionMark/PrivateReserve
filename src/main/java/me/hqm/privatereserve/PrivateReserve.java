@@ -3,6 +3,7 @@ package me.hqm.privatereserve;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import me.hqm.document.SupportedFormat;
 import me.hqm.privatereserve.chat.ChatTags;
 import me.hqm.privatereserve.delivery.Deliveries;
 import me.hqm.privatereserve.landmark.Landmarks;
@@ -51,27 +52,31 @@ public class PrivateReserve extends JavaPlugin {
         saveConfig();
 
         // Configure database type
-        getLogger().info("Json file saving enabled."); // Only json file, for now
+        SupportedFormat saveFormat = SupportedFormat.JSON;
+        try {
+            saveFormat = SupportedFormat.valueOf(Settings.FILE_FORMAT.getString().toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+        }
 
         // Check WorldGuard
         Regions.init(Bukkit.getWorlds().getFirst().getSpawnLocation());
 
         // Enable members
-        Members.init(this);
+        Members.init(this, saveFormat);
 
         // Enable landmarks
         if (Settings.LANDMARK_ENABLED.getBoolean()) {
-            Landmarks.init();
+            Landmarks.init(saveFormat);
         }
 
         // Enable locked blocks
         if (Settings.LOCKED_BLOCK_ENABLED.getBoolean()) {
-            LockedBlocks.init(this);
+            LockedBlocks.init(this, saveFormat);
         }
 
         // Deliveries
         if (Settings.DELIVERY_MOB_ENABLED.getBoolean()) {
-            Deliveries.init(this);
+            Deliveries.init(this, saveFormat);
         }
 
         // Build chat format
