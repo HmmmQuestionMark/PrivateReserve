@@ -5,7 +5,11 @@ import me.hqm.privatereserve.delivery.old.MobDeliveryLoadUnloadTask;
 import me.hqm.privatereserve.delivery.old.MobDeliveryTask;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.ApiStatus;
 
+@Deprecated
+@ApiStatus.Obsolete
+@ApiStatus.ScheduledForRemoval(inVersion = "1.1")
 public class GhastDeliveryUnloadTask extends MobDeliveryLoadUnloadTask {
     public GhastDeliveryUnloadTask(DeliveryDocument model) {
         super(GhastDeliveryTaskType.UNLOAD, model);

@@ -11,9 +11,21 @@ public class TimeTask extends BukkitRunnable {
 
     // The amount of moon phases minus one
     private final static int MOON_PHASES = 7;
-    public static long DAY_LENGTH_TICKS = 24000;
+    public static final long DAY_LENGTH_TICKS = 24000;
 
     private int counter = 0;
+
+    public static int getMultiplier(World world) {
+        long time = world.getTime();
+        if (isDay(time)) {
+            return Settings.DAYLIGHT_MULTIPLIER.getInteger();
+        }
+        return Settings.NIGHT_MULTIPLIER.getInteger();
+    }
+
+    public static boolean isDay(long time) {
+        return time < (DAY_LENGTH_TICKS / 2);
+    }
 
     @Override
     public void run() {
@@ -48,17 +60,5 @@ public class TimeTask extends BukkitRunnable {
                 }
             }
         }
-    }
-
-    public static int getMultiplier(World world) {
-        long time = world.getTime();
-        if (isDay(time)) {
-            return Settings.DAYLIGHT_MULTIPLIER.getInteger();
-        }
-        return Settings.NIGHT_MULTIPLIER.getInteger();
-    }
-
-    public static boolean isDay(long time) {
-        return time < (DAY_LENGTH_TICKS / 2);
     }
 }

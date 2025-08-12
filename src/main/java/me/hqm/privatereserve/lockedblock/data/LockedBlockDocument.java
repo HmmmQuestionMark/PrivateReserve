@@ -1,21 +1,22 @@
-package me.hqm.privatereserve.lockedblock;
+package me.hqm.privatereserve.lockedblock.data;
 
-import me.hqm.privatereserve.Locations;
-import me.hqm.document.DocumentMap;
 import me.hqm.document.Document;
-import me.hqm.privatereserve._PrivateReserve;
+import me.hqm.document.DocumentCompatible;
+import me.hqm.privatereserve.Locations;
+import me.hqm.privatereserve.lockedblock.LockedBlocks;
 import org.bukkit.Location;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class LockedBlockDocument implements Document {
+public class LockedBlockDocument implements DocumentCompatible {
 
     // -- DATA -- //
 
     private final String location;
     private final String owner;
-    private boolean locked;
+    private Boolean locked;
 
     // -- CONSTRUCTORS -- //
 
@@ -31,10 +32,10 @@ public class LockedBlockDocument implements Document {
         locked = false;
     }
 
-    public LockedBlockDocument(String location, DocumentMap data) {
+    public LockedBlockDocument(String location, Document data) {
         this.location = location;
-        owner = data.getString("owner");
-        locked = data.getBoolean("locked");
+        owner = data.get("owner", PersistentDataType.STRING);
+        locked = data.get("locked", PersistentDataType.BOOLEAN);
     }
 
     // -- GETTERS -- //
@@ -52,12 +53,12 @@ public class LockedBlockDocument implements Document {
     }
 
     @Override
-    public String getKey() {
+    public String getId() {
         return location;
     }
 
     @Override
-    public Map<String, Object> serialize() {
+    public Map<String, Object> asMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("owner", owner);
         map.put("locked", locked);
@@ -68,14 +69,13 @@ public class LockedBlockDocument implements Document {
 
     public boolean setLocked(boolean locked) {
         this.locked = locked;
-        register();
+        write();
         return locked;
     }
 
     // -- UTIL -- //
 
-    @Override
-    public void register() {
-        _PrivateReserve.LOCKED_DATA.register(this);
+    public void write() {
+        LockedBlocks.data().add(this);
     }
 }

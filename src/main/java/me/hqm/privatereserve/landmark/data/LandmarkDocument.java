@@ -1,22 +1,23 @@
 package me.hqm.privatereserve.landmark.data;
 
-import me.hqm.privatereserve.Locations;
-import me.hqm.document.DocumentMap;
 import me.hqm.document.Document;
-import me.hqm.privatereserve._PrivateReserve;
+import me.hqm.document.DocumentCompatible;
+import me.hqm.privatereserve.Locations;
+import me.hqm.privatereserve.landmark.Landmarks;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class LandmarkDocument implements Document {
+public class LandmarkDocument implements DocumentCompatible {
 
     // -- DATA -- //
 
     private final String name;
-    private String location;
     private final String owner;
+    private String location;
     private long timeCreated;
 
     // -- CONSTRUCTORS -- //
@@ -26,24 +27,30 @@ public class LandmarkDocument implements Document {
         this.location = Locations.stringFromLocation(location);
         this.owner = owner;
         this.timeCreated = System.currentTimeMillis();
-        register();
+        write();
     }
 
-    public LandmarkDocument(String name, DocumentMap data) {
+    public LandmarkDocument(String name, Document data) {
         this.name = name;
-        this.location = data.getString("location");
-        this.owner = data.getString("owner");
-        this.timeCreated = data.getLong("timeCreated", System.currentTimeMillis());
+        this.location = data.get("location", PersistentDataType.STRING);
+        this.owner = data.get("owner", PersistentDataType.STRING);
+        this.timeCreated = data.getOrDefault("timeCreated", PersistentDataType.LONG, System.currentTimeMillis());
     }
 
     // -- GETTERS -- //
 
     public String getName() {
-        return getKey();
+        return getId();
     }
 
     public Location getLocation() {
         return Locations.locationFromString(location);
+    }
+
+    public void setLocation(Location location) {
+        this.location = Locations.stringFromLocation(location);
+        this.timeCreated = System.currentTimeMillis();
+        write();
     }
 
     public boolean isOwnerOrAdmin(Player player) {
@@ -59,12 +66,14 @@ public class LandmarkDocument implements Document {
     }
 
     @Override
-    public String getKey() {
+    public String getId() {
         return name;
     }
 
+    // -- MUTATORS -- //
+
     @Override
-    public Map<String, Object> serialize() {
+    public Map<String, Object> asMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("location", location);
         map.put("owner", owner);
@@ -72,18 +81,9 @@ public class LandmarkDocument implements Document {
         return map;
     }
 
-    // -- MUTATORS -- //
-
-    public void setLocation(Location location) {
-        this.location = Locations.stringFromLocation(location);
-        this.timeCreated = System.currentTimeMillis();
-        register();
-    }
-
     // -- UTIL -- //
 
-    @Override
-    public void register() {
-        _PrivateReserve.LANDMARK_DATA.register(this);
+    public void write() {
+        Landmarks.data().add(this);
     }
 }

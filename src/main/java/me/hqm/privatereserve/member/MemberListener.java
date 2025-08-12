@@ -1,6 +1,6 @@
 package me.hqm.privatereserve.member;
 
-import me.hqm.privatereserve._PrivateReserve;
+import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.member.data.MemberDocument;
 import me.hqm.privatereserve.member.region.Regions;
 import net.kyori.adventure.text.Component;
@@ -23,11 +23,11 @@ public class MemberListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (_PrivateReserve.MEMBER_DATA.isVisitor(player.getUniqueId())) {
-            Optional<MemberDocument> maybeThem = _PrivateReserve.MEMBER_DATA.fromName(player.getName());
+        if (Members.data().isVisitor(player.getUniqueId())) {
+            Optional<MemberDocument> maybeThem = Members.data().fromName(player.getName());
             if (maybeThem.isPresent()) {
-                _PrivateReserve.MEMBER_DATA.remove(maybeThem.get().getKey());
-                _PrivateReserve.MEMBER_DATA.invite(player, maybeThem.get().getInvitedFrom());
+                Members.data().remove(maybeThem.get().getId());
+                Members.data().invite(player, maybeThem.get().getInvitedFrom());
                 player.teleport(Regions.spawnLocation());
                 Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(4000), Duration.ofMillis(500));
                 Title title = Title.title(Component.text("Celebrate!", NamedTextColor.YELLOW), Component.text("You were invited! Have fun!", NamedTextColor.GREEN), times);
@@ -35,8 +35,8 @@ public class MemberListener implements Listener {
                 return;
             }
             if (player.hasPermission("privatereserve.admin") || player.isWhitelisted()) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(_PrivateReserve.PLUGIN, () -> {
-                    _PrivateReserve.MEMBER_DATA.inviteSelf(player);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(PrivateReserve.plugin(), () -> {
+                    Members.data().inviteSelf(player);
                     player.kick(Component.text("Sorry, had reconfigure your permissions. Please rejoin.", NamedTextColor.GREEN));
                 }, 20);
                 return;
@@ -52,7 +52,7 @@ public class MemberListener implements Listener {
                     append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)).
                     append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
         } else {
-            Optional<MemberDocument> maybeThem = _PrivateReserve.MEMBER_DATA.fromPlayer(event.getPlayer());
+            Optional<MemberDocument> maybeThem = Members.data().fromPlayer(event.getPlayer());
             if (maybeThem.isPresent()) {
                 MemberDocument model = maybeThem.get();
                 model.setLastKnownName(event.getPlayer().getName());
@@ -71,7 +71,7 @@ public class MemberListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (_PrivateReserve.MEMBER_DATA.isVisitorOrExpelled(player.getUniqueId())) {
+        if (Members.data().isVisitorOrExpelled(player.getUniqueId())) {
             if (!Regions.visitingContains(event.getTo())) {
                 Title.Times times = Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(3000), Duration.ofMillis(500));
                 Title title = Title.title(Component.text("Sorry!", NamedTextColor.RED), Component.text("Only invited members are allowed there.", NamedTextColor.RED), times);

@@ -1,7 +1,10 @@
 #Configuration File
-file:
-  enabled: true
-  pretty: false
+persistence:
+  file:
+    format: 'json'
+    pretty: false
+  pdc:
+    enabled: false
 debug:
   enabled: false
 member:
@@ -22,6 +25,8 @@ time:
 landmark:
   enabled: true
   limit: 3
+locked_block:
+  enabled: true
 delivery:
   enabled: false
   limit: 1

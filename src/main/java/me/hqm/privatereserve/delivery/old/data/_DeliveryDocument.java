@@ -1,22 +1,25 @@
 package me.hqm.privatereserve.delivery.old.data;
 
-import me.hqm.document.DocumentMap;
-import me.hqm.document.Document;
 import com.destroystokyo.paper.entity.Pathfinder;
-import me.hqm.privatereserve._PrivateReserve;
+import me.hqm.document.Document;
+import me.hqm.document.DocumentCompatible;
+import me.hqm.privatereserve.PrivateReserve;
+import me.hqm.privatereserve.delivery.Deliveries;
 import me.hqm.privatereserve.delivery.old.DeliveryTaskType;
 import me.hqm.privatereserve.delivery.old.MobDeliveryTask;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class _DeliveryDocument implements Document {
+@Deprecated
+@ApiStatus.Obsolete
+@ApiStatus.ScheduledForRemoval(inVersion = "1.1")
+public class _DeliveryDocument implements DocumentCompatible {
     // -- DATA -- //
 
     // NonNullable
@@ -32,21 +35,23 @@ public class _DeliveryDocument implements Document {
         deliveryMobEntityType = task.getEntityType();
         currentTaskType = task.getType();
         loadedChunks = new ArrayList<>();
-        register();
+        write();
     }
 
-    public _DeliveryDocument(String id, DocumentMap data) {
+    public _DeliveryDocument(String id, Document data) {
         deliveryMobId = id;
-        deliveryMobEntityType = EntityType.valueOf(data.getString("deliveryMobEntityType"));
-        currentTaskType = DeliveryTaskType.valueOf(deliveryMobEntityType, data.getString("currentTaskType"));
-        loadedChunks = data.getLongList("loadedChunks");
-        MobDeliveryTask.createFromData(currentTaskType, deliveryMobId).start();
+        deliveryMobEntityType = EntityType.valueOf(data.get("deliveryMobEntityType", PersistentDataType.STRING));
+        currentTaskType = DeliveryTaskType.
+                valueOf(deliveryMobEntityType, Objects.
+                        requireNonNull(data.get("currentTaskType", PersistentDataType.STRING)));
+        loadedChunks = data.get("loadedChunks", PersistentDataType.LIST.longs());
+        Objects.requireNonNull(MobDeliveryTask.createFromData(currentTaskType, deliveryMobId)).start();
     }
 
     // -- GETTERS -- //
 
     public String getId() {
-        return getKey();
+        return deliveryMobId;
     }
 
     public DeliveryTaskType getCurrentTaskType() {
@@ -58,12 +63,7 @@ public class _DeliveryDocument implements Document {
     }
 
     @Override
-    public String getKey() {
-        return deliveryMobId;
-    }
-
-    @Override
-    public Map<String, Object> serialize() {
+    public Map<String, Object> asMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("deliveryMobEntityType", deliveryMobEntityType.name());
         map.put("currentTaskType", currentTaskType.name());
@@ -75,12 +75,12 @@ public class _DeliveryDocument implements Document {
 
     public void addChunk(Chunk chunk) {
         this.loadedChunks.add(chunk.getChunkKey());
-        register();
+        write();
     }
 
     public void addPath(Pathfinder.PathResult result) {
         if (result != null) {
-            Location previous = _PrivateReserve.DELIVERY_DATA.fromKey(deliveryMobId).get().getCurrentLocation();
+            Location previous = Deliveries.data().fromId(deliveryMobId).get().getCurrentLocation();
             World world = previous.getWorld();
             for (Location next : result.getPoints()) {
                 int minX = Math.min(previous.getBlockX(), next.getBlockX());
@@ -94,32 +94,31 @@ public class _DeliveryDocument implements Document {
                         Chunk chunk = world.getChunkAt(x, z);
                         if (!loadedChunks.contains(chunk.getChunkKey())) {
                             loadedChunks.add(chunk.getChunkKey());
-                            chunk.addPluginChunkTicket(_PrivateReserve.PLUGIN);
+                            chunk.addPluginChunkTicket(PrivateReserve.plugin());
                         }
                     }
                 }
             }
         }
-        register();
+        write();
     }
 
     // -- UTIL -- //
 
     public void loadChunks() {
-        World currentWorld = _PrivateReserve.DELIVERY_DATA.fromKey(deliveryMobId).get().getCurrentLocation().getWorld();
+        World currentWorld = Deliveries.data().fromId(deliveryMobId).get().getCurrentLocation().getWorld();
         for (Long chunkKey : loadedChunks) {
             Chunk chunk = currentWorld.getChunkAt(chunkKey);
-            chunk.addPluginChunkTicket(_PrivateReserve.PLUGIN);
+            chunk.addPluginChunkTicket(PrivateReserve.plugin());
         }
     }
 
-    @Override
-    public void register() {
-        _PrivateReserve._DELIVERY_DATA.register(this);
+    public void write() {
+        Deliveries.___data().add(this);
     }
 
     public void clear() {
-        _PrivateReserve._DELIVERY_DATA.clearChunkTicketsForDelivery(this);
-        _PrivateReserve._DELIVERY_DATA.remove(deliveryMobId);
+        Deliveries.___data().clearChunkTicketsForDelivery(this);
+        Deliveries.___data().remove(deliveryMobId);
     }
 }

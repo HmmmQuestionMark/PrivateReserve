@@ -10,16 +10,27 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 public enum Settings {
-    // File Databases
-    FILE_ENABLED("file.enabled", true),
-    FILE_FOLDER("file.folder", JavaPlugin.getProvidingPlugin(Settings.class).getDataFolder().getPath() + "/data/"),
-    FILE_PRETTY("file.pretty", false),
+    // Persistence
+    PERSISTENCE_TYPE("persistence.type", "file"),
+
+    // File
+    FILE_FORMAT("persistence.file.format", "json"),
+    FILE_FOLDER("persistence.file.folder", JavaPlugin.getProvidingPlugin(Settings.class).getDataFolder().getPath() + "/data/"),
+    FILE_PRETTY("persistence.file.pretty", false),
+
+    // PDC
+    PDC_ENABLED("persistence.pdc.enabled", false),
 
     // Debug
     DEBUG_ENABLED("debug.enabled", false),
 
+    // Chat
+    CHAT_TAGS_ENABLED("chat.enabled", true),
+
+    // WorldGuard regions
+    MEMBER_REGION_ENABLED("member.region.enabled", true),
+
     // Memberships
-    MEMBER_ENABLED("member.enabled", true),
     MEMBER_HOME_ENABLED("home.enabled", true),
     MEMBER_SPAWN_REGION("region.spawn", "spawn"),
     MEMBER_SPAWN_REGION_WORLD("region.spawn_world", "world"),
@@ -36,6 +47,9 @@ public enum Settings {
     LANDMARK_ENABLED("landmark.enabled", true),
     LANDMARK_LIMIT("landmark.limit", 2),
 
+    // Locked block
+    LOCKED_BLOCK_ENABLED("locked_block.enabled", true),
+
     // Deliveries
     DELIVERY_MOB_ENABLED("delivery_mob.enabled", false),
     DELIVERY_MOB_LIMIT("delivery_mob.limit", 1),
@@ -48,6 +62,15 @@ public enum Settings {
     Settings(String path, Object defaultValue) {
         this.path = path;
         this.defaultValue = defaultValue;
+    }
+
+    private static ConfigurationSection getConfig() {
+        return JavaPlugin.getProvidingPlugin(Settings.class).getConfig();
+    }
+
+    public static void set(String settingPath, @Nullable Object value) {
+        getConfig().set(settingPath, value);
+        JavaPlugin.getProvidingPlugin(Settings.class).saveConfig();
     }
 
     public String getPath() {
@@ -69,14 +92,5 @@ public enum Settings {
     public List<String> getStringList() {
         return getConfig().isList(path) ?
                 ImmutableList.copyOf(getConfig().getStringList(path)) : (List<String>) defaultValue;
-    }
-
-    private static ConfigurationSection getConfig() {
-        return JavaPlugin.getProvidingPlugin(Settings.class).getConfig();
-    }
-
-    public static void set(String settingPath, @Nullable Object value) {
-        getConfig().set(settingPath, value);
-        JavaPlugin.getProvidingPlugin(Settings.class).saveConfig();
     }
 }

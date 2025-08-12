@@ -15,25 +15,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.function.Predicate;
 
 /**
  * Custom flags will not require reflection in WorldGuard 6+, until then we'll use it.
  */
-public class WGHandler extends BukkitRunnable {
-    public WGHandler() {
-        if (JavaPlugin.getProvidingPlugin(WGHandler.class).isEnabled()) {
-            Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin,
-                    () -> , 40);
-        }
+class WGHandler {
+
+    static WGPVPListener wgpvpListener;
+
+    private WGHandler() {
     }
 
     /**
@@ -41,7 +35,7 @@ public class WGHandler extends BukkitRunnable {
      * @deprecated If you don't have WorldGuard installed this will error.
      */
     @Deprecated
-    public static Flag<?> getFlag(String id) {
+    static Flag<?> getFlag(String id) {
         return Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), id);
     }
 
@@ -52,7 +46,7 @@ public class WGHandler extends BukkitRunnable {
      * @param location The location being checked.
      * @return The region does exist at the provided location.
      */
-    public static boolean checkForRegion(final String name, Location location) {
+    static boolean checkForRegion(final String name, Location location) {
         return Iterators
                 .any(WorldGuard.getInstance().getPlatform().getRegionContainer()
                         .get(BukkitAdapter.adapt(location.getWorld()))
@@ -67,7 +61,7 @@ public class WGHandler extends BukkitRunnable {
      * @param world The world containing the region.
      * @return The region object.
      */
-    public static ProtectedRegion getRegion(final String name, World world) throws NullPointerException {
+    static ProtectedRegion getRegion(final String name, World world) throws NullPointerException {
         return WorldGuard.getInstance().getPlatform().getRegionContainer()
                 .get(BukkitAdapter.adapt(world))
                 .getRegion(name);
@@ -80,7 +74,7 @@ public class WGHandler extends BukkitRunnable {
      * @param location The location being checked.
      * @return The flag does exist at the provided location.
      */
-    public static boolean checkForFlag(final Flag flag, Location location) {
+    static boolean checkForFlag(final Flag flag, Location location) {
         return Iterators
                 .any(WorldGuard.getInstance().getPlatform().getRegionContainer()
                         .get(BukkitAdapter.adapt(location.getWorld()))
@@ -101,7 +95,7 @@ public class WGHandler extends BukkitRunnable {
      * @param location The location being checked.
      * @return The flag is enabled.
      */
-    public static boolean checkStateFlagAllows(final StateFlag flag, Location location, RegionAssociable associable) {
+    static boolean checkStateFlagAllows(final StateFlag flag, Location location, RegionAssociable associable) {
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         return query.testState(BukkitAdapter.adapt(location), associable, flag);
     }
@@ -113,7 +107,7 @@ public class WGHandler extends BukkitRunnable {
      * @param location The location being checked.
      * @return The flag is enabled.
      */
-    public static boolean checkStateFlagAllows(final StateFlag flag, Location location, Player player) {
+    static boolean checkStateFlagAllows(final StateFlag flag, Location location, Player player) {
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         return query.testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst().wrapPlayer(player), flag);
     }
@@ -126,7 +120,7 @@ public class WGHandler extends BukkitRunnable {
      * @param location The location being checked.
      * @return The flag-value does exist at the provided location.
      */
-    public static boolean checkForFlagValue(final Flag flag, final String value, Location location) {
+    static boolean checkForFlagValue(final Flag flag, final String value, Location location) {
         return Iterators
                 .any(WorldGuard.getInstance().getPlatform().getRegionContainer()
                         .get(BukkitAdapter.adapt(location.getWorld()))
@@ -145,7 +139,7 @@ public class WGHandler extends BukkitRunnable {
      * @param location Given location.
      * @return The player can build here.
      */
-    public static boolean canBuild(Player player, Location location) {
+    static boolean canBuild(Player player, Location location) {
         return checkStateFlagAllows(Flags.BUILD, location, player);
     }
 
@@ -153,18 +147,27 @@ public class WGHandler extends BukkitRunnable {
      * @param location Given location.
      * @return PVP is allowed here.
      */
-    public static boolean canPVP(Player player, Location location) {
+    static boolean canPVP(Player player, Location location) {
         return checkStateFlagAllows(Flags.PVP, location, player);
     }
 
-    public static void setWhenToOverridePVP(Plugin plugin, Predicate<Event> checkPVP) {
-        new WGPVPListener(plugin, checkPVP);
+    static void setWhenToOverridePVP(Plugin plugin, Predicate<Event> checkPVP) {
+        if (plugin.isEnabled()) {
+            if (wgpvpListener != null) {
+                HandlerList.unregisterAll(wgpvpListener);
+            }
+            wgpvpListener = new WGPVPListener(plugin, checkPVP);
+            Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, () -> {
+                plugin.getServer().getPluginManager().registerEvents(wgpvpListener, plugin);
+            }, 40);
+        }
     }
 
-    @Override
-    public void run() {
-        JavaPlugin plugin = JavaPlugin.getProvidingPlugin(WGHandler.class);
-        Bukkit.getPluginManager().registerEvents(new WGPVPListener(plugin), plugin);
+    static Location spawnLocation(com.sk89q.worldguard.protection.regions.ProtectedRegion region) {
+        com.sk89q.worldedit.util.Location location = region.getFlag(Flags.SPAWN_LOC);
+        float sY = location.getYaw();
+        float sP = location.getPitch();
+        return new Location(Bukkit.getWorlds().getFirst(), location.getX(), location.getY(), location.getZ(), sY, sP);
     }
 
     static class WGPVPListener implements Listener {

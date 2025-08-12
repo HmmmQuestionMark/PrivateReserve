@@ -12,6 +12,7 @@
     <properties> <!-- It is important to keep up to date manually. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <paper.version>1.21.8-R0.1-SNAPSHOT</paper.version>
+        <msgpack.version>0.9.9</msgpack.version>
         <chitchat.version>2.2.0-SNAPSHOT</chitchat.version>
         <worldguard.version>7.0.14</worldguard.version>
     </properties>
@@ -28,18 +29,27 @@
     </repositories>
 
     <dependencies>
-        <!-- Chitchat -->
-        <dependency>
-            <groupId>com.demigodsrpg</groupId>
-            <artifactId>chitchat</artifactId>
-            <version>${chitchat.version}</version>
-        </dependency>
-
         <!-- Paper -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>${paper.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- MessagePack -->
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>msgpack-core</artifactId>
+            <version>${msgpack.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Chitchat -->
+        <dependency>
+            <groupId>com.demigodsrpg</groupId>
+            <artifactId>chitchat</artifactId>
+            <version>${chitchat.version}</version>
             <scope>provided</scope>
         </dependency>
 

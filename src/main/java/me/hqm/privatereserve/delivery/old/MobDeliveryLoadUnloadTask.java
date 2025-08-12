@@ -1,7 +1,7 @@
 package me.hqm.privatereserve.delivery.old;
 
 import me.hqm.privatereserve.Locations;
-import me.hqm.privatereserve._PrivateReserve;
+import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.delivery.data.DeliveryDocument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -10,22 +10,21 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Deprecated
+@ApiStatus.Obsolete
+@ApiStatus.ScheduledForRemoval(inVersion = "1.1")
 public abstract class MobDeliveryLoadUnloadTask extends MobDeliveryTask {
 
-    enum State {
-        LOAD, UNLOAD
-    }
-
-    Long wait;
-    State state;
-    List<InventoryHolder> holders;
-
+    final Long wait;
+    final State state;
+    final List<InventoryHolder> holders;
     public MobDeliveryLoadUnloadTask(DeliveryTaskType type, DeliveryDocument model) {
         super(type, model);
         state = State.valueOf(type.name());
@@ -39,7 +38,7 @@ public abstract class MobDeliveryLoadUnloadTask extends MobDeliveryTask {
             Optional<Block> maybe = Locations.nearestOfType(location, 4, Material.HOPPER, Material.HOPPER_MINECART);
             if (maybe.isPresent()) {
                 getMob().setFrozen(true);
-                runTaskLater(_PrivateReserve.PLUGIN, wait);
+                runTaskLater(PrivateReserve.plugin(), wait);
             }
         }
 
@@ -98,5 +97,9 @@ public abstract class MobDeliveryLoadUnloadTask extends MobDeliveryTask {
         data.put("wait", wait);
         data.put("state", state.name());
         return data;
+    }
+
+    enum State {
+        LOAD, UNLOAD
     }
 }

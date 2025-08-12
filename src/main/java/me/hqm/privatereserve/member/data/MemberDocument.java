@@ -1,10 +1,9 @@
 package me.hqm.privatereserve.member.data;
 
-import me.hqm.privatereserve.Locations;
-import me.hqm.document.DocumentMap;
 import me.hqm.document.Document;
-import me.hqm.privatereserve._PrivateReserve;
-import me.hqm.privatereserve.chat.ChatTags;
+import me.hqm.document.DocumentCompatible;
+import me.hqm.privatereserve.Locations;
+import me.hqm.privatereserve.member.Members;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.TextComponent;
@@ -14,11 +13,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class MemberDocument implements Document {
+public class MemberDocument implements DocumentCompatible {
 
     // -- META DATA -- //
 
@@ -77,23 +77,23 @@ public class MemberDocument implements Document {
         buildNameTag();
     }
 
-    public MemberDocument(String mojangId, DocumentMap data) {
+    public MemberDocument(String mojangId, Document data) {
         this.mojangId = mojangId;
-        lastKnownName = data.getString("last_known_name");
+        lastKnownName = data.get("last_known_name", PersistentDataType.STRING);
 
-        nickName = data.getString("nickname");
-        pronouns = data.getStringNullable("pronouns");
+        nickName = data.get("nickname", PersistentDataType.STRING);
+        pronouns = data.get("pronouns", PersistentDataType.STRING);
 
-        trusted = data.getBoolean("trusted", false);
-        expelled = data.getBoolean("expelled", false);
+        trusted = data.getOrDefault("trusted", PersistentDataType.BOOLEAN, false);
+        expelled = data.getOrDefault("expelled", PersistentDataType.BOOLEAN, false);
 
-        primaryAccount = data.getStringNullable("primaryAccount"); // If specified, this is an alt account
+        primaryAccount = data.get("primaryAccount", PersistentDataType.STRING); // If specified, this is an alt account
 
-        timeInvited = data.getLong("timeInvited", System.currentTimeMillis());
-        invitedFrom = data.getString("invitedFrom", "d5133464-b1ef-42b4-9ad4-8cac217d40f0"); // Default to HQM
-        invited = data.getStringList("invited");
+        timeInvited = data.getOrDefault("timeInvited", PersistentDataType.LONG, System.currentTimeMillis());
+        invitedFrom = data.getOrDefault("invitedFrom", PersistentDataType.STRING, "d5133464-b1ef-42b4-9ad4-8cac217d40f0"); // Default to HQM
+        invited = data.get("invited", PersistentDataType.LIST.strings());
 
-        homeLoc = data.getStringNullable("homeLoc");
+        homeLoc = data.get("homeLoc", PersistentDataType.STRING);
 
         buildNameTag();
     }
@@ -101,12 +101,12 @@ public class MemberDocument implements Document {
     // -- GETTERS -- //
 
     @Override
-    public String getKey() {
+    public String getId() {
         return mojangId;
     }
 
     @Override
-    public Map<String, Object> serialize() {
+    public Map<String, Object> asMap() {
         Map<String, Object> data = new HashMap<>();
         data.put("last_known_name", lastKnownName);
 
@@ -151,8 +151,19 @@ public class MemberDocument implements Document {
         return lastKnownName;
     }
 
+    public void setLastKnownName(String lastKnownName) {
+        this.lastKnownName = lastKnownName;
+        write();
+    }
+
     public String getPrimaryAccount() {
         return primaryAccount;
+    }
+
+    public void setPrimaryAccount(String primaryAccount) {
+        this.primaryAccount = primaryAccount;
+        buildNameTag();
+        write();
     }
 
     public String getRawNickName() {
@@ -163,8 +174,19 @@ public class MemberDocument implements Document {
         return LegacyComponentSerializer.legacyAmpersand().deserialize(nickName);
     }
 
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+        write();
+    }
+
     public String getPronouns() {
         return pronouns;
+    }
+
+    public void setPronouns(String pronouns) {
+        this.pronouns = pronouns;
+        buildNameTag();
+        write();
     }
 
     public @Nullable Location getHomeLoc() {
@@ -172,6 +194,15 @@ public class MemberDocument implements Document {
             return Locations.locationFromString(homeLoc);
         }
         return null;
+    }
+
+    public void setHomeLoc(Location homeLoc) {
+        if (homeLoc != null) {
+            this.homeLoc = Locations.stringFromLocation(homeLoc);
+        } else {
+            this.homeLoc = null;
+        }
+        write();
     }
 
     public Component getNameTag() {
@@ -182,12 +213,24 @@ public class MemberDocument implements Document {
         return timeInvited;
     }
 
+    // -- MUTATORS -- //
+
     public boolean isTrusted() {
-        return isAlternate() ? _PrivateReserve.MEMBER_DATA.isTrusted(primaryAccount) : trusted;
+        return isAlternate() ? Members.data().isTrusted(primaryAccount) : trusted;
+    }
+
+    public void setTrusted(boolean trusted) {
+        this.trusted = trusted;
+        write();
     }
 
     public boolean isExpelled() {
-        return isAlternate() ? _PrivateReserve.MEMBER_DATA.isExpelled(primaryAccount) : expelled;
+        return isAlternate() ? Members.data().isExpelled(primaryAccount) : expelled;
+    }
+
+    public void setExpelled(boolean expelled) {
+        this.expelled = expelled;
+        write();
     }
 
     public boolean isAlternate() {
@@ -198,69 +241,26 @@ public class MemberDocument implements Document {
         return invitedFrom;
     }
 
-    public List<String> getInvited() {
-        return invited;
-    }
-
-    // -- MUTATORS -- //
-
-    public void setLastKnownName(String lastKnownName) {
-        this.lastKnownName = lastKnownName;
-        register();
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-        register();
-    }
-
-    public void setPronouns(String pronouns) {
-        this.pronouns = pronouns;
-        buildNameTag();
-        register();
-    }
-
-    public void setHomeLoc(Location homeLoc) {
-        if (homeLoc != null) {
-            this.homeLoc = Locations.stringFromLocation(homeLoc);
-        } else {
-            this.homeLoc = null;
-        }
-        register();
-    }
-
-    public void setTrusted(boolean trusted) {
-        this.trusted = trusted;
-        register();
-    }
-
-    public void setExpelled(boolean expelled) {
-        this.expelled = expelled;
-        register();
-    }
-
-    public void setPrimaryAccount(String primaryAccount) {
-        this.primaryAccount = primaryAccount;
-        buildNameTag();
-        register();
-    }
-
     public void setInvitedFrom(String invitedFrom) {
         this.invitedFrom = invitedFrom;
         this.timeInvited = System.currentTimeMillis();
-        register();
+        write();
+    }
+
+    public List<String> getInvited() {
+        return invited;
     }
 
     @Deprecated
     public void setInvited(List<String> invited) {
         this.invited = invited;
-        register();
+        write();
     }
 
     public void addInvited(String invitee) {
         this.invited.add(invitee);
         buildNameTag();
-        register();
+        write();
     }
 
     // -- UTIL -- //
@@ -268,18 +268,18 @@ public class MemberDocument implements Document {
     public void buildNameTag() {
         String primaryAccountName = null;
         if (isAlternate()) {
-            Optional<MemberDocument> primary = _PrivateReserve.MEMBER_DATA.fromId(primaryAccount);
+            Optional<MemberDocument> primary = Members.data().fromId(primaryAccount);
             if (primary.isPresent()) {
                 primaryAccountName = primary.get().getLastKnownName();
             } else {
                 setPrimaryAccount(null);
-                register();
+                write();
             }
         }
 
         nameTagText = buildNameTag0(nickName, lastKnownName, primaryAccountName, pronouns, invited);
 
-        // Set display name in Bukkit/Spigot
+        // Set display name
         if (getOnline()) {
             Player player = (Player) getOfflinePlayer();
             player.displayName(LegacyComponentSerializer.legacyAmpersand().deserialize(nickName));
@@ -306,21 +306,21 @@ public class MemberDocument implements Document {
             // Give last known username for the primary account
             Component primaryUsername = Component.text("Primary Account: " +
                     primaryAccountName, NamedTextColor.DARK_GRAY);
-            hover.append(ChatTags.NEW_LINE);
+            hover.appendNewline();
             hover.append(primaryUsername);
         }
 
         // Set pronouns
         if (pronouns != null) {
             Component pronounsComp = Component.text("Pronouns: " + pronouns, NamedTextColor.DARK_GRAY);
-            hover.append(ChatTags.NEW_LINE);
+            hover.appendNewline();
             hover.append(pronounsComp);
         }
 
         // Set invited amount
         if (!invited.isEmpty()) {
             Component countText = Component.text("Invited: " + invited.size() + " members", NamedTextColor.DARK_GRAY);
-            hover.append(ChatTags.NEW_LINE);
+            hover.appendNewline();
             hover.append(countText);
         }
 
@@ -330,8 +330,9 @@ public class MemberDocument implements Document {
         return nameTagText.build();
     }
 
-    @Override
-    public void register() {
-        _PrivateReserve.MEMBER_DATA.register(this);
+    // -- UTIL -- //
+
+    public void write() {
+        Members.data().add(this);
     }
 }

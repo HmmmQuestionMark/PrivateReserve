@@ -20,30 +20,30 @@
  * SOFTWARE.
  */
 
-package me.hqm.document;
+package me.hqm.document.json;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import me.hqm.document.Document;
+import me.hqm.document.DocumentCompatible;
+import me.hqm.document.DocumentDatabase;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public abstract class GeneralFileDatabase<T extends Document> implements Database<T> {
-    protected final Cache<String, T> REGISTERED_DATA;
+public abstract class JsonFileDatabase<D extends DocumentCompatible> implements DocumentDatabase<D> {
+    protected final Cache<String, D> REGISTERED_DATA;
 
     // -- FILE -- //
     private final File FOLDER;
     private final boolean PRETTY;
 
-    public GeneralFileDatabase(String path, String folder, boolean pretty, int expireMins) {
+    public JsonFileDatabase(String path, String folder, boolean pretty, int expireMins) {
         if (expireMins > 0) {
             REGISTERED_DATA =
                     CacheBuilder.newBuilder().concurrencyLevel(4).expireAfterAccess(expireMins, TimeUnit.MINUTES)
@@ -56,23 +56,16 @@ public abstract class GeneralFileDatabase<T extends Document> implements Databas
         PRETTY = pretty;
     }
 
-    public Optional<T> fromKey(String key) {
-        if (!REGISTERED_DATA.asMap().containsKey(key)) {
-            loadFromDb(key);
+    public Optional<D> fromId(String id) {
+        if (!REGISTERED_DATA.asMap().containsKey(id)) {
+            load(id);
         }
-        return Optional.ofNullable(REGISTERED_DATA.asMap().getOrDefault(key, null));
+        return Optional.ofNullable(REGISTERED_DATA.asMap().getOrDefault(id, null));
     }
 
-    public T register(T value) {
-        REGISTERED_DATA.put(value.getKey(), value);
-        saveToDb(value.getKey());
-        return value;
-    }
-
-    public T put(String key, T value) {
-        REGISTERED_DATA.put(key, value);
-        saveToDb(key);
-        return value;
+    public void add(D value) {
+        REGISTERED_DATA.put(value.getId(), value);
+        save(value.getId());
     }
 
     public void remove(String key) {
@@ -80,38 +73,36 @@ public abstract class GeneralFileDatabase<T extends Document> implements Databas
         removeFile(key);
     }
 
-    public void saveToDb(String key) {
+    public void save(String key) {
         if (REGISTERED_DATA.asMap().containsKey(key)) {
-            File file = new File(FOLDER.getPath() + "/" + key + ".json");
-            if (!(file.exists())) {
-                createFile(file);
-            }
-            Gson gson = PRETTY ? new GsonBuilder().setPrettyPrinting().create() : new GsonBuilder().create();
-            String json = gson.toJson(REGISTERED_DATA.asMap().get(key).serialize());
-            try {
-                PrintWriter writer = new PrintWriter(file);
-                writer.print(json);
-                writer.close();
-            } catch (Exception oops) {
-                oops.printStackTrace();
-            }
-
+            write(REGISTERED_DATA.asMap().get(key));
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void loadFromDb(String key) {
-        Gson gson = new GsonBuilder().create();
+    @Override
+    public void write(D document) {
+        File file = new File(FOLDER.getPath() + "/" + document.getId() + ".json");
+        if (!(file.exists())) {
+            createFile(file);
+        }
+        try {
+            PrintWriter writer = new PrintWriter(file);
+            writer.print(toString(document));
+            writer.close();
+        } catch (Exception oops) {
+            oops.printStackTrace();
+        }
+    }
+
+    public void load(String key) {
         try {
             File file = new File(FOLDER.getPath() + "/" + key + ".json");
-            synchronized (file) {
-                if (file.exists()) {
-                    FileInputStream inputStream = new FileInputStream(file);
-                    InputStreamReader reader = new InputStreamReader(inputStream);
-                    JsonFileMap section = new JsonFileMap(gson.fromJson(reader, Map.class));
-                    REGISTERED_DATA.put(key, fromDataSection(key, section));
-                    reader.close();
-                }
+            if (file.exists()) {
+                FileInputStream inputStream = new FileInputStream(file);
+                InputStreamReader reader = new InputStreamReader(inputStream);
+                D document = read(reader);
+                REGISTERED_DATA.put(key, createDocument(key, (Document) document));
+                reader.close();
             }
         } catch (Exception oops) {
             oops.printStackTrace();
@@ -119,24 +110,24 @@ public abstract class GeneralFileDatabase<T extends Document> implements Databas
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void loadAllFromDb() {
+    public void loadAll() {
         for (File file : FOLDER.listFiles()) {
             if (file.isFile() && file.getName().endsWith(".json")) {
                 String key = file.getName().replace(".json", "");
-                loadFromDb(key);
+                load(key);
             }
         }
         REGISTERED_DATA.asMap();
     }
 
     public void purge() {
-        loadAllFromDb();
+        loadAll();
         REGISTERED_DATA.asMap().keySet().forEach(this::removeFile);
         REGISTERED_DATA.asMap().clear();
     }
 
     @Override
-    public Map<String, T> getRawData() {
+    public Map<String, D> getRawData() {
         return REGISTERED_DATA.asMap();
     }
 
@@ -157,12 +148,34 @@ public abstract class GeneralFileDatabase<T extends Document> implements Databas
     }
 
     @Override
-    public boolean open() {
-        return false;
+    public String name() {
+        return "JSON";
+    }
+
+    public String toString(D data) {
+        Gson gson = PRETTY ? new GsonBuilder().setPrettyPrinting().create() : new GsonBuilder().create();
+        return gson.toJson(data.asMap());
     }
 
     @Override
-    public boolean close() {
-        return false;
+    public byte[] toRaw(D data) {
+        return toString(data).getBytes();
+    }
+
+    public D read(Reader reader) {
+        Gson gson = new GsonBuilder().create();
+        return (D) new JsonFileDocumentMap(gson.fromJson(reader, Map.class));
+    }
+
+    public D fromString(String json) {
+        StringReader reader = new StringReader(json);
+        return read(reader);
+    }
+
+    @Override
+    public D fromRaw(byte[] raw) {
+        String rawString = new String(raw);
+        StringReader reader = new StringReader(rawString);
+        return read(reader);
     }
 }

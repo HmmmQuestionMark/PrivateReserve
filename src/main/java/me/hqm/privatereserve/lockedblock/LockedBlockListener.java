@@ -1,10 +1,13 @@
 package me.hqm.privatereserve.lockedblock;
 
-import me.hqm.privatereserve._PrivateReserve;
+import me.hqm.privatereserve.PrivateReserve;
+import me.hqm.privatereserve.lockedblock.data.LockedBlockDatabase;
+import me.hqm.privatereserve.lockedblock.data.LockedBlockDocument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -19,6 +22,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Optional;
@@ -27,10 +31,10 @@ public class LockedBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (_PrivateReserve.LOCKED_DATA.isLockable(event.getBlockPlaced())) {
+        if (LockedBlocks.data().isLockable(event.getBlockPlaced())) {
             Location location = event.getBlockPlaced().getLocation();
-            Bukkit.getScheduler().scheduleSyncDelayedTask(_PrivateReserve.PLUGIN, () -> {
-                if (_PrivateReserve.LOCKED_DATA.create(location.getBlock(), event.getPlayer())) {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(PrivateReserve.plugin(), () -> {
+                if (LockedBlocks.data().create(location.getBlock(), event.getPlayer())) {
                     event.getPlayer().sendMessage(Component.text("Block secured.", NamedTextColor.RED));
                     event.getPlayer().sendMessage(Component.text("Right-click while sneaking to lock/unlock.", NamedTextColor.YELLOW));
                 }
@@ -41,10 +45,10 @@ public class LockedBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onBlockBreak(BlockBreakEvent event) {
         String playerId = event.getPlayer().getUniqueId().toString();
-        Optional<LockedBlockDocument> oModel = _PrivateReserve.LOCKED_DATA.fromLocation(event.getBlock().getLocation());
+        Optional<LockedBlockDocument> oModel = LockedBlocks.data().fromLocation(event.getBlock().getLocation());
         if (oModel.isPresent()) {
-            if (!_PrivateReserve.LOCKED_DATA.isLockable(event.getBlock()) || oModel.get().getOwner().equals(playerId)) {
-                _PrivateReserve.LOCKED_DATA.delete(event.getBlock());
+            if (!LockedBlocks.data().isLockable(event.getBlock()) || oModel.get().getOwner().equals(playerId)) {
+                LockedBlocks.data().delete(event.getBlock());
                 event.getPlayer().sendMessage(Component.text("Secured block was destroyed.", NamedTextColor.RED));
             }
         }
@@ -52,7 +56,7 @@ public class LockedBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent event) {
-        if (_PrivateReserve.LOCKED_DATA.isRegistered(event.getBlock())) {
+        if (LockedBlocks.data().isRegistered(event.getBlock())) {
             event.setCancelled(true);
         }
     }
@@ -60,13 +64,13 @@ public class LockedBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        String playerId = player.getUniqueId().toString();
         Block block = event.getClickedBlock();
+
         if (canLock(player) && player.isSneaking() && EquipmentSlot.HAND.equals(event.getHand()) &&
-                _PrivateReserve.LOCKED_DATA.isRegistered(block)) {
+                LockedBlocks.data().isRegistered(block)) {
             event.setUseInteractedBlock(Event.Result.DENY);
             event.setUseItemInHand(Event.Result.DENY);
-            LockedBlockDatabase.LockState state = _PrivateReserve.LOCKED_DATA.lockUnlock(block, event.getPlayer());
+            LockedBlockDatabase.LockState state = LockedBlocks.data().lockUnlock(block, event.getPlayer());
             if (state == LockedBlockDatabase.LockState.LOCKED) {
                 player.sendMessage(Component.text("This block is locked.", NamedTextColor.RED));
             } else if (state == LockedBlockDatabase.LockState.UNLOCKED) {
@@ -74,25 +78,33 @@ public class LockedBlockListener implements Listener {
             } else if (state == LockedBlockDatabase.LockState.UNCHANGED) {
                 player.sendMessage(Component.text("You don't have the key to this block.", NamedTextColor.YELLOW));
             }
-        } else if (_PrivateReserve.LOCKED_DATA.getLockState(event.getClickedBlock()) ==
+        } else if (LockedBlocks.data().getLockState(event.getClickedBlock()) ==
                 LockedBlockDatabase.LockState.LOCKED) {
             // Deny interaction
             event.setUseInteractedBlock(Event.Result.DENY);
             event.setUseItemInHand(Event.Result.DENY);
 
             // Cancel break animation
-            _PrivateReserve.RELATIONAL_DATA.put(playerId, "NO-BREAK", true);
+            player.getPersistentDataContainer().set(
+                    new NamespacedKey(PrivateReserve.plugin().namespace(), "no_break"),
+                    PersistentDataType.BOOLEAN,
+                    true
+            );
             player.addPotionEffect(PotionEffectType.MINING_FATIGUE.createEffect(9999999, 5));
-        } else if (block == null || _PrivateReserve.RELATIONAL_DATA.contains(playerId, "NO-BREAK")) {
+        } else if (block == null || player.getPersistentDataContainer().has(
+                new NamespacedKey(PrivateReserve.plugin().namespace(), "no_break"
+                ))) {
             // Allow break animation
-            _PrivateReserve.RELATIONAL_DATA.remove(playerId, "NO-BREAK");
+            player.getPersistentDataContainer().remove(
+                    new NamespacedKey(PrivateReserve.plugin().namespace(), "no_break"
+                    ));
             player.removePotionEffect(PotionEffectType.MINING_FATIGUE);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRedstone(BlockRedstoneEvent event) {
-        if (_PrivateReserve.LOCKED_DATA.getLockState(event.getBlock()) == LockedBlockDatabase.LockState.LOCKED) {
+        if (LockedBlocks.data().getLockState(event.getBlock()) == LockedBlockDatabase.LockState.LOCKED) {
             event.setNewCurrent(event.getOldCurrent()); // cancelled
         }
     }
@@ -100,17 +112,16 @@ public class LockedBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onItemMove(InventoryMoveItemEvent event) {
         if (event.getSource().getHolder() instanceof Block) {
-            if (_PrivateReserve.LOCKED_DATA.getLockState((Block) event.getSource().getHolder()) ==
+            if (LockedBlocks.data().getLockState((Block) event.getSource().getHolder()) ==
                     LockedBlockDatabase.LockState.LOCKED) {
                 event.setCancelled(true);
             }
         }
     }
 
-    @SuppressWarnings("SuspiciousMethodCalls")
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityExplode(final EntityExplodeEvent event) {
-        _PrivateReserve.LOCKED_DATA.getRawData().values().stream().filter(model -> model.getLocation().getWorld().
+        LockedBlocks.data().getRawData().values().stream().filter(model -> model.getLocation().getWorld().
                         equals(event.getLocation().getWorld()) && model.getLocation().distance(event.getLocation()) <= 10).
                 map(save -> save.getLocation().getBlock()).forEach(block -> {
                     if (LockedBlockDatabase.isBisected(block)) {
@@ -124,6 +135,8 @@ public class LockedBlockListener implements Listener {
     }
 
     boolean canLock(Player player) {
-        return !_PrivateReserve.RELATIONAL_DATA.contains(player.getUniqueId().toString(), "NO-LOCK");
+        return !player.getPersistentDataContainer().has(
+                new NamespacedKey(PrivateReserve.plugin().namespace(), "no_lock"
+                ));
     }
 }

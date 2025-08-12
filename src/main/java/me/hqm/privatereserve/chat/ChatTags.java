@@ -28,7 +28,7 @@ public class ChatTags {
         builder.append(Component.text(initial, color));
         builder.append(Component.text("]", NamedTextColor.DARK_GRAY));
         builder.hoverEvent(HoverEvent.showText(Component.text(text, color)));
-        if(clickRun != null) {
+        if (clickRun != null) {
             builder.clickEvent(ClickEvent.runCommand(clickRun));
         }
         return builder.build();

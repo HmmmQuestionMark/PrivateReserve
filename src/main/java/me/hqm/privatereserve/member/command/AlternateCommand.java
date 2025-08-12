@@ -1,56 +1,61 @@
 package me.hqm.privatereserve.member.command;
 
-import me.hqm.basecommand.BaseCommand;
-import me.hqm.basecommand.CommandResult;
-import me.hqm.privatereserve._PrivateReserve;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.data.MemberDocument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
-public class AlternateCommand extends BaseCommand {
+public class AlternateCommand {
+    private static final String ADMIN_PERM = "privatereserve.admin";
 
-    @Override
-    protected CommandResult onCommand(CommandSender sender, Command command, String[] args) {
-        // Needs at least 2 arguments
-        if (args.length < 2) {
-            return CommandResult.INVALID_SYNTAX;
-        }
+    private AlternateCommand() {
+    }
 
-        // Get the invitee
-        Optional<MemberDocument> model = _PrivateReserve.MEMBER_DATA.fromName(args[0]);
+    public static LiteralCommandNode<CommandSourceStack> createCommand() {
+        return Commands.literal("alternate")
+                .requires(stack ->
+                        !(stack.getSender() instanceof Player p) || p.hasPermission(ADMIN_PERM))
+                .then(Commands.argument("player", StringArgumentType.word())
+                        .then(Commands.argument("primary", StringArgumentType.word())
+                                .executes(AlternateCommand::runAlternate)))
+                .build();
+    }
+
+    private static int runAlternate(CommandContext<CommandSourceStack> ctx) {
+        CommandSender sender = ctx.getSource().getSender();
+        String playerName = StringArgumentType.getString(ctx, "player");
+        String primaryName = StringArgumentType.getString(ctx, "primary");
+
+        Optional<MemberDocument> model = Members.data().fromName(playerName);
         if (model.isEmpty()) {
-            Bukkit.getServer().dispatchCommand(sender, "invite " + args[0] + " " + args[1]);
-            return CommandResult.SUCCESS;
+            // If the alt doesn't exist yet, run the invite with primary link
+            Bukkit.getServer().dispatchCommand(sender, "invite " + playerName + " " + primaryName);
+            return Command.SINGLE_SUCCESS;
         } else if (model.get().isExpelled()) {
             sender.sendMessage(Component.text("Player is expelled, please try a different name.", NamedTextColor.RED));
-            return CommandResult.QUIET_ERROR;
-        }
-        OfflinePlayer invitee = model.get().getOfflinePlayer();
-
-        if (!sender.hasPermission("privatereserve.admin")) {
-            return CommandResult.NO_PERMISSIONS;
+            return Command.SINGLE_SUCCESS;
         }
 
-        // Register from player
-        else {
-            Optional<MemberDocument> primary = _PrivateReserve.MEMBER_DATA.fromName(args[1]);
-            if (primary.isPresent()) {
-                model.get().setPrimaryAccount(primary.get().getKey());
-            } else {
-                sender.sendMessage(Component.text("The provided primary account does not exist.", NamedTextColor.RED));
-                return CommandResult.QUIET_ERROR;
-            }
+        Optional<MemberDocument> primary = Members.data().fromName(primaryName);
+        if (primary.isPresent()) {
+            model.get().setPrimaryAccount(primary.get().getId());
+        } else {
+            sender.sendMessage(Component.text("The provided primary account does not exist.", NamedTextColor.RED));
+            return Command.SINGLE_SUCCESS;
         }
 
-        // If this is reached, the invite worked
-        sender.sendMessage(Component.text(invitee.getName() + " has been set as an alternate account.", NamedTextColor.RED));
-
-        return CommandResult.SUCCESS;
+        sender.sendMessage(Component.text(model.get().getLastKnownName() + " has been set as an alternate account.", NamedTextColor.YELLOW));
+        return Command.SINGLE_SUCCESS;
     }
 }

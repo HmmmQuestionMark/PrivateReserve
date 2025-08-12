@@ -2,47 +2,11 @@ name: PrivateReserve
 main: me.hqm.privatereserve.PrivateReserve
 api-version: '1.21.8'
 version: ${project.version}
-description: Special sauce for HQM's private reserve.
+description: Special sauce for HQM\'s private reserve.
 authors: [HQM]
-depend: [Chitchat, WorldGuard]
-commands:
-  ## Everyday Commands
-  nickname:
-    usage: /nickname [username] <nickname>
-    aliases: [nick]
-  pronouns:
-    usage: /pronouns [username] <pronouns>
-  clearnickname:
-    usage: /nickname [username]
-    aliases: [clearnick]
-  clearpronouns:
-    usage: /pronouns [username]
-  invite:
-    usage: /invite <player> [primary]
-  trust:
-    usage: /trust <player>
-  expel:
-    usage: /expel <player>
-  alternate:
-    usage: /alternate <player> <primary>
-    aliases: [alt]
-  spawn:
-    usage: /spawn
-  home:
-    usage: /home [go|set|clear] [username]
-  landmark:
-    usage: /landmark <list|go|set|clear|limit> <landmark|limit>
-    aliases: [warp]
-  visiting:
-    usage: /visiting
-    aliases: [vspawn]
-  lockmode:
-    usage: /lockmode
-    aliases: [lock]
-  memberhelp:
-    usage: /memberhelp [topic]
-  prdebug:
-    usage: /prdebug
+softdepend: [Chitchat, WorldGuard]
+libraries:
+  - org.msgpack:msgpack-core:0.9.9
 permisions:
   privatereserve.bypasslock:
     default: op

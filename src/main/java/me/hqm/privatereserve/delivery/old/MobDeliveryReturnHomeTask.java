@@ -2,14 +2,18 @@ package me.hqm.privatereserve.delivery.old;
 
 import com.destroystokyo.paper.entity.Pathfinder;
 import io.papermc.paper.entity.TeleportFlag;
-import me.hqm.privatereserve._PrivateReserve;
+import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.delivery.data.DeliveryDocument;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 
+@Deprecated
+@ApiStatus.Obsolete
+@ApiStatus.ScheduledForRemoval(inVersion = "1.1")
 public class MobDeliveryReturnHomeTask extends MobDeliveryMovementTask {
 
     public MobDeliveryReturnHomeTask(DeliveryDocument model) {
@@ -27,7 +31,7 @@ public class MobDeliveryReturnHomeTask extends MobDeliveryMovementTask {
             if (result != null && result.canReachFinalPoint() && finish.distance(result.getFinalPoint()) >= 4) {
                 getDelivery().addPath(result);
                 Bukkit.getServer().broadcast(Component.text("Moving: " + finder.moveTo(finish)));
-                runTaskTimer(_PrivateReserve.PLUGIN, 20, 20);
+                runTaskTimer(PrivateReserve.plugin(), 20, 20);
             } else {
                 getMob().getBukkitEntity().teleport(finish, TeleportFlag.EntityState.RETAIN_PASSENGERS);
                 getDelivery().clear();

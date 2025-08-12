@@ -1,7 +1,7 @@
 package me.hqm.privatereserve.member.data;
 
-import me.hqm.document.DocumentMap;
-import me.hqm.document.Database;
+import me.hqm.document.Document;
+import me.hqm.document.DocumentDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public interface MemberDatabase extends Database<MemberDocument> {
+public interface MemberDatabase extends DocumentDatabase<MemberDocument> {
     String NAME = "players";
 
     @Deprecated
@@ -23,7 +23,7 @@ public interface MemberDatabase extends Database<MemberDocument> {
 
     @Deprecated
     default Optional<MemberDocument> fromPlayer(OfflinePlayer player) {
-        return fromKey(player.getUniqueId().toString());
+        return this.fromId(player.getUniqueId().toString());
     }
 
     default Optional<MemberDocument> fromId(UUID id) {
@@ -40,8 +40,12 @@ public interface MemberDatabase extends Database<MemberDocument> {
         return getRawData().values().stream().map(MemberDocument::getOfflinePlayer).collect(Collectors.toSet());
     }
 
+    default Set<String> getPlayerNames() {
+        return getRawData().values().stream().map(MemberDocument::getLastKnownName).collect(Collectors.toSet());
+    }
+
     @Override
-    default MemberDocument fromDataSection(String stringKey, DocumentMap data) {
+    default MemberDocument createDocument(String stringKey, Document data) {
         return new MemberDocument(stringKey, data);
     }
 
@@ -51,9 +55,9 @@ public interface MemberDatabase extends Database<MemberDocument> {
 
     default MemberDocument invite(OfflinePlayer player, String inviteFrom) {
         MemberDocument model = new MemberDocument(player, inviteFrom, null);
-        MemberDocument invite = fromKey(inviteFrom).get();
-        invite.addInvited(model.getKey());
-        register(model);
+        MemberDocument invite = this.fromId(inviteFrom).get();
+        invite.addInvited(model.getId());
+        write(model);
         return model;
     }
 
@@ -63,33 +67,33 @@ public interface MemberDatabase extends Database<MemberDocument> {
 
     default MemberDocument invite(OfflinePlayer player, String inviteFrom, String primaryAcoount) {
         MemberDocument model = new MemberDocument(player, inviteFrom, primaryAcoount);
-        MemberDocument invite = fromKey(inviteFrom).get();
-        invite.addInvited(model.getKey());
-        register(model);
+        MemberDocument invite = this.fromId(inviteFrom).get();
+        invite.addInvited(model.getId());
+        write(model);
         return model;
     }
 
     default MemberDocument inviteConsole(OfflinePlayer player) {
         MemberDocument model = new MemberDocument(player, true);
-        register(model);
+        write(model);
         return model;
     }
 
     default MemberDocument inviteConsole(OfflinePlayer player, String primaryAccount) {
         MemberDocument model = new MemberDocument(player, true, false, primaryAccount);
-        register(model);
+        write(model);
         return model;
     }
 
     default MemberDocument inviteConsole(OfflinePlayer player, boolean trusted) {
         MemberDocument model = new MemberDocument(player, true, trusted);
-        register(model);
+        write(model);
         return model;
     }
 
     default MemberDocument inviteSelf(Player player) {
         MemberDocument model = new MemberDocument(player, false);
-        register(model);
+        write(model);
         return model;
     }
 
@@ -126,8 +130,8 @@ public interface MemberDatabase extends Database<MemberDocument> {
     @Deprecated
     default List<String> getInvitedManually(MemberDocument model) {
         return getRawData().values().stream().filter(
-                playerModel -> model.getKey().equals(playerModel.getInvitedFrom())).map(
-                MemberDocument::getKey).collect(Collectors.toList());
+                playerModel -> model.getId().equals(playerModel.getInvitedFrom())).map(
+                MemberDocument::getId).collect(Collectors.toList());
     }
 
     default int getInvitedCount(UUID player) {

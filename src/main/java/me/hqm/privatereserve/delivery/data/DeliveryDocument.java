@@ -1,10 +1,10 @@
 package me.hqm.privatereserve.delivery.data;
 
-import me.hqm.privatereserve.Locations;
-import me.hqm.document.DocumentMap;
-import me.hqm.document.Document;
 import io.papermc.paper.entity.Leashable;
-import me.hqm.privatereserve._PrivateReserve;
+import me.hqm.document.Document;
+import me.hqm.document.DocumentCompatible;
+import me.hqm.privatereserve.Locations;
+import me.hqm.privatereserve.delivery.Deliveries;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -13,10 +13,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
-public class DeliveryDocument implements Document {
+public class DeliveryDocument implements DocumentCompatible {
     // -- DATA -- //
 
     // NonNullable
@@ -52,29 +53,30 @@ public class DeliveryDocument implements Document {
         this.active = false;
         this.frozen = false;
 
-        register();
+        write();
     }
 
-    public DeliveryDocument(String id, DocumentMap data) {
+    public DeliveryDocument(String id, Document data) {
         this.id = id;
-        subIds = data.getStringList("subIds");
-        name = LegacyComponentSerializer.legacyAmpersand().deserialize(data.getString("name"));
-        ownerId = data.getString("ownerId");
-        entityType = data.getString("entityType");
-        active = data.getBoolean("active", false);
-        frozen = data.getBoolean("frozen", false);
-        homeLocation = data.getStringNullable("homeLocation");
-        loadLocation = data.getStringNullable("loadLocation");
-        unloadLocation = data.getStringNullable("unloadLocation");
-        loadTicks = data.getLongNullable("loadTicks");
-        unloadTicks = data.getLongNullable("unloadTicks");
+        subIds = data.get("subIds", PersistentDataType.LIST.strings());
+        name = LegacyComponentSerializer.legacyAmpersand()
+                .deserialize(Objects.requireNonNull(data.get("name", PersistentDataType.STRING)));
+        ownerId = data.get("ownerId", PersistentDataType.STRING);
+        entityType = data.get("entityType", PersistentDataType.STRING);
+        active = data.getOrDefault("active", PersistentDataType.BOOLEAN, false);
+        frozen = data.getOrDefault("frozen", PersistentDataType.BOOLEAN, false);
+        homeLocation = data.get("homeLocation", PersistentDataType.STRING);
+        loadLocation = data.get("loadLocation", PersistentDataType.STRING);
+        unloadLocation = data.get("unloadLocation", PersistentDataType.STRING);
+        loadTicks = data.get("loadTicks", PersistentDataType.LONG);
+        unloadTicks = data.get("unloadTicks", PersistentDataType.LONG);
     }
 
     // -- GETTERS -- //
 
 
     public String getId() {
-        return getKey();
+        return id;
     }
 
     public List<String> getSubIds() {
@@ -97,8 +99,18 @@ public class DeliveryDocument implements Document {
         return active;
     }
 
+    public void setActive(boolean active) {
+        this.active = active;
+        write();
+    }
+
     public boolean isFrozen() {
         return frozen;
+    }
+
+    public void setFrozen(boolean frozen) {
+        this.frozen = frozen;
+        write();
     }
 
     public boolean isEntityOrSub(Entity entity) {
@@ -147,16 +159,38 @@ public class DeliveryDocument implements Document {
         return Locations.locationFromString(homeLocation);
     }
 
+    public void setHomeLocation(Location homeLocation) {
+        this.homeLocation = Locations.stringFromLocation(homeLocation);
+        write();
+    }
+
     public Location getLoadLocation() {
         return Locations.locationFromString(loadLocation);
+    }
+
+    public void setLoadLocation(Location loadLocation) {
+        this.loadLocation = Locations.stringFromLocation(loadLocation);
+        write();
     }
 
     public Location getUnloadLocation() {
         return Locations.locationFromString(unloadLocation);
     }
 
+    public void setUnloadLocation(Location unloadLocation) {
+        this.unloadLocation = Locations.stringFromLocation(unloadLocation);
+        write();
+    }
+
+    // -- MUTATORS -- //
+
     public Long getLoadTicks() {
         return loadTicks;
+    }
+
+    public void setLoadTicks(long loadTicks) {
+        this.loadTicks = loadTicks;
+        write();
     }
 
     public Integer getLoadSeconds() {
@@ -166,8 +200,17 @@ public class DeliveryDocument implements Document {
         return null;
     }
 
+    public void setLoadSeconds(int seconds) {
+        setLoadTicks(seconds * 20L);
+    }
+
     public Long getUnloadTicks() {
         return unloadTicks;
+    }
+
+    public void setUnloadTicks(long unloadTicks) {
+        this.unloadTicks = unloadTicks;
+        write();
     }
 
     public Integer getUnloadSeconds() {
@@ -177,13 +220,12 @@ public class DeliveryDocument implements Document {
         return null;
     }
 
-    @Override
-    public String getKey() {
-        return id;
+    public void setUnloadSeconds(int seconds) {
+        setUnloadTicks(seconds * 20L);
     }
 
     @Override
-    public Map<String, Object> serialize() {
+    public Map<String, Object> asMap() {
         Map<String, Object> map = new HashMap<>();
 
         //NonNullable
@@ -213,51 +255,6 @@ public class DeliveryDocument implements Document {
         return map;
     }
 
-    // -- MUTATORS -- //
-
-    public void setActive(boolean active) {
-        this.active = active;
-        register();
-    }
-
-    public void setFrozen(boolean frozen) {
-        this.frozen = frozen;
-        register();
-    }
-
-    public void setHomeLocation(Location homeLocation) {
-        this.homeLocation = Locations.stringFromLocation(homeLocation);
-        register();
-    }
-
-    public void setLoadLocation(Location loadLocation) {
-        this.loadLocation = Locations.stringFromLocation(loadLocation);
-        register();
-    }
-
-    public void setUnloadLocation(Location unloadLocation) {
-        this.unloadLocation = Locations.stringFromLocation(unloadLocation);
-        register();
-    }
-
-    public void setLoadTicks(long loadTicks) {
-        this.loadTicks = loadTicks;
-        register();
-    }
-
-    public void setLoadSeconds(int seconds) {
-        setLoadTicks(seconds * 20L);
-    }
-
-    public void setUnloadTicks(long unloadTicks) {
-        this.unloadTicks = unloadTicks;
-        register();
-    }
-
-    public void setUnloadSeconds(int seconds) {
-        setUnloadTicks(seconds * 20L);
-    }
-
     public void refreshSubIds() {
         refreshSubIds(getBukkitEntity(), true);
     }
@@ -285,15 +282,13 @@ public class DeliveryDocument implements Document {
         }
 
         if (register) {
-            register();
+            write();
         }
     }
 
-
     // -- UTIL -- //
 
-    @Override
-    public void register() {
-        _PrivateReserve.DELIVERY_DATA.register(this);
+    public void write() {
+        Deliveries.data().add(this);
     }
 }

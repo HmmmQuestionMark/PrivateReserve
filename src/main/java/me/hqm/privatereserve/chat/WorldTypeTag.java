@@ -16,14 +16,14 @@ public class WorldTypeTag extends ChatTag {
 
     @Override
     public Component getComponentFor(Player player) {
-        switch(player.getWorld().getEnvironment()) {
+        switch (player.getWorld().getEnvironment()) {
             case NETHER -> {
                 return nether;
             }
             case THE_END -> {
                 return the_end;
             }
-            default ->  {
+            default -> {
                 return Component.empty();
             }
         }

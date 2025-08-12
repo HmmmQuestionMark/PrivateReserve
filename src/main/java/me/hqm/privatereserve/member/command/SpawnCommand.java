@@ -1,35 +1,42 @@
 package me.hqm.privatereserve.member.command;
 
-import me.hqm.basecommand.BaseCommand;
-import me.hqm.basecommand.CommandResult;
-import me.hqm.privatereserve._PrivateReserve;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import me.hqm.command.CommandResult;
+import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.region.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-public class SpawnCommand extends BaseCommand {
+public class SpawnCommand {
+    private SpawnCommand() {
+    }
 
-    @Override
-    protected CommandResult onCommand(CommandSender sender, Command command, String[] args) {
-        if (command.getName().equals("spawn")) {
-            if (sender instanceof ConsoleCommandSender) {
-                return CommandResult.PLAYER_ONLY;
-            }
-            if (_PrivateReserve.MEMBER_DATA.isVisitorOrExpelled(((Player) sender).getUniqueId())) {
-                sender.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW).
-                        append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)).
-                        append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
-                return CommandResult.QUIET_ERROR;
-            }
-
-            ((Player) sender).teleport(Regions.spawnLocation());
-            sender.sendMessage(Component.text("Warped to spawn.", NamedTextColor.YELLOW));
-        }
-        return CommandResult.SUCCESS;
+    public static LiteralCommandNode<CommandSourceStack> createCommand() {
+        return Commands.literal("spawn")
+                .requires(stack -> {
+                    if (!(stack.getSender() instanceof Player p)) {
+                        CommandResult.PLAYER_ONLY.send(stack.getSender());
+                        return false;
+                    }
+                    if (Members.data().isVisitorOrExpelled(p.getUniqueId())) {
+                        p.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW)
+                                .append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
+                                .append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
+                        return false;
+                    }
+                    return true;
+                })
+                .executes(ctx -> {
+                    Player player = (Player) ctx.getSource().getSender();
+                    player.teleport(Regions.spawnLocation());
+                    player.sendMessage(Component.text("Warped to spawn.", NamedTextColor.YELLOW));
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
     }
 }
