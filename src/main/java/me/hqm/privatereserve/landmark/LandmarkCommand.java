@@ -21,6 +21,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -147,7 +148,7 @@ public class LandmarkCommand {
         Landmark landmark = maybe.get();
         Location location = landmark.getLocation();
         if (location != null) {
-            new TeleportTask(player, location, true).runTaskLater(PrivateReserve.plugin(), 1);
+            new TeleportTask(player, location, true, PlayerTeleportEvent.TeleportCause.COMMAND).runTaskLater(PrivateReserve.plugin(), 1);
             player.sendMessage(
                     Component.text("Warped to ", NamedTextColor.YELLOW).
                             append(Component.text(landmark.getName(), NamedTextColor.GREEN)).

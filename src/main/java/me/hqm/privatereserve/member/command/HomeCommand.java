@@ -114,18 +114,14 @@ public class HomeCommand {
         Location homeLoc = homeOwner.getHomeLoc();
         if (executor.getName().equals(homeOwner.getLastKnownName())) {
             if (homeLoc != null) {
-                new TeleportTask(executor, homeLoc, true).runTaskLater(PrivateReserve.plugin(), 1);
+                new TeleportTask(executor, homeLoc, true, PlayerTeleportEvent.TeleportCause.COMMAND).runTaskLater(PrivateReserve.plugin(), 1);
                 executor.sendMessage(Component.text("Warped home.", NamedTextColor.YELLOW));
             } else {
                 executor.sendMessage(Component.text("You need to set a home first, silly.", NamedTextColor.RED));
             }
         } else {
             if (homeLoc != null) {
-                executor.teleportAsync(
-                        homeLoc,
-                        PlayerTeleportEvent.TeleportCause.COMMAND,
-                        TeleportFlag.EntityState.RETAIN_VEHICLE
-                );
+                new TeleportTask(executor, homeLoc, true, PlayerTeleportEvent.TeleportCause.COMMAND).runTaskLater(PrivateReserve.plugin(), 1);
                 executor.sendMessage(Component.text("Warped to ", NamedTextColor.YELLOW)
                         .append(homeOwner.getNameTag())
                         .append(Component.text("'s home.", NamedTextColor.YELLOW)));

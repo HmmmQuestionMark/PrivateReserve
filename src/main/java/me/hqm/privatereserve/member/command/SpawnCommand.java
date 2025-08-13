@@ -4,12 +4,15 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.region.Regions;
+import me.hqm.privatereserve.task.TeleportTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class SpawnCommand {
     private SpawnCommand() {
@@ -31,7 +34,7 @@ public class SpawnCommand {
                 })
                 .executes(ctx -> {
                     Player player = (Player) ctx.getSource().getSender();
-                    player.teleport(Regions.spawnLocation());
+                    new TeleportTask(player, Regions.spawnLocation(), true, PlayerTeleportEvent.TeleportCause.COMMAND).runTaskLater(PrivateReserve.plugin(), 1);
                     player.sendMessage(Component.text("Warped to spawn.", NamedTextColor.YELLOW));
                     return Command.SINGLE_SUCCESS;
                 })

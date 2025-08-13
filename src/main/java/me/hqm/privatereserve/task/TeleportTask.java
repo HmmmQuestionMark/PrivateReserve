@@ -2,50 +2,54 @@ package me.hqm.privatereserve.task;
 
 import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HappyGhast;
-import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class TeleportTask extends BukkitRunnable {
-    Player player;
+    Entity entity;
     Location to;
     boolean async;
+    PlayerTeleportEvent.TeleportCause cause;
+    TeleportFlag flag;
 
-    public TeleportTask(Player player, Location to, boolean async) {
-        this.player = player;
+    public TeleportTask(Entity entity, Location to, boolean async, PlayerTeleportEvent.TeleportCause cause) {
+        this.entity = entity;
         this.to = to;
         this.async = async;
+        this.cause = cause;
     }
 
     @Override
     public void run() {
-        if(player.isInsideVehicle() && player.getVehicle() instanceof HappyGhast ghast) {
-            if(async) {
-                ghast.teleportAsync(to.add(0.0, 4.0, 0.0),
-                        PlayerTeleportEvent.TeleportCause.COMMAND,
-                        TeleportFlag.EntityState.RETAIN_PASSENGERS
-                );
+        if(entity.isInsideVehicle()) {
+            entity = entity.getVehicle();
+            flag = TeleportFlag.EntityState.RETAIN_PASSENGERS;
+            if (entity instanceof HappyGhast) {
+                to = to.add(0.0, 4.0, 0.0);
             } else {
-                ghast.teleport(to.add(0.0, 4.0, 0.0),
-                        PlayerTeleportEvent.TeleportCause.COMMAND,
-                        TeleportFlag.EntityState.RETAIN_PASSENGERS
-                );
+                to = to.add(0.0, 1.0, 0.0);
             }
+            teleport();
         } else {
-            if(async) {
-                player.teleportAsync(
-                        to,
-                        PlayerTeleportEvent.TeleportCause.COMMAND,
-                        TeleportFlag.EntityState.RETAIN_VEHICLE
-                );
-            } else {
-                player.teleport(
-                        to,
-                        PlayerTeleportEvent.TeleportCause.COMMAND,
-                        TeleportFlag.EntityState.RETAIN_VEHICLE
-                );
-            }
+            flag = TeleportFlag.EntityState.RETAIN_VEHICLE;
+            teleport();
         }
     }
+
+    private void teleport() {
+        if (async) {
+            entity.teleportAsync(to,
+                    PlayerTeleportEvent.TeleportCause.COMMAND,
+                    flag
+            );
+        } else {
+            entity.teleport(to,
+                    PlayerTeleportEvent.TeleportCause.COMMAND,
+                    flag
+            );
+        }
+    }
+
 }

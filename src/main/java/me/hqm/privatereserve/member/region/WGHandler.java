@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 @SuppressWarnings({"rawtypes", "unchecked"})
 class WGHandler {
 
-    static WGPVPListener wgpvpListener;
+    static WGPVPListener WG_PVP_LISTENER;
 
     private WGHandler() {
     }
@@ -157,10 +157,10 @@ class WGHandler {
 
     static void setWhenToOverridePVP(JavaPlugin plugin, Predicate<Event> checkPVP) {
         if (plugin.isEnabled()) {
-            if (wgpvpListener != null) {
-                HandlerList.unregisterAll(wgpvpListener);
+            if (WG_PVP_LISTENER != null) {
+                HandlerList.unregisterAll(WG_PVP_LISTENER);
             }
-            wgpvpListener = new WGPVPListener(plugin, checkPVP);
+            WG_PVP_LISTENER = new WGPVPListener(plugin, checkPVP);
             new WGPVPRegistrationTask(plugin).runTaskLaterAsynchronously(plugin, 40);
         }
     }
@@ -188,7 +188,7 @@ class WGHandler {
 
         @Override
         public void run() {
-            plugin.getServer().getPluginManager().registerEvents(wgpvpListener, plugin);
+            plugin.getServer().getPluginManager().registerEvents(WG_PVP_LISTENER, plugin);
         }
     }
 

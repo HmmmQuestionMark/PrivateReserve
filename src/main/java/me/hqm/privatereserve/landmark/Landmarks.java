@@ -40,6 +40,6 @@ public class Landmarks {
         PrivateReserve.registerCommand(LandmarkCommand.createCommand(), "warp");
 
         // Log
-        PrivateReserve.logger().info("Locked blocks enabled.");
+        PrivateReserve.logger().info("Landmarks enabled.");
     }
 }
