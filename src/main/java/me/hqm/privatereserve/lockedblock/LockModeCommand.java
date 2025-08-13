@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.member.Members;
 import net.kyori.adventure.text.Component;
@@ -35,7 +34,6 @@ public class LockModeCommand {
 
     private static boolean canRun(CommandSourceStack stack, @Nullable String permission) {
         if (!(stack.getSender() instanceof Player player)) {
-            CommandResult.PLAYER_ONLY.send(stack.getSender());
             return false;
         }
 
@@ -46,12 +44,7 @@ public class LockModeCommand {
             return false;
         }
 
-        if (permission != null && !player.hasPermission(permission)) {
-            CommandResult.NO_PERMISSIONS.send(player);
-            return false;
-        }
-
-        return true;
+        return permission == null || player.hasPermission(permission);
     }
 
     private static int runToggleLogic(CommandContext<CommandSourceStack> ctx) {

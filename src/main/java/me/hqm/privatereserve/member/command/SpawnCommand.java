@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.region.Regions;
 import net.kyori.adventure.text.Component;
@@ -20,7 +19,6 @@ public class SpawnCommand {
         return Commands.literal("spawn")
                 .requires(stack -> {
                     if (!(stack.getSender() instanceof Player p)) {
-                        CommandResult.PLAYER_ONLY.send(stack.getSender());
                         return false;
                     }
                     if (Members.data().isVisitorOrExpelled(p.getUniqueId())) {

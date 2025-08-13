@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.member.region.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,13 +15,7 @@ public class VisitingCommand {
 
     public static LiteralCommandNode<CommandSourceStack> createCommand() {
         return Commands.literal("visiting")
-                .requires(stack -> {
-                    if (!(stack.getSender() instanceof Player)) {
-                        CommandResult.PLAYER_ONLY.send(stack.getSender());
-                        return false;
-                    }
-                    return true;
-                })
+                .requires(stack ->  stack.getSender() instanceof Player)
                 .executes(ctx -> {
                     Player player = (Player) ctx.getSource().getSender();
                     player.teleport(Regions.visitingLocation());

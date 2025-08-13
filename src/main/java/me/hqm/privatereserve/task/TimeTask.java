@@ -1,5 +1,6 @@
-package me.hqm.privatereserve;
+package me.hqm.privatereserve.task;
 
+import me.hqm.privatereserve.Settings;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;

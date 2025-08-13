@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.data.Member;
 import net.kyori.adventure.text.Component;
@@ -47,20 +46,12 @@ public class NickNameCommand {
 
     private static boolean canRun(CommandSourceStack stack, @Nullable String permission) {
         if (!(stack.getSender() instanceof Player player)) {
-            CommandResult.PLAYER_ONLY.send(stack.getSender());
             return false;
         }
         if (Members.data().isVisitorOrExpelled(player.getUniqueId())) {
-            player.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW)
-                    .append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
-                    .append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
             return false;
         }
-        if (permission != null && !player.hasPermission(permission)) {
-            CommandResult.NO_PERMISSIONS.send(player);
-            return false;
-        }
-        return true;
+        return permission == null || player.hasPermission(permission);
     }
 
     private static boolean isValidNick(String s) {
@@ -82,7 +73,9 @@ public class NickNameCommand {
         String nick = StringArgumentType.getString(ctx, "name");
         Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
-            player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
+            player.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW)
+                    .append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
+                    .append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
             return Command.SINGLE_SUCCESS;
         }
         if (!isValidNick(nick)) {
@@ -121,7 +114,9 @@ public class NickNameCommand {
         Player player = (Player) ctx.getSource().getSender();
         Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
-            player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
+            player.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW)
+                    .append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
+                    .append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
             return Command.SINGLE_SUCCESS;
         }
         clearNickName(maybe.get(), player.getName());

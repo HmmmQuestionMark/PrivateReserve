@@ -10,6 +10,7 @@ import me.hqm.privatereserve.landmark.Landmarks;
 import me.hqm.privatereserve.lockedblock.LockedBlocks;
 import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.region.Regions;
+import me.hqm.privatereserve.task.TimeTask;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;

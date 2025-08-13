@@ -9,10 +9,10 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.entity.TeleportFlag;
-import me.hqm.command.CommandResult;
-import me.hqm.privatereserve.Locations;
+import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.data.Member;
+import me.hqm.privatereserve.task.TeleportTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -74,30 +74,23 @@ public class HomeCommand {
 
     private static boolean canRun(CommandSourceStack stack, @Nullable String permission) {
         if (!(stack.getSender() instanceof Player player)) {
-            CommandResult.PLAYER_ONLY.send(stack.getSender());
             return false;
         }
 
         if (Members.data().isVisitorOrExpelled(player.getUniqueId())) {
-            player.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW)
-                    .append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
-                    .append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
             return false;
         }
 
-        if (permission != null && !player.hasPermission(permission)) {
-            CommandResult.NO_PERMISSIONS.send(player);
-            return false;
-        }
-
-        return true;
+        return permission == null || player.hasPermission(permission);
     }
 
     private static int runGoSelf(CommandContext<CommandSourceStack> ctx) {
         Player player = (Player) ctx.getSource().getSender();
         Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
-            player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
+            player.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW)
+                    .append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
+                    .append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
             return Command.SINGLE_SUCCESS;
         }
         return goHome(player, maybe.get());
@@ -121,7 +114,7 @@ public class HomeCommand {
         Location homeLoc = homeOwner.getHomeLoc();
         if (executor.getName().equals(homeOwner.getLastKnownName())) {
             if (homeLoc != null) {
-                Locations.teleportAsyncWithGhast(executor, homeLoc);
+                new TeleportTask(executor, homeLoc, true).runTaskLater(PrivateReserve.plugin(), 1);
                 executor.sendMessage(Component.text("Warped home.", NamedTextColor.YELLOW));
             } else {
                 executor.sendMessage(Component.text("You need to set a home first, silly.", NamedTextColor.RED));
@@ -148,7 +141,9 @@ public class HomeCommand {
         Player player = (Player) ctx.getSource().getSender();
         Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
-            player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
+            player.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW)
+                    .append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
+                    .append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
             return Command.SINGLE_SUCCESS;
         }
         return setHome(player, maybe.get(), player.getLocation());
@@ -194,7 +189,9 @@ public class HomeCommand {
         Player player = (Player) ctx.getSource().getSender();
         Optional<Member> maybe = Members.data().fromId(player.getUniqueId());
         if (maybe.isEmpty()) {
-            player.sendMessage(Component.text("Player is still a visitor, please try again later.", NamedTextColor.RED));
+            player.sendMessage(Component.text("Currently you are just a ", NamedTextColor.YELLOW)
+                    .append(Component.text("visitor", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC))
+                    .append(Component.text(", ask for an invite on Discord!", NamedTextColor.YELLOW)));
             return Command.SINGLE_SUCCESS;
         }
         return clearHome(player, maybe.get());

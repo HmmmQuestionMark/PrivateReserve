@@ -9,19 +9,18 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.entity.TeleportFlag;
-import me.hqm.command.CommandResult;
 import me.hqm.privatereserve.Locations;
+import me.hqm.privatereserve.PrivateReserve;
 import me.hqm.privatereserve.Settings;
 import me.hqm.privatereserve.landmark.data.Landmark;
 import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.data.Member;
+import me.hqm.privatereserve.task.TeleportTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -71,7 +70,6 @@ public class LandmarkCommand {
 
     private static boolean canRun(CommandSourceStack stack, @Nullable String permission) {
         if (!(stack.getSender() instanceof Player player)) {
-            CommandResult.PLAYER_ONLY.send(stack.getSender());
             return false;
         }
 
@@ -82,12 +80,7 @@ public class LandmarkCommand {
             return false;
         }
 
-        if (permission != null && !player.hasPermission(permission)) {
-            CommandResult.NO_PERMISSIONS.send(player);
-            return false;
-        }
-
-        return true;
+        return permission == null || player.hasPermission(permission);
     }
 
     private static int runLandmarkRoot(CommandContext<CommandSourceStack> ctx) {
@@ -154,7 +147,7 @@ public class LandmarkCommand {
         Landmark landmark = maybe.get();
         Location location = landmark.getLocation();
         if (location != null) {
-            Locations.teleportAsyncWithGhast(player, location);
+            new TeleportTask(player, location, true).runTaskLater(PrivateReserve.plugin(), 1);
             player.sendMessage(
                     Component.text("Warped to ", NamedTextColor.YELLOW).
                             append(Component.text(landmark.getName(), NamedTextColor.GREEN)).

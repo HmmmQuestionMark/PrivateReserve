@@ -1,50 +1,16 @@
 package me.hqm.privatereserve;
 
-import io.papermc.paper.entity.TeleportFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.HappyGhast;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Optional;
 
 public class Locations {
-
-    public static void teleportWithGhast(Player player, Location to) {
-        if(player.isInsideVehicle() && player.getVehicle() instanceof HappyGhast ghast) {
-            ghast.teleport(to.add(0.0, 4.0, 0.0),
-                    PlayerTeleportEvent.TeleportCause.COMMAND,
-                    TeleportFlag.EntityState.RETAIN_PASSENGERS
-            );
-        } else {
-            player.teleport(
-                    to,
-                    PlayerTeleportEvent.TeleportCause.COMMAND,
-                    TeleportFlag.EntityState.RETAIN_VEHICLE
-            );
-        }
-    }
-
-    public static void teleportAsyncWithGhast(Player player, Location to) {
-        if(player.isInsideVehicle() && player.getVehicle() instanceof HappyGhast ghast) {
-            ghast.teleportAsync(to.add(0.0, 4.0, 0.0),
-                    PlayerTeleportEvent.TeleportCause.COMMAND,
-                    TeleportFlag.EntityState.RETAIN_PASSENGERS
-            );
-        } else {
-            player.teleportAsync(
-                    to,
-                    PlayerTeleportEvent.TeleportCause.COMMAND,
-                    TeleportFlag.EntityState.RETAIN_VEHICLE
-            );
-        }
-    }
 
     public static String stringFromLocation(Location location) {
         return location.getWorld().getName() + ";" + location.getX() + ";" + location.getY() + ";" + location.getZ() +

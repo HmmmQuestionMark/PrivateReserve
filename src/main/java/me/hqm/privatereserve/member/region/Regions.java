@@ -36,7 +36,7 @@ public class Regions {
                 WG_ENABLED = false;
             }
         }
-        return true;
+        return Bukkit.getWorlds().getFirst().getSpawnLocation().distance(location) < 10;
     }
 
     public static boolean visitingContains(Location location) {
@@ -47,7 +47,7 @@ public class Regions {
                 WG_ENABLED = false;
             }
         }
-        return true;
+        return Bukkit.getWorlds().getFirst().getSpawnLocation().distance(location) < 10;
     }
 
     public static Location spawnLocation() throws NullPointerException {
