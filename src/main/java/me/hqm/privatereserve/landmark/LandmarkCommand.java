@@ -154,11 +154,7 @@ public class LandmarkCommand {
         Landmark landmark = maybe.get();
         Location location = landmark.getLocation();
         if (location != null) {
-            player.teleportAsync(
-                    location,
-                    PlayerTeleportEvent.TeleportCause.COMMAND,
-                    TeleportFlag.EntityState.RETAIN_VEHICLE
-            );
+            Locations.teleportAsyncWithGhast(player, location);
             player.sendMessage(
                     Component.text("Warped to ", NamedTextColor.YELLOW).
                             append(Component.text(landmark.getName(), NamedTextColor.GREEN)).

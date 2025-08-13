@@ -10,6 +10,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.entity.TeleportFlag;
 import me.hqm.command.CommandResult;
+import me.hqm.privatereserve.Locations;
 import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.data.Member;
 import net.kyori.adventure.text.Component;
@@ -120,11 +121,7 @@ public class HomeCommand {
         Location homeLoc = homeOwner.getHomeLoc();
         if (executor.getName().equals(homeOwner.getLastKnownName())) {
             if (homeLoc != null) {
-                executor.teleportAsync(
-                        homeLoc,
-                        PlayerTeleportEvent.TeleportCause.COMMAND,
-                        TeleportFlag.EntityState.RETAIN_VEHICLE
-                );
+                Locations.teleportAsyncWithGhast(executor, homeLoc);
                 executor.sendMessage(Component.text("Warped home.", NamedTextColor.YELLOW));
             } else {
                 executor.sendMessage(Component.text("You need to set a home first, silly.", NamedTextColor.RED));
