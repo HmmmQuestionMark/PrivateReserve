@@ -1,12 +1,15 @@
 package me.hqm.privatereserve;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @SuppressWarnings("unchecked")
 public enum Settings {
@@ -25,6 +28,9 @@ public enum Settings {
 
     // Debug
     DEBUG_ENABLED("debug.enabled", false),
+
+    // Server links
+    SERVER_LINKS("server_links", null),
 
     // Chat
     CHAT_TAGS_ENABLED("chat.enabled", true),
@@ -94,5 +100,17 @@ public enum Settings {
     public List<String> getStringList() {
         return getConfig().isList(path) ?
                 ImmutableList.copyOf(getConfig().getStringList(path)) : (List<String>) defaultValue;
+    }
+
+    public boolean notNull() {
+        return getConfig().contains(path);
+    }
+
+    public Map<String, Object> getMap() {
+        if (getConfig().isConfigurationSection(path)) {
+            return ImmutableMap.
+                    copyOf(Objects.requireNonNull(getConfig().getConfigurationSection(path)).getValues(false));
+        }
+        return (Map<String, Object>) defaultValue;
     }
 }

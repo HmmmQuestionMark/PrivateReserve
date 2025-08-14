@@ -11,11 +11,15 @@ import me.hqm.privatereserve.lockedblock.LockedBlocks;
 import me.hqm.privatereserve.member.Members;
 import me.hqm.privatereserve.member.region.Regions;
 import me.hqm.privatereserve.task.TimeTask;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.ServerLinks;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class PrivateReserve extends JavaPlugin {
@@ -52,6 +56,13 @@ public class PrivateReserve extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveConfig();
 
+        // Register server links
+        if(Settings.SERVER_LINKS.notNull()) {
+            for(Map.Entry<String, Object> linkData : Settings.SERVER_LINKS.getMap().entrySet()) {
+                addServerLink(linkData.getKey(), linkData.getValue().toString());
+            }
+        }
+
         // Configure database type
         SupportedFormat saveFormat = SupportedFormat.JSON;
         try {
@@ -60,7 +71,7 @@ public class PrivateReserve extends JavaPlugin {
         }
 
         // Check WorldGuard
-        Regions.init(Bukkit.getWorlds().getFirst().getSpawnLocation());
+        Regions.init(getServer().getWorlds().getFirst().getSpawnLocation());
 
         // Enable members
         Members.init(this, saveFormat);
@@ -104,6 +115,21 @@ public class PrivateReserve extends JavaPlugin {
 
         // Manually unregister listeners and tasks
         HandlerList.unregisterAll(this);
-        Bukkit.getScheduler().cancelTasks(this);
+        getServer().getScheduler().cancelTasks(this);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private void addServerLink(String name, String rawUrl) {
+        try {
+            URI uri = new URI(rawUrl);
+            for(ServerLinks.Type type :  ServerLinks.Type.values()) {
+                if(name.equalsIgnoreCase(type.name())) {
+                    getServer().getServerLinks().addLink(type, uri);
+                    return;
+                }
+            }
+            getServer().getServerLinks().addLink( LegacyComponentSerializer.legacyAmpersand().deserialize(name), uri);
+        } catch (URISyntaxException ignored) {
+        }
     }
 }
